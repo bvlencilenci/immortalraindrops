@@ -133,7 +133,8 @@ footer p {
 }
 
 .social-links a:hover {
-  text-decoration: underline;
+  color: #892525cb;
+  text-decoration: none;
 }
 
 /* Contact Information */
@@ -142,7 +143,7 @@ footer .contact-info p {
 }
 
 footer .contact-info p:first-child {
-  margin-bottom: 10px; /* Add space between the "Get in touch with us" text and email */
+  margin-bottom: 5px; /* Add space between the "Get in touch with us" text and email */
 }
 
 /* Styling the email link in the footer to match the social links */
@@ -152,7 +153,8 @@ footer .footer-email {
 }
 
 footer .footer-email:hover {
-  text-decoration: underline; /* Underline on hover */
+  color: #892525cb;
+  text-decoration: none; /* Underline on hover */
 }
 
 
