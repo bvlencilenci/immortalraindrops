@@ -1,31 +1,31 @@
-const modeLinks = document.querySelectorAll('.mode-link');
-const body = document.body;
+// themeSwitch.js
+document.addEventListener('DOMContentLoaded', function () {
+  const modeLinks = document.querySelectorAll('.mode-link');
+  
+  // Check if there's a saved theme in localStorage
+  if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.querySelector('.mode-link[data-mode="dark"]').classList.add('current');
+  } else {
+      document.body.classList.remove('dark-mode');
+      document.querySelector('.mode-link[data-mode="light"]').classList.add('current');
+  }
 
-// Function to update the mode
-function updateMode(mode) {
-    // Remove 'current' class from all links
-    modeLinks.forEach(link => link.classList.remove('current'));
+  modeLinks.forEach(link => {
+      link.addEventListener('click', function () {
+          const mode = link.getAttribute('data-mode');
+          
+          if (mode === 'dark') {
+              document.body.classList.add('dark-mode');
+              localStorage.setItem('theme', 'dark');
+          } else {
+              document.body.classList.remove('dark-mode');
+              localStorage.setItem('theme', 'light');
+          }
 
-    if (mode === 'dark') {
-        body.classList.add('dark-mode');
-        document.querySelector('[data-mode="dark"]').classList.add('current');
-        localStorage.setItem('theme', 'dark');
-    } else {
-        body.classList.remove('dark-mode');
-        document.querySelector('[data-mode="light"]').classList.add('current');
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-// Check stored theme preference
-const savedTheme = localStorage.getItem('theme') || 'light';
-updateMode(savedTheme);
-
-// Event listener for mode switching
-modeLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const selectedMode = link.dataset.mode;
-        updateMode(selectedMode);
-    });
+          // Update the 'current' class on mode links
+          modeLinks.forEach(link => link.classList.remove('current'));
+          link.classList.add('current');
+      });
+  });
 });

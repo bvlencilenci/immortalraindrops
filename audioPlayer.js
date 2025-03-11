@@ -1,80 +1,51 @@
-// Get elements
-const audio = document.getElementById('audio');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const seekBar = document.getElementById('seekBar');
-const currentTimeDisplay = document.getElementById('current-time');
-const durationDisplay = document.getElementById('duration');
+document.addEventListener('DOMContentLoaded', function () {
+  // Loop through all audio players
+  for (let i = 1; i <= 12; i++) {
+      const audioPlayer = document.getElementById(`audio${i}`);
+      const playPauseBtn = document.getElementById(`playPauseBtn${i}`);
+      const seekBar = document.getElementById(`seekBar${i}`);
+      const currentTime = document.getElementById(`current-time${i}`);
+      const duration = document.getElementById(`duration${i}`);
+      
+      // Update duration display when audio metadata is loaded
+      audioPlayer.addEventListener('loadedmetadata', function () {
+          const durationFormatted = formatTime(audioPlayer.duration);
+          duration.textContent = durationFormatted;
+      });
 
-// Play/Pause functionality
-playPauseBtn.addEventListener('click', function() {
-  if (audio.paused) {
-    audio.play();
-    playPauseBtn.textContent = 'Pause';
-  } else {
-    audio.pause();
-    playPauseBtn.textContent = 'Play';
+      // Play/Pause button functionality
+      playPauseBtn.addEventListener('click', function () {
+          if (audioPlayer.paused) {
+              audioPlayer.play();
+              playPauseBtn.textContent = 'Pause';
+          } else {
+              audioPlayer.pause();
+              playPauseBtn.textContent = 'Play';
+          }
+      });
+
+      // Update seek bar as audio plays
+      audioPlayer.addEventListener('timeupdate', function () {
+          const currentTimeFormatted = formatTime(audioPlayer.currentTime);
+          currentTime.textContent = currentTimeFormatted;
+
+          const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+          seekBar.style.background = `linear-gradient(to right, #bf3636cb ${progress}%, #ddd ${progress}%)`;  // Fill up the progress bar without showing thumb
+      });
+
+      // Optional: Allow clicking on the progress bar to seek
+      seekBar.addEventListener('click', function (e) {
+          const rect = seekBar.getBoundingClientRect();
+          const offsetX = e.clientX - rect.left;
+          const newTime = (offsetX / rect.width) * audioPlayer.duration;
+          audioPlayer.currentTime = newTime;
+      });
   }
-});
 
-// Update the seek bar as the audio plays
-audio.addEventListener('timeupdate', function() {
-  const currentTime = audio.currentTime;
-  const duration = audio.duration;
-  const seekValue = (currentTime / duration) * 100;
-  seekBar.value = seekValue;
-
-  // Update current time display
-  currentTimeDisplay.textContent = formatTime(currentTime);
-
-  // Update duration display
-  if (duration) {
-    durationDisplay.textContent = formatTime(duration);
+  // Format time as mm:ss
+  function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
-});
-
-// Seek bar functionality
-seekBar.addEventListener('input', function() {
-  const seekTo = (seekBar.value / 100) * audio.duration;
-  audio.currentTime = seekTo;
-});
-
-// Format time function (minutes:seconds)
-function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-}
-// Function to handle play/pause and update seek bar
-function togglePlayPause(audioId, playPauseBtnId, seekBarId, currentTimeId, durationId) {
-  const audio = document.getElementById(audioId);
-  const playPauseBtn = document.getElementById(playPauseBtnId);
-  const seekBar = document.getElementById(seekBarId);
-  const currentTimeDisplay = document.getElementById(currentTimeId);
-}
-document.querySelectorAll('.play-pause').forEach((button, index) => {
-  const audio = document.getElementById(`audio${index + 1}`);
-  const playPauseBtn = button;
-
-  playPauseBtn.addEventListener('click', function() {
-      if (audio.paused) {
-          audio.play();
-          playPauseBtn.classList.add('playing');
-          playPauseBtn.classList.remove('paused');
-      } else {
-          audio.pause();
-          playPauseBtn.classList.add('paused');
-          playPauseBtn.classList.remove('playing');
-      }
-  });
-
-  // Update play/pause icon based on audio status
-  audio.addEventListener('play', function() {
-      playPauseBtn.classList.add('playing');
-      playPauseBtn.classList.remove('paused');
-  });
-
-  audio.addEventListener('pause', function() {
-      playPauseBtn.classList.add('paused');
-      playPauseBtn.classList.remove('playing');
-  });
 });

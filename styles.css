@@ -28,29 +28,40 @@ header {
 /* Navigation */
 header nav {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 header nav a {
+  display: flex;
+  align-items: center;
   text-decoration: none;
   color: inherit;
   font-size: 1.2rem;
   padding: 5px;
-  white-space: nowrap;
 }
 
+/* Current Link Styles */
 header nav a.current {
   font-weight: bold;
   text-decoration: underline;
 }
 
+/* Current Link Colors (Light and Dark Modes) */
+body:not(.dark-mode) header nav a.current {
+  color: #000; /* Black color for light mode */
+}
+
+body.dark-mode header nav a.current {
+  color: #fff; /* White color for dark mode */
+}
+
+/* Navigation Separator */
 header nav a:not(:last-child)::after {
   content: " |";
-  margin-left: 10px;
+  margin-left: 50px;
   margin-right: 10px;
   color: inherit;
   font-size: 1.5rem;
@@ -136,7 +147,7 @@ footer .social-links {
   display: flex;
   gap: 6px;
   justify-content: center;
-  margin-top: 5px;
+  margin-top: 1px;
 }
 
 footer .social-links a {
@@ -195,7 +206,7 @@ body.dark-mode footer {
 .mode-switch {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 5px;
 }
 
 .mode-link {
@@ -235,13 +246,12 @@ body.dark-mode footer {
   header nav {
     justify-content: center;
     gap: 5px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    margin-top: 15px;
   }
 
   header nav a {
-    font-size: 1rem;
-    margin: 0 3px;
+    font-size: 1.1rem;
+    margin: 0 5px;
   }
 
   .product-grid {
@@ -265,4 +275,53 @@ body.dark-mode footer {
     font-size: 1.3rem;
     padding: 12px 20px;
   }
+}
+/* Style for the audio progress bar (slider) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: #ddd; /* Default background */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Style the progress fill (changes as audio plays) */
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #efb2b2cb;
+  height: 5px;
+  border-radius: 5px;
+}
+
+input[type="range"]::-moz-range-track {
+  background: #dc9090cb;
+  height: 5px;
+  border-radius: 5px;
+}
+
+input[type="range"]::-ms-track {
+  background: #cc7373cb;
+  height: 5px;
+  border-radius: 5px;
+  border-color: transparent;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0; /* Hide the thumb */
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 0; /* Hide the thumb */
+}
+
+input[type="range"]::-ms-thumb {
+  width: 0; /* Hide the thumb */
 }
