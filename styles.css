@@ -1,7 +1,7 @@
 /* General Page Styling */
 body {
   font-family: Inter, sans-serif;
-  background-color: #000;
+  background-color: #474B4E; /* Updated color */
   color: #fff;
   margin: 0;
   padding: 0;
@@ -9,7 +9,7 @@ body {
 
 /* Header */
 header {
-  background-color: #1DB954;
+  background-color: #474B4E; /* Updated color */
   padding: 20px;
   text-align: center;
 }
@@ -30,10 +30,34 @@ nav a:hover {
   text-decoration: underline;
 }
 
+/* Hero Section */
+.hero {
+  background-color: #474B4E; /* Updated color */
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.hero h2 {
+  font-size: 2.5em;
+}
+
+.cta-btn {
+  background-color: #474B4E; /* Updated color */
+  color: #fff;
+  padding: 15px 25px;
+  text-decoration: none;
+  font-size: 1.5em;
+  border-radius: 5px;
+}
+
+.cta-btn:hover {
+  background-color: #2dbf7d;
+}
+
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr); /* 4 items per row (can change this number to adjust items per row) */
   gap: 30px;
   padding: 30px;
   text-align: center;
@@ -43,7 +67,7 @@ nav a:hover {
   width: 100%;
   height: 200px;
   object-fit: cover;
-  border: 2px solid #1DB954;
+  border: 2px solid #474B4E; /* Updated color */
   border-radius: 10px;
 }
 
@@ -58,7 +82,7 @@ nav a:hover {
 }
 
 .btn {
-  background-color: #1DB954;
+  background-color: #474B4E; /* Updated color */
   color: #fff;
   padding: 10px 20px;
   text-decoration: none;
@@ -69,29 +93,9 @@ nav a:hover {
   background-color: #2dbf7d;
 }
 
-/* Archive Section */
-.archive-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  padding: 30px;
-  text-align: center;
-}
-
-.archive-item img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-audio {
-  margin-top: 10px;
-}
-
 /* Footer */
 footer {
-  background-color: #111;
+  background-color: #474B4E; /* Updated color */
   padding: 20px;
   text-align: center;
 }
@@ -101,7 +105,7 @@ footer p {
 }
 
 .social-links a {
-  color: #1DB954;
+  color: #474B4E; /* Updated color */
   text-decoration: none;
   margin: 0 10px;
 }
@@ -112,13 +116,13 @@ footer p {
 
 /* Responsive Design */
 @media (max-width: 800px) {
-  .product-grid, .archive-container {
-      grid-template-columns: repeat(2, 1fr);
+  .product-grid {
+      grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
   }
 }
 
 @media (max-width: 500px) {
-  .product-grid, .archive-container {
-      grid-template-columns: 1fr;
+  .product-grid {
+      grid-template-columns: 1fr; /* 1 item per row on extra small screens */
   }
 }
