@@ -36,7 +36,7 @@ header nav a {
 /* Add pipe separator except for the last link */
 header nav a:not(:last-child)::after {
   content: " |"; /* Add pipe after each link */
-  margin-left: 10px; /* Space between the link and the pipe */
+  margin-left: 5 px; /* Space between the link and the pipe */
   color: inherit; /* Ensure pipe has the same color as the text */
 }
 
