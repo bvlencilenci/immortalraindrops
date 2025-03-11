@@ -49,11 +49,12 @@ nav a:hover {
 .member img {
   width: 200px;
   height: 200px;
-  border-radius: 50%;
+  border-radius: 10px; /* Optional: Rounds just the edges */
   object-fit: cover;
   margin-bottom: 15px;
-  border: 2px solid #1DB954; /* Adds a stylish border */
+  border: 2px solid #1DB954; /* Keeps the stylish border */
 }
+
 
 /* Member Info */
 .member-name {
