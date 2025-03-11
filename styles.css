@@ -129,7 +129,7 @@ footer p {
 /* Social Links */
 .social-links {
   display: flex;
-  gap: 15px;
+  gap: 6px;
   justify-content: center;
   margin-top: 5px;
 }

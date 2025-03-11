@@ -7,9 +7,68 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         header nav a.current {
-            color: #ffffff; /* Change to the color you want */
+            color: #ffffff;
             font-weight: bold;
             text-decoration: underline;
+        }
+
+        /* Roster Styling */
+        .roster-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 members per row */
+            gap: 30px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .member {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .member img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #bf3636cb;
+        }
+
+        .member-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .member-role {
+            font-size: 1.2em;
+            color: #bf3636cb;
+            margin-bottom: 10px;
+        }
+
+        .social-links a {
+            color: #bf3636cb;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .social-links a:hover {
+            color: #892525cb;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 800px) {
+            .roster-container {
+                grid-template-columns: repeat(2, 1fr); /* 2 members per row on medium screens */
+            }
+        }
+
+        @media (max-width: 500px) {
+            .roster-container {
+                grid-template-columns: 1fr; /* 1 member per row on small screens */
+            }
         }
     </style>
 </head>
@@ -21,11 +80,10 @@
             <a href="index.html">Home</a>
             <a href="archive.html">Archive</a>
             <a href="roster.html" class="current">Roster</a>
-           
         </nav>
     </header>
 
-    <h1> </h1>
+    <h1>Roster</h1>
 
     <div class="roster-container">
         <!-- Member 1 -->
@@ -72,7 +130,7 @@
             </div>
         </div>
 
-        <!-- Member 5 (Goes to next row) -->
+        <!-- Member 5 -->
         <div class="member">
             <img src="member5.jpg" alt="New Member">
             <div class="member-name">New Member</div>
@@ -84,20 +142,21 @@
         </div>
     </div>
 
-     <!-- Footer -->
-     <footer>
-      <div class="contact-info">
-          <p><strong>Get in touch with us at:</strong></p>
-          <p><a href="mailto:contact@immortalraindrops.com" class="footer-email">contact@immortalraindrops.com</a></p>
-      </div>
-      
-      <p>&copy; 2025 Immortal Raindrops</p>
-      
-      <div class="social-links">
-          <a href="https://www.instagram.com/youraccount" target="_blank">Instagram</a> |
-          <a href="https://soundcloud.com/youraccount" target="_blank">SoundCloud</a>
-      </div>
-  </footer>
+    <!-- Footer -->
+    <footer>
+       <!-- Contact Information -->
+       <div class="contact-info">
+        <p>Get in touch with us at:</p>
+        <p><a href="mailto:contact@immortalraindrops.com" class="footer-email">contact@immortalraindrops.com</a></p>
+    </div>
+        <p>&copy; 2025 Immortal Raindrops</p>
+        <div class="social-links">
+            <a href="https://www.instagram.com/youraccount">Instagram</a> |
+            <a href="https://soundcloud.com/youraccount">SoundCloud</a>
+        </div> 
+
+       
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
