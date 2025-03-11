@@ -9,7 +9,7 @@ body {
 
 /* Header */
 header {
-  background-color: #bf3636; /* Rose color */
+  background-color: #bf3636cb; /* Rose color */
   padding: 20px;
   text-align: center;
 }
@@ -40,11 +40,11 @@ nav a:hover {
 
 .hero h2 {
   font-size: 2.5em;
-  color: #474B4E; /* Rose color */
+  color: #bf3636cb; /* Rose color */
 }
 
 .cta-btn {
-  background-color: #474B4E; /* Rose color */
+  background-color: #bf3636cb; /* Rose color */
   color: #fff;
   padding: 15px 25px;
   text-decoration: none;
@@ -53,7 +53,7 @@ nav a:hover {
 }
 
 .cta-btn:hover {
-  background-color: #5F6368; /* Darker rose for hover effect */
+  background-color: #832424cb; /* Darker rose for hover effect */
 }
 
 /* Product Grid */
@@ -69,7 +69,7 @@ nav a:hover {
   width: 100%;
   height: 200px;
   object-fit: cover;
-  border: 2px solid #474B4E; /* Rose border */
+  border: 2px solid #bf3636cb; /* Rose border */
   border-radius: 10px;
 }
 
@@ -84,7 +84,7 @@ nav a:hover {
 }
 
 .btn {
-  background-color: #474B4E; /* Rose color */
+  background-color: #bf3636cb; /* Rose color */
   color: #fff;
   padding: 10px 20px;
   text-decoration: none;
@@ -92,7 +92,7 @@ nav a:hover {
 }
 
 .btn:hover {
-  background-color: #5F6368; /* Darker rose for hover effect */
+  background-color: #832424cb; /* Darker rose for hover effect */
 }
 
 /* Footer */
@@ -107,7 +107,7 @@ footer p {
 }
 
 .social-links a {
-  color: #474B4E; /* Rose color for links */
+  color: #bf3636cb; /* Rose color for links */
   text-decoration: none;
   margin: 0 10px;
 }
