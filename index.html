@@ -3,97 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Immortal Raindrops - Upload Beats</title>
+    <title>Immortal Raindrops</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap" rel="stylesheet">
+
 </head>
 <body>
-    <!-- Upload Link -->
-    <a href="#" id="uploadLink">Upload New Beat</a>
+    <!-- Header -->
+    <header> 
+        <!-- Mode Switch (Left Side) -->
+        <div class="mode-switch">
+            <a href="#" class="mode-link current" data-mode="dark">Dark</a>/
+            <a href="#" class="mode-link" data-mode="light">Light</a>
+        </div>
+        
+        <h1>Immortal Raindrops</h1>
+      
+        <nav>
+            <a href="index.html" class="current">Home</a>
+            <a href="archive.html">Archive</a>
+            <a href="roster.html">Roster</a>
+            <a href="cart.html">Cart</a>
+        </nav>
+    </header>
+    
 
-    <!-- Upload Form (Hidden by default) -->
-    <div id="uploadForm" style="display:none;">
-        <h3>Upload Your Beat</h3>
-        <form id="beatForm">
-            <label for="beatName">Beat Name:</label>
-            <input type="text" id="beatName" name="beatName" required><br><br>
+    <!-- Product Grid Section (12 Products, 4 per row) -->
+    <section id="shop-now" class="product-grid">
+        <!-- Product 1 -->
+        <div class="product">
+            <img src="beat1.jpg" alt="Beat 1">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio1" preload="metadata">
+                    <source src="beat1.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn1">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar1" value="0" step="1" max="100" />
+                    <span id="current-time1">0:00</span> / <span id="duration1">0:00</span>
+                </div>
+            </div>
+        </div>
 
-            <label for="beatFile">Beat File (MP3):</label>
-            <input type="file" id="beatFile" name="beatFile" accept="audio/mp3" required><br><br>
+        <!-- Product 2 -->
+        <div class="product">
+            <img src="beat2.jpg" alt="Beat 2">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio2" preload="metadata">
+                    <source src="beat2.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn2">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar2" value="0" step="1" max="100" />
+                    <span id="current-time2">0:00</span> / <span id="duration2">0:00</span>
+                </div>
+            </div>
+        </div>
 
-            <label for="beatPrice">Price ($):</label>
-            <input type="number" id="beatPrice" name="beatPrice" step="0.01" required><br><br>
+        <!-- Product 3 -->
+        <div class="product">
+            <img src="beat3.jpg" alt="Beat 3">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio3" preload="metadata">
+                    <source src="beat3.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn3">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar3" value="0" step="1" max="100" />
+                    <span id="current-time3">0:00</span> / <span id="duration3">0:00</span>
+                </div>
+            </div>
+        </div>
 
-            <button type="submit">Upload Beat</button>
-        </form>
-    </div>
+        <!-- Product 4 -->
+        <div class="product">
+            <img src="beat4.jpg" alt="Beat 4">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio4" preload="metadata">
+                    <source src="beat4.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn4">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar4" value="0" step="1" max="100" />
+                    <span id="current-time4">0:00</span> / <span id="duration4">0:00</span>
+                </div>
+            </div>
+        </div>
 
-    <!-- Product Grid (Empty for now, will be populated after upload) -->
-    <section id="shopNow" class="product-grid">
-        <!-- Products will be dynamically added here -->
+        <!-- Product 5 -->
+        <div class="product">
+            <img src="beat5.jpg" alt="Beat 5">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio5" preload="metadata">
+                    <source src="beat5.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn5">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar5" value="0" step="1" max="100" />
+                    <span id="current-time5">0:00</span> / <span id="duration5">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product 6 -->
+        <div class="product">
+            <img src="beat6.jpg" alt="Beat 6">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio6" preload="metadata">
+                    <source src="beat6.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn6">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar6" value="0" step="1" max="100" />
+                    <span id="current-time6">0:00</span> / <span id="duration6">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product 7 -->
+        <div class="product">
+            <img src="beat7.jpg" alt="Beat 7">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio7" preload="metadata">
+                    <source src="beat7.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn7">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar7" value="0" step="1" max="100" />
+                    <span id="current-time7">0:00</span> / <span id="duration7">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product 8 -->
+        <div class="product">
+            <img src="beat8.jpg" alt="Beat 8">
+            <button class="btn">Bag it</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio8" preload="metadata">
+                    <source src="beat8.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn8">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar8" value="0" step="1" max="100" />
+                    <span id="current-time8">0:00</span> / <span id="duration8">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product 9 -->
+        <div class="product">
+            <img src="beat9.jpg" alt="Beat 9">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio9" preload="metadata">
+                    <source src="beat9.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn9">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar9" value="0" step="1" max="100" />
+                    <span id="current-time9">0:00</span> / <span id="duration9">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product 10 -->
+        <div class="product">
+            <img src="beat10.jpg" alt="Beat 10">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio10" preload="metadata">
+                    <source src="beat10.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn10">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar10" value="0" step="1" max="100" />
+                    <span id="current-time10">0:00</span> / <span id="duration10">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product 11 -->
+        <div class="product">
+            <img src="beat11.jpg" alt="Beat 11">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio11" preload="metadata">
+                    <source src="beat11.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn11">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar11" value="0" step="1" max="100" />
+                    <span id="current-time11">0:00</span> / <span id="duration11">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product 12 -->
+        <div class="product">
+            <img src="beat12.jpg" alt="Beat 12">
+            <button class="btn">Bag It</button>
+            <!-- Custom Audio Player -->
+            <div class="audio-player">
+                <audio id="audio12" preload="metadata">
+                    <source src="beat12.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button class="play-pause" id="playPauseBtn12">Play</button>
+                    <input type="range" class="seek-bar" id="seekBar12" value="0" step="1" max="100" />
+                    <span id="current-time12">0:00</span> / <span id="duration12">0:00</span>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <script>
-        // Show the upload form when the link is clicked
-        document.getElementById("uploadLink").addEventListener("click", function(event) {
-            event.preventDefault();
-            document.getElementById("uploadForm").style.display = "block";
-        });
+    <!-- Footer -->
+    <footer>
+        <div class="contact-info">
+            <p><strong>Get in touch with us at:</strong></p>
+            <p><a href="mailto:contact@immortalraindrops.com" class="footer-email">contact@immortalraindrops.com</a></p>
+        </div>
 
-        // Handle the beat upload form submission
-        document.getElementById("beatForm").addEventListener("submit", function(event) {
-            event.preventDefault();
+        <p>&copy; 2025 Immortal Raindrops</p>
 
-            // Get form values
-            const beatName = document.getElementById("beatName").value;
-            const beatFile = document.getElementById("beatFile").files[0];
-            const beatPrice = parseFloat(document.getElementById("beatPrice").value).toFixed(2);
+        <div class="social-links">
+            <a href="https://www.instagram.com/youraccount" target="_blank" rel="noopener noreferrer">Instagram</a> |
+            <a href="https://soundcloud.com/youraccount" target="_blank" rel="noopener noreferrer">SoundCloud</a>
+        </div>
+    </footer>
 
-            // Generate a unique ID for the beat (for simplicity, using the current timestamp)
-            const beatId = new Date().getTime();
-
-            // Create a new product element
-            const newProduct = document.createElement("div");
-            newProduct.classList.add("product");
-            newProduct.setAttribute("data-id", beatId);
-            newProduct.setAttribute("data-name", beatName);
-            newProduct.setAttribute("data-price", beatPrice);
-
-            // Create an image element (for simplicity, using a placeholder image)
-            const productImage = document.createElement("img");
-            productImage.src = "placeholder.jpg"; // Replace with the actual image URL
-            productImage.alt = beatName;
-
-            // Create an audio player element
-            const audioPlayer = document.createElement("div");
-            audioPlayer.classList.add("audio-player");
-            const audio = document.createElement("audio");
-            audio.preload = "metadata";
-            audio.src = URL.createObjectURL(beatFile);
-            audio.controls = true;
-
-            // Add audio to the player
-            audioPlayer.appendChild(audio);
-
-            // Add the product name, audio player, and price
-            newProduct.appendChild(productImage);
-            newProduct.appendChild(audioPlayer);
-
-            const priceElement = document.createElement("p");
-            priceElement.textContent = `$${beatPrice}`;
-            newProduct.appendChild(priceElement);
-
-            // Add the "Bag It" button
-            const bagItButton = document.createElement("button");
-            bagItButton.classList.add("btn");
-            bagItButton.textContent = "Bag It";
-            newProduct.appendChild(bagItButton);
-
-            // Add the new product to the product grid
-            document.getElementById("shopNow").appendChild(newProduct);
-
-            // Clear the form for the next upload
-            document.getElementById("beatForm").reset();
-            document.getElementById("uploadForm").style.display = "none"; // Hide the form after submission
-        });
-    </script>
+    <script src="audioPlayer.js"></script>
+    <script src="themeSwitch.js"></script>
+    
 </body>
 </html>
