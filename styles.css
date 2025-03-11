@@ -10,45 +10,39 @@ body {
 /* Header Styles */
 header {
   display: flex;
-  justify-content: flex-start; /* Align the header title to the left */
-  align-items: center; /* Vertically center the content */
-  padding: 20px; /* Optional: add some padding for spacing */
+  justify-content: flex-start; /* Align title and logo to the left */
+  align-items: center; /* Vertically center content */
+  padding: 20px;
 }
 
 header h1 {
-  margin: 0; /* Remove default margin for h1 */
-  font-size: 2em; /* Adjust size as needed */
+  margin: 0;
+  font-size: 2em;
 }
 
 header nav {
-  display: flex; /* Use flexbox for the navigation container */
-  justify-content: center; /* Center the links within the nav */
-  align-items: center; /* Vertically center the navigation items */
-  margin-left: 20px; /* Optional: space between the title and navigation */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
 }
 
 header nav a {
-  margin: 0 5px; /* Space between links */
-  text-decoration: none; /* Remove underline from links */
-  color: inherit; /* Make links inherit the text color */
+  margin: 0 10px;
+  text-decoration: none;
+  color: inherit; /* Inherit text color */
 }
 
 /* Add pipe separator except for the last link */
 header nav a:not(:last-child)::after {
-  content: " |"; /* Add pipe after each link */
-  margin-left: 6 px; /* Space between the link and the pipe */
-  color: inherit; /* Ensure pipe has the same color as the text */
+  content: " |";
+  margin-left: 10px;
 }
 
-/* Active Link Styling - Bold and Underline without color change */
+/* Active Link Styling */
 header nav a.current {
-  font-weight: bold; /* Makes the active link bold */
-  text-decoration: underline; /* Underline the active link */
-}
-
-/* Optional: Style to remove the last link margin */
-header nav a:last-child {
-  margin-right: 0;
+  font-weight: bold;
+  text-decoration: underline;
 }
 
 /* Hero Section */
@@ -64,7 +58,7 @@ header nav a:last-child {
 }
 
 .cta-btn {
-  background-color: #bf3636cb; /* Rose color */
+  background-color: #bf3636cb;
   color: #fff;
   padding: 15px 25px;
   text-decoration: none;
@@ -73,7 +67,7 @@ header nav a:last-child {
 }
 
 .cta-btn:hover {
-  background-color: #832424cb; /* Darker rose for hover effect */
+  background-color: #832424cb; /* Darker rose */
 }
 
 /* Product Grid */
@@ -89,7 +83,7 @@ header nav a:last-child {
   width: 100%;
   height: 200px;
   object-fit: cover;
-  border: 2px solid #bf3636cb; /* Rose border */
+  border: 2px solid #bf3636cb;
   border-radius: 10px;
 }
 
@@ -104,7 +98,7 @@ header nav a:last-child {
 }
 
 .btn {
-  background-color: #bf3636cb; /* Rose color */
+  background-color: #bf3636cb;
   color: #fff;
   padding: 10px 20px;
   text-decoration: none;
@@ -112,7 +106,7 @@ header nav a:last-child {
 }
 
 .btn:hover {
-  background-color: #832424cb; /* Darker rose for hover effect */
+  background-color: #832424cb;
 }
 
 /* Footer */
@@ -123,39 +117,82 @@ footer {
 }
 
 footer p {
-  margin: 0;
+  margin: 10px 0;
 }
 
-.social-links a {
-  color: #bf3636cb; /* Rose color for links */
-  text-decoration: none;
-  margin: 0 10px;
+.contact-info {
+  margin-top: 20px; /* Space between social links and contact info */
 }
 
-.social-links a:hover {
-  color: #892525cb;
+.contact-info a {
+  color: #bf3636cb;
   text-decoration: none;
 }
 
-/* Contact Information */
-footer .contact-info p {
-  margin: 5px 0; /* Small margin for better spacing */
+.contact-info a:hover {
+  text-decoration: underline;
 }
 
-footer .contact-info p:first-child {
-  margin-bottom: 5px; /* Add space between the "Get in touch with us" text and email */
+/* Responsive Design */
+
+/* Tablet Layout (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 items per row */
+  }
 }
 
-/* Styling the email link in the footer to match the social links */
-footer .footer-email {
-  color: #bf3636cb; /* Same color as the social media links */
-  text-decoration: none; /* Remove underline */
+/* Mobile Layout (max-width: 768px) */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column; /* Stack logo and nav */
+    align-items: center;
+  }
+
+  header nav {
+    flex-direction: column; /* Stack links vertically */
+    margin-left: 0;
+  }
+
+  header nav a {
+    display: block;
+    padding: 10px 0; /* Space between links */
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr; /* 1 item per row */
+  }
+
+  footer {
+    padding: 20px;
+  }
+
+  .social-links {
+    display: flex;
+    flex-direction: column; /* Stack links */
+    gap: 10px;
+  }
 }
 
-footer .footer-email:hover {
-  color: #892525cb;
-  text-decoration: none; /* Underline on hover */
+/* Small Mobile (max-width: 600px) */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.8em; /* Reduce size */
+  }
+
+  p {
+    font-size: 1em;
+  }
+
+  .cta-btn {
+    font-size: 1.2em;
+    padding: 10px 20px;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
 }
-
-
-/* Res */
