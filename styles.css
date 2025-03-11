@@ -112,4 +112,44 @@ header nav a.current {
 }
 
 .btn:hover {
-  background-color: #832424cb; /* Darker rose 
+  background-color: #832424cb; /* Darker rose for hover effect */
+}
+
+/* Footer */
+footer {
+  background-color: #111;
+  padding: 20px;
+  text-align: center; /* Centers the text */
+  display: flex;
+  justify-content: center; /* Centers content horizontally */
+  align-items: center; /* Centers content vertically */
+  flex-direction: column; /* Stack content vertically */
+}
+
+
+footer p {
+  margin: 0;
+}
+
+.social-links a {
+  color: #bf3636cb; /* Rose color for links */
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+.social-links a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 800px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
+  }
+}
+
+@media (max-width: 500px) {
+  .product-grid {
+    grid-template-columns: 1fr; /* 1 item per row on extra small screens */
+  }
+}
