@@ -28,9 +28,14 @@ header nav {
 }
 
 header nav a {
-  margin-right: 15px; /* Space between links */
+  margin: 0 10px; /* Space between links */
   text-decoration: none; /* Remove underline from links */
   color: inherit; /* Make links inherit the text color */
+}
+
+header nav a:not(:last-child)::after {
+  content: " |"; /* Add pipe after each link */
+  margin-left: 10px; /* Space between the link and the pipe */
 }
 
 /* Optional: Style to remove the last link margin */
