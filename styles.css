@@ -9,25 +9,23 @@ html, body {
 
 body {
   font-family: Inter, sans-serif;
-  background-color: #fff; /* Light mode is now the default */
-  color: #000; /* Text is dark in light mode */
+  background-color: #fff; /* Light mode is default */
+  color: #000;
   flex: 1;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden;
 }
 
+/* Header */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
   flex-wrap: wrap;
+  background-color: inherit; /* Same as body */
 }
 
-header h1 {
-  margin: 0;
-  font-size: 2rem; /* Responsive font size */
-}
-
+/* Navigation */
 header nav {
   display: flex;
   justify-content: flex-start;
@@ -53,15 +51,16 @@ header nav a.current {
 header nav a:not(:last-child)::after {
   content: " |";
   margin-left: 50px;
-  margin-right: 10px; /* Adjust the margin to move the pipe to the right */
+  margin-right: 10px;
   color: inherit;
-  font-size: 1.5rem; /* Increase the size of the pipe */
-  font-weight: normal; /* Make sure the pipe is not bold */
-  text-decoration: none; /* Remove underline from the pipe */
+  font-size: 1.5rem;
+  font-weight: normal;
+  text-decoration: none;
 }
 
+/* Hero Section */
 .hero {
-  background-color: #ddd; /* Light mode background */
+  background-color: #ddd; /* Light mode */
   padding: 50px 20px;
   text-align: center;
 }
@@ -71,6 +70,7 @@ header nav a:not(:last-child)::after {
   color: #bf3636cb;
 }
 
+/* Buttons */
 .cta-btn {
   background-color: #130f80cb;
   color: #fff;
@@ -82,6 +82,21 @@ header nav a:not(:last-child)::after {
 
 .cta-btn:hover {
   background-color: #832424cb;
+}
+
+.btn {
+  background-color: #ca1366b4;
+  color: #fff;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn:hover {
+  background-color: #cb14668f;
 }
 
 /* Product Grid */
@@ -109,71 +124,28 @@ header nav a:not(:last-child)::after {
   border-radius: 10px;
 }
 
-/* Product Info */
-.product-info h3 {
-  font-size: 1.5rem;
-  margin: 10px 0;
-}
-
-.product-info p {
-  font-size: 1.2rem;
-  margin: 10px 0;
-}
-
-/* Add to Cart Button */
-.btn {
-  background-color: #ca1366b4; /* Change to the new color */
-  color: #fff;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 5px;
-  display: block; /* Make the button a block element to take up full width */
-  width: 100%; /* Ensure it matches the width of the image */
-  margin-top: 10px; /* Add a little space between the image and the button */
-}
-
-.btn:hover {
-  background-color: #cb14668f; /* Change to the new hover color */
-}
-
 /* Footer */
 footer {
-  background-color: #efeeee; /* Light mode footer */
+  background-color: #efeeee;
   padding: 20px;
   text-align: center;
   margin-top: auto;
 }
 
-footer p {
-  margin: 0;
-}
-
-.social-links {
+footer .social-links {
   display: flex;
   gap: 6px;
   justify-content: center;
   margin-top: 5px;
 }
 
-.social-links a {
+footer .social-links a {
   color: #bf3636cb;
   text-decoration: none;
 }
 
-.social-links a:hover {
+footer .social-links a:hover {
   color: #892525cb;
-}
-
-footer .contact-info {
-  margin-top: 10px;
-}
-
-footer .contact-info p {
-  margin: 5px 0;
-}
-
-footer .contact-info p:first-child {
-  margin-bottom: 5px;
 }
 
 footer .footer-email {
@@ -185,59 +157,41 @@ footer .footer-email:hover {
   color: #892525cb;
 }
 
-/* Dark Mode Styling (Switched) */
+/* Dark Mode */
 body.dark-mode {
   background-color: #000;
   color: #fff;
 }
 
 body.dark-mode header {
-  background-color: #111;
-}
-
-body.dark-mode footer {
-  background-color: #111;
+  background-color: #000;
 }
 
 body.dark-mode .hero {
   background-color: #111;
 }
 
-body.dark-mode .product-grid {
-  border: none;
-}
-
 body.dark-mode .product img {
   border-color: #666;
 }
 
-body.dark-mode .play-pause {
-  background-color: #e03a3a;
+body.dark-mode .cta-btn {
+  background-color: #832424cb;
 }
 
-body.dark-mode .play-pause:hover {
-  background-color: #e00000;
-}
-/* Light Mode (Default) */
-body {
-  background-color: #fff; /* Light mode background */
-  color: #000;
+body.dark-mode .btn {
+  background-color: #cb14668f;
 }
 
-header {
-  background-color: #fff; /* Same as main background */
+body.dark-mode .btn:hover {
+  background-color: #ca1366b4;
 }
 
-/* Dark Mode */
-body.dark-mode {
-  background-color: #000; /* Dark mode background */
-  color: #fff;
+body.dark-mode footer {
+  background-color: #111;
 }
 
-body.dark-mode header {
-  background-color: #000; /* Match dark mode background */
-}
-/* Mode Switch Styling */
+/* Mode Switch */
 .mode-switch {
   display: flex;
   align-items: center;
@@ -253,56 +207,61 @@ body.dark-mode header {
   transition: color 0.3s ease-in-out;
 }
 
-/* Highlight the active mode just like nav links */
 .mode-link.current {
   font-weight: bold;
   text-decoration: underline;
 }
 
-/* Light Mode Styles */
-body {
-  background-color: #fff;
-  color: #000;
+/* Mobile Optimization */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-header {
-  background-color: #fff; /* Matches body background */
-  border-bottom: none; /* Removes any border when switching */
+@media (max-width: 800px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* Dark Mode Styles */
-body.dark-mode {
-  background-color: #000;
-  color: #fff;
-}
+@media (max-width: 500px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 
-body.dark-mode header {
-  background-color: #000;
-  border-bottom: none; /* Remove border in dark mode */
-}
+  header nav {
+    justify-content: center;
+    gap: 5px;
+    margin-top: 15px;
+  }
 
-body.dark-mode .mode-link.current {
-  text-decoration: underline;
-  font-weight: bold;
-}
+  header nav a {
+    font-size: 1.1rem;
+    margin: 0 5px;
+  }
 
-/* Make sure other dark mode elements are properly adjusted */
-body.dark-mode .product-grid {
-  border-color: transparent;
-}
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
 
-body.dark-mode .product img {
-  border-color: #bf3636cb;
-}
+  .product-info h3 {
+    font-size: 1.3rem;
+  }
 
-body.dark-mode .cta-btn {
-  background-color: #832424cb;
-}
+  .product-info p {
+    font-size: 1rem;
+  }
 
-body.dark-mode .btn {
-  background-color: #cb14668f;
-}
+  .btn {
+    padding: 8px 15px;
+    font-size: 1rem;
+  }
 
-body.dark-mode .btn:hover {
-  background-color: #ca1366b4;
+  .cta-btn {
+    font-size: 1.3rem;
+    padding: 12px 20px;
+  }
 }
