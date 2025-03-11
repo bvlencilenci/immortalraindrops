@@ -44,9 +44,8 @@ header nav a:last-child {
   margin-right: 0;
 }
 
-/* Active Link Styling */
+/* Active Link Styling - Bold and Underline without color change */
 header nav a.current {
-  color: #f39c12; /* Highlight color for active link */
   font-weight: bold; /* Makes the active link bold */
   text-decoration: underline; /* Underline the active link */
 }
@@ -136,15 +135,4 @@ footer p {
   text-decoration: underline;
 }
 
-/* Responsive Design */
-@media (max-width: 800px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
-  }
-}
-
-@media (max-width: 500px) {
-  .product-grid {
-    grid-template-columns: 1fr; /* 1 item per row on extra small screens */
-  }
-}
+/* Res
