@@ -31,12 +31,11 @@ h1 {
   border-radius: 10px;
 }
 
-/* Square Images */
+/* Square Images (no rounded borders) */
 .member img {
   width: 200px;
   height: 200px;
   object-fit: cover;
-  border-radius: 10px; /* Slightly rounded corners (optional) */
   border: 2px solid #1DB954; /* Stylish border */
 }
 
