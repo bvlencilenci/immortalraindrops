@@ -21,35 +21,37 @@
     <!-- Cart Section -->
     <section id="cart">
         <h2>Your Cart</h2>
-        <div class="cart-items">
-            <!-- Product Item 1 -->
-            <div class="cart-item">
-                <img src="beat1.jpg" alt="Beat 1">
-                <div class="cart-item-info">
-                    <h3>Beat 1</h3>
-                    <p>Price: $10.00</p>
-                    <input type="number" value="1" min="1">
-                    <button class="remove-item">Remove</button>
+        <div class="cart-container">
+            <!-- Cart Items -->
+            <div class="cart-items">
+                <!-- Product Item 1 -->
+                <div class="cart-item">
+                    <img src="beat1.jpg" alt="Beat 1">
+                    <div class="cart-item-info">
+                        <h3>Beat 1</h3>
+                        <p>Price: $10.00</p>
+                        <button class="remove-item">Remove</button>
+                    </div>
                 </div>
+
+                <!-- Product Item 2 -->
+                <div class="cart-item">
+                    <img src="beat2.jpg" alt="Beat 2">
+                    <div class="cart-item-info">
+                        <h3>Beat 2</h3>
+                        <p>Price: $12.00</p>
+                        <button class="remove-item">Remove</button>
+                    </div>
+                </div>
+
+                <!-- Add more cart items here... -->
             </div>
 
-            <!-- Product Item 2 -->
-            <div class="cart-item">
-                <img src="beat2.jpg" alt="Beat 2">
-                <div class="cart-item-info">
-                    <h3>Beat 2</h3>
-                    <p>Price: $12.00</p>
-                    <input type="number" value="1" min="1">
-                    <button class="remove-item">Remove</button>
-                </div>
+            <!-- Cart Summary (Total and Checkout) -->
+            <div class="cart-summary">
+                <p><strong>Total: $22.00</strong></p>
+                <button class="checkout-btn">Proceed to Checkout</button>
             </div>
-
-            <!-- Add more cart items here... -->
-        </div>
-
-        <div class="cart-summary">
-            <p><strong>Total: $22.00</strong></p>
-            <button class="checkout-btn">Proceed to Checkout</button>
         </div>
     </section>
 
@@ -61,6 +63,6 @@
             <a href="https://soundcloud.com/youraccount" target="_blank">SoundCloud</a>
         </div>
     </footer>
-    
+
 </body>
 </html>
