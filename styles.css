@@ -44,6 +44,12 @@ header nav a:last-child {
   margin-right: 0;
 }
 
+/* Active Link Styling */
+header nav a.current {
+  color: #f39c12; /* Highlight color for active link */
+  font-weight: bold; /* Makes the active link bold */
+  text-decoration: underline; /* Underline the active link */
+}
 
 /* Hero Section */
 .hero {

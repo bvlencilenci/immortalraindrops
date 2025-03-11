@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roster - Immortal Raindrops</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        header nav a.current {
+            color: #f39c12; /* Change to the color you want */
+            font-weight: bold;
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -13,7 +20,7 @@
         <nav>
             <a href="index.html">Home</a> |
             <a href="archive.html">Archive</a> |
-            <a href="roster.html">Roster</a> |
+            <a href="roster.html" class="current">Roster</a> |
             <a href="contact.html">Contact</a>
         </nav>
     </header>
@@ -86,7 +93,17 @@
         </div>
     </footer>
 
-    <!-- Link to your custom JavaScript -->
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('header nav a');
+            const currentPath = window.location.pathname;
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('current');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
