@@ -82,25 +82,36 @@ header nav a:not(:last-child)::after {
 }
 
 /* Buttons */
+.cta-btn, .btn {
+  font-family: "Big Shoulders Stencil", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  display: inline-block;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+/* CTA Button Styles */
 .cta-btn {
   background-color: #130f80cb;
   color: #fff;
   padding: 15px 25px;
   text-decoration: none;
   font-size: 1.5rem;
-  border-radius: 5px;
+  border: 2px solid #130f80cb; /* Border to match the background */
 }
 
 .cta-btn:hover {
   background-color: #832424cb;
+  animation: glitch 0.4s ease-in-out forwards; /* Shorter duration and stops at final state */
 }
 
+/* Standard Button Styles */
 .btn {
   background-color: #ca1366b4;
   color: #fff;
   padding: 10px 20px;
   text-decoration: none;
-  border-radius: 5px;
   display: block;
   width: 100%;
   margin-top: 10px;
@@ -108,6 +119,7 @@ header nav a:not(:last-child)::after {
 
 .btn:hover {
   background-color: #cb14668f;
+  animation: glitch 0.4s ease-in-out forwards; /* Shorter duration and stops at final state */
 }
 
 /* Product Grid */
@@ -162,6 +174,7 @@ footer .social-links a:hover {
 footer .footer-email {
   color: #bf3636cb;
   text-decoration: none;
+  margin-top: 10px; /* Adjusted to reduce gap */
 }
 
 footer .footer-email:hover {
@@ -276,13 +289,14 @@ body.dark-mode footer {
     padding: 12px 20px;
   }
 }
-/* Style for the audio progress bar (slider) */
+
+/* Audio Progress Bar (Slider) */
 input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
+  -webkit-appearance: none;  /* For WebKit-based browsers like Chrome and Safari */
+  appearance: none;          /* For other browsers */
   width: 100%;
   height: 5px;
-  background: #ddd; /* Default background */
+  background: #ddd;
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.1s ease;
@@ -292,7 +306,6 @@ input[type="range"]:focus {
   outline: none;
 }
 
-/* Style the progress fill (changes as audio plays) */
 input[type="range"]::-webkit-slider-runnable-track {
   background: #efb2b2cb;
   height: 5px;
@@ -312,16 +325,47 @@ input[type="range"]::-ms-track {
   border-color: transparent;
 }
 
+/* Remove the thumb completely */
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 0; /* Hide the thumb */
+  -webkit-appearance: none;  /* Remove thumb for WebKit browsers */
+  appearance: none;          /* Remove thumb for other browsers */
+  width: 0;
+  height: 0;
+  background: transparent;
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 0; /* Hide the thumb */
+  width: 0;
+  height: 0;
+  background: transparent;
 }
 
 input[type="range"]::-ms-thumb {
-  width: 0; /* Hide the thumb */
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+/* Glitch Effect Animation */
+@keyframes glitch {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  25% {
+    transform: translateX(-2px);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(2px);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateX(-2px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
