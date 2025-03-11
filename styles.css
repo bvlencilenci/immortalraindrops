@@ -28,7 +28,7 @@ header nav {
 }
 
 header nav a {
-  margin: 0 10px; /* Space between links */
+  margin: 0 5px; /* Space between links */
   text-decoration: none; /* Remove underline from links */
   color: inherit; /* Make links inherit the text color */
 }
