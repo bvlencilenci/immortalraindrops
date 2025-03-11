@@ -12,43 +12,50 @@ header {
   display: flex;
   justify-content: flex-start; /* Align the header title to the left */
   align-items: center; /* Vertically center the content */
-  padding: 20px; /* Optional: add some padding for spacing */
+  padding: 20px;
 }
 
 header h1 {
-  margin: 0; /* Remove default margin for h1 */
-  font-size: 2em; /* Adjust size as needed */
+  margin: 0;
+  font-size: 2em;
 }
 
+/* Custom Font Styling for "Raindrops" */
+.immortal {
+  font-family: Inter, sans-serif;
+  font-weight: bold;
+}
+
+.raindrops {
+  font-family: Butler, cursive;
+  font-size: 1.5em;
+}
+
+/* Navigation */
 header nav {
-  display: flex; /* Use flexbox for the navigation container */
-  justify-content: center; /* Center the links within the nav */
-  align-items: center; /* Vertically center the navigation items */
-  margin-left: 20px; /* Optional: space between the title and navigation */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
 }
 
 header nav a {
-  margin: 0 5px; /* Space between links */
-  text-decoration: none; /* Remove underline from links */
-  color: inherit; /* Make links inherit the text color */
+  margin: 0 5px;
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Add pipe separator except for the last link */
 header nav a:not(:last-child)::after {
-  content: " |"; /* Add pipe after each link */
-  margin-left: 6px; /* Space between the link and the pipe */
-  color: inherit; /* Ensure pipe has the same color as the text */
+  content: " |";
+  margin-left: 6px;
+  color: inherit;
 }
 
-/* Active Link Styling - Bold and Underline without color change */
+/* Active Link Styling */
 header nav a.current {
-  font-weight: bold; /* Makes the active link bold */
-  text-decoration: underline; /* Underline the active link */
-}
-
-/* Optional: Style to remove the last link margin */
-header nav a:last-child {
-  margin-right: 0;
+  font-weight: bold;
+  text-decoration: underline;
 }
 
 /* Hero Section */
@@ -60,11 +67,11 @@ header nav a:last-child {
 
 .hero h2 {
   font-size: 2.5em;
-  color: #bf3636cb; /* Rose color */
+  color: #bf3636cb;
 }
 
 .cta-btn {
-  background-color: #bf3636cb; /* Rose color */
+  background-color: #bf3636cb;
   color: #fff;
   padding: 15px 25px;
   text-decoration: none;
@@ -73,13 +80,13 @@ header nav a:last-child {
 }
 
 .cta-btn:hover {
-  background-color: #832424cb; /* Darker rose for hover effect */
+  background-color: #832424cb;
 }
 
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 items per row */
+  grid-template-columns: repeat(4, 1fr);
   gap: 30px;
   padding: 30px;
   text-align: center;
@@ -87,12 +94,15 @@ header nav a:last-child {
 
 .product img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border: 2px solid #bf3636cb; /* Rose border */
+  height: 100%;
+  object-fit: cover; /* Ensure the image covers the area without distortion */
+  max-width: 1200px;
+  max-height: 1200px;
+  border: 2px solid #bf3636cb;
   border-radius: 10px;
 }
 
+/* Product Info */
 .product-info h3 {
   font-size: 1.5em;
   margin: 10px 0;
@@ -104,7 +114,7 @@ header nav a:last-child {
 }
 
 .btn {
-  background-color: #bf3636cb; /* Rose color */
+  background-color: #bf3636cb;
   color: #fff;
   padding: 10px 20px;
   text-decoration: none;
@@ -112,7 +122,7 @@ header nav a:last-child {
 }
 
 .btn:hover {
-  background-color: #832424cb; /* Darker rose for hover effect */
+  background-color: #832424cb;
 }
 
 /* Footer */
@@ -135,13 +145,12 @@ footer p {
 }
 
 .social-links a {
-  color: #bf3636cb; /* Rose color for links */
+  color: #bf3636cb;
   text-decoration: none;
 }
 
 .social-links a:hover {
   color: #892525cb;
-  text-decoration: none;
 }
 
 /* Contact Information */
@@ -150,34 +159,43 @@ footer .contact-info {
 }
 
 footer .contact-info p {
-  margin: 5px 0; /* Small margin for better spacing */
+  margin: 5px 0;
 }
 
 footer .contact-info p:first-child {
-  margin-bottom: 5px; /* Add space between the "Get in touch with us" text and email */
+  margin-bottom: 5px;
 }
 
-/* Styling the email link in the footer to match the social links */
+/* Email Styling */
 footer .footer-email {
-  color: #bf3636cb; /* Same color as the social media links */
-  text-decoration: none; /* Remove underline */
+  color: #bf3636cb;
+  text-decoration: none;
 }
 
 footer .footer-email:hover {
   color: #892525cb;
-  text-decoration: none;
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
   .product-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr); /* Reduce to 3 columns on medium screens */
+  }
+
+  .product img {
+    max-width: 100%; /* Ensure image doesn't exceed container width */
+    max-height: 100%; /* Ensure image doesn't exceed container height */
   }
 }
 
 @media (max-width: 800px) {
   .product-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* Reduce to 2 columns on smaller screens */
+  }
+
+  .product img {
+    max-width: 100%; /* Ensure image doesn't exceed container width */
+    max-height: 100%; /* Ensure image doesn't exceed container height */
   }
 }
 
@@ -201,10 +219,10 @@ footer .footer-email:hover {
 
   /* Adjust product grid */
   .product-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column layout on extra small screens */
   }
 
-  /* Center footer elements properly */
+  /* Center footer elements */
   .social-links {
     flex-direction: row;
     justify-content: center;
