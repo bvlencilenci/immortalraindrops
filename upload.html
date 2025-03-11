@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Beats</title>
+</head>
+<body>
+    <header>
+        <h1>Upload New Beat</h1>
+    </header>
+
+    <!-- Password Prompt (Initially Hidden) -->
+    <div id="password-prompt">
+        <label for="password">Enter Password:</label>
+        <input type="password" id="password" />
+        <button onclick="checkPassword()">Submit</button>
+    </div>
+
+    <!-- Upload Form (Initially Hidden) -->
+    <div id="upload-section" style="display: none;">
+        <form id="upload-form">
+            <label for="beat-name">Beat Name:</label>
+            <input type="text" id="beat-name" name="beat-name" required><br><br>
+
+            <label for="beat-price">Price:</label>
+            <input type="number" id="beat-price" name="beat-price" required step="0.01"><br><br>
+
+            <label for="beat-file">Upload Beat (MP3 only):</label>
+            <input type="file" id="beat-file" name="beat-file" accept="audio/mp3" required><br><br>
+
+            <button type="submit">Upload Beat</button>
+        </form>
+    </div>
+
+    <!-- Product Grid where beats will be displayed -->
+    <section id="shop-now" class="product-grid"></section>
+
+    <script src="uploadScript.js"></script>
+</body>
+</html>
