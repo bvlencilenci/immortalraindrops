@@ -1,19 +1,26 @@
 /* General Page Styling */
-body {
-  font-family: Inter, sans-serif;
-  background-color: #000; /* Black background */
-  color: #fff; /* White text */
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Header Styles */
+body {
+  font-family: Inter, sans-serif;
+  background-color: #000;
+  color: #fff;
+  flex: 1;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
 header {
   display: flex;
-  justify-content: flex-start; /* Align the header title to the left */
-  align-items: center; /* Vertically center the content */
+  justify-content: flex-start;
+  align-items: center;
   padding: 20px;
-  flex-wrap: wrap; /* Allow wrapping for small screens */
+  flex-wrap: wrap;
 }
 
 header h1 {
@@ -21,47 +28,32 @@ header h1 {
   font-size: 2em;
 }
 
-/* Custom Font Styling for "Raindrops" */
-.immortal {
-  font-family: Inter, sans-serif;
-  font-weight: bold;
-}
-
-.raindrops {
-  font-family: Butler, sans-serif;
-  font-size: 1.5em;
-}
-
-/* Navigation */
 header nav {
   display: flex;
-  justify-content: flex-start; /* Align links to the left */
+  justify-content: flex-start;
   align-items: center;
   margin-left: 20px;
-  gap: 15px; /* Space between nav items */
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 header nav a {
   text-decoration: none;
   color: inherit;
-  font-size: 1.2em; /* Set font size for readability */
+  font-size: 1.2em;
 }
 
-/* Add pipe separator except for the last link */
 header nav a:not(:last-child)::after {
   content: " |";
   margin-left: 6px;
   color: inherit;
 }
 
-/* Active Link Styling */
 header nav a.current {
   font-weight: bold;
   text-decoration: underline;
 }
 
-/* Hero Section */
 .hero {
   background-color: #111;
   padding: 50px 20px;
@@ -98,9 +90,9 @@ header nav a.current {
 .product img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensure the image covers the area without distortion */
-  max-width: 1200px;
-  max-height: 1200px;
+  object-fit: cover;
+  max-width: 100%; /* Prevent images from overflowing */
+  max-height: 100%;
   border: 2px solid #bf3636cb;
   border-radius: 10px;
 }
@@ -128,18 +120,17 @@ header nav a.current {
   background-color: #832424cb;
 }
 
-/* Footer */
 footer {
   background-color: #111;
   padding: 20px;
   text-align: center;
+  margin-top: auto;
 }
 
 footer p {
   margin: 0;
 }
 
-/* Social Links */
 .social-links {
   display: flex;
   gap: 6px;
@@ -156,7 +147,6 @@ footer p {
   color: #892525cb;
 }
 
-/* Contact Information */
 footer .contact-info {
   margin-top: 10px;
 }
@@ -169,7 +159,6 @@ footer .contact-info p:first-child {
   margin-bottom: 5px;
 }
 
-/* Email Styling */
 footer .footer-email {
   color: #bf3636cb;
   text-decoration: none;
@@ -179,150 +168,43 @@ footer .footer-email:hover {
   color: #892525cb;
 }
 
-/* Cart Page Styling */
-#cart {
-  padding: 30px;
-  background-color: #111;
-  color: #fff;
-  text-align: center;
-}
-
-.cart-container {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-/* Cart Items Section */
-.cart-items {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Individual Cart Item */
-.cart-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 2px solid #bf3636cb;
-  padding: 15px;
-  border-radius: 10px;
-}
-
-.cart-item img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.cart-item-info {
-  flex-grow: 1;
-  padding-left: 20px;
-  text-align: left;
-}
-
-.cart-item-info h3 {
-  font-size: 1.5em;
-}
-
-.cart-item-info p {
-  margin: 10px 0;
-  font-size: 1.2em;
-}
-
-.remove-item {
-  background-color: #bf3636cb;
-  color: #fff;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.remove-item:hover {
-  background-color: #832424cb;
-}
-
-/* Cart Summary Section */
-.cart-summary {
-  flex: 0 0 250px; /* Fixed width for the summary */
-  padding: 20px;
-  background-color: #222;
-  border-radius: 10px;
-  text-align: left;
-}
-
-.cart-summary p {
-  font-size: 1.5em;
-}
-
-.checkout-btn {
-  background-color: #bf3636cb;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  font-size: 1.2em;
-  width: 100%;
-}
-
-.checkout-btn:hover {
-  background-color: #832424cb;
-}
-
-/* Responsive Design */
+/* Mobile Optimization */
 @media (max-width: 1024px) {
   .product-grid {
-    grid-template-columns: repeat(3, 1fr); /* Reduce to 3 columns on medium screens */
-  }
-
-  .product img {
-    max-width: 100%; /* Ensure image doesn't exceed container width */
-    max-height: 100%; /* Ensure image doesn't exceed container height */
+    grid-template-columns: repeat(3, 1fr); /* 3 products per row on medium screens */
   }
 }
 
 @media (max-width: 800px) {
   .product-grid {
-    grid-template-columns: repeat(2, 1fr); /* Reduce to 2 columns on smaller screens */
-  }
-
-  .product img {
-    max-width: 100%; /* Ensure image doesn't exceed container width */
-    max-height: 100%; /* Ensure image doesn't exceed container height */
+    grid-template-columns: repeat(2, 1fr); /* 2 products per row on smaller screens */
   }
 }
 
 @media (max-width: 500px) {
-  /* Adjust header layout */
   header {
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
   }
 
   header nav {
-    flex-direction: row; /* Keep the navigation links in a row */
     justify-content: center;
-    gap: 1px;
-    margin-left: 0;
-    flex-wrap: nowrap; /* Prevent wrapping on small screens */
+    gap: 5px;
+    margin-top: 15px;
   }
 
   header nav a {
-    font-size: 1em; /* Reduce font size to fit all items */
-    margin: 0 5px; /* Spacing between the links */
+    font-size: 1em;
+    margin: 0 5px;
   }
 
-  header nav a:not(:last-child)::after {
-    content: " |";
-    margin-left: 6px;
-  }
-
-  /* Adjust product grid */
   .product-grid {
-    grid-template-columns: repeat(2, 1fr); /* Show 2 products per row on very small screens */
+    grid-template-columns: 1fr; /* 1 product per row on very small screens */
+  }
+
+  .product img {
+    max-width: 100%; /* Ensure images don't exceed the container */
+    max-height: 100%;
   }
 }
