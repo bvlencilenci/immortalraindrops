@@ -1,0 +1,79 @@
+/* General Page Styling */
+body {
+  font-family: Arial, sans-serif; /* Changed to a more universal font */
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header */
+h1 {
+  font-size: 3em;
+  margin-top: 50px;
+}
+
+/* Navigation Bar */
+nav {
+  margin-top: 20px;
+  padding: 10px;
+}
+
+nav a {
+  color: #fff;
+  margin: 0 15px;
+  text-decoration: none;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* Member Section (For Roster Page) */
+.member {
+  margin-top: 30px;
+  font-size: 1.5em;
+}
+
+.member img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+/* Member Info */
+.member-name {
+  font-weight: bold;
+}
+
+.member-role {
+  color: #888;
+}
+
+/* Social Links */
+.social-links {
+  margin-top: 10px;
+}
+
+.social-links a {
+  color: #1DB954; /* Spotify Green for style */
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+.social-links a:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+footer {
+  margin-top: 50px;
+  padding: 20px;
+  font-size: 1em;
+  color: #888;
+}
