@@ -7,29 +7,29 @@ body {
   padding: 0;
 }
 
-/* Header */
+/* Header Styles */
 header {
-  background-color: #bf3636cb; /* Rose color */
-  padding: 20px;
-  text-align: center;
+  display: flex;
+  justify-content: flex-start; /* Align the content to the left */
+  align-items: center; /* Vertically center the content */
+  padding: 20px; /* Optional: add some padding for spacing */
 }
 
-h1 {
-  font-size: 3em;
-  margin-bottom: 10px;
-  color: #fff; /* White text for header */
+header h1 {
+  margin: 0; /* Remove default margin for h1 */
+  font-size: 2em; /* Adjust size as needed */
 }
 
-nav a {
-  color: #fff; /* White links */
-  margin: 0 15px;
-  text-decoration: none;
-  font-weight: bold;
+header nav {
+  margin-left: 20px; /* Optional: space between the title and navigation */
 }
 
-nav a:hover {
-  text-decoration: underline;
+header nav a {
+  margin-right: 15px; /* Space between links */
+  text-decoration: none; /* Remove underline from links */
+  color: inherit; /* Make links inherit the text color */
 }
+
 
 /* Hero Section */
 .hero {
