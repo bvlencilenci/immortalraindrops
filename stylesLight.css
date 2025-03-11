@@ -9,8 +9,8 @@ html, body {
 
 body {
   font-family: Inter, sans-serif;
-  background-color: #fff; /* Light mode is now the default */
-  color: #000; /* Text is dark in light mode */
+  background-color: #faf9f6; /* Updated to the new background color */
+  color: #000; /* Change text color to dark for better contrast */
   flex: 1;
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
@@ -21,6 +21,7 @@ header {
   align-items: center;
   padding: 20px;
   flex-wrap: wrap;
+  background-color: #faf9f6; /* Same background color for header */
 }
 
 header h1 {
@@ -61,7 +62,7 @@ header nav a:not(:last-child)::after {
 }
 
 .hero {
-  background-color: #ddd; /* Light mode background */
+  background-color: #faf9f6; /* Updated background color for hero section */
   padding: 50px 20px;
   text-align: center;
 }
@@ -72,7 +73,7 @@ header nav a:not(:last-child)::after {
 }
 
 .cta-btn {
-  background-color: #130f80cb;
+  background-color: #296694cb;
   color: #fff;
   padding: 15px 25px;
   text-decoration: none;
@@ -122,7 +123,7 @@ header nav a:not(:last-child)::after {
 
 /* Add to Cart Button */
 .btn {
-  background-color: #ca1366b4; /* Change to the new color */
+  background-color: #3684bfcb; /* Change to the new color */
   color: #fff;
   padding: 10px 20px;
   text-decoration: none;
@@ -133,12 +134,12 @@ header nav a:not(:last-child)::after {
 }
 
 .btn:hover {
-  background-color: #cb14668f; /* Change to the new hover color */
+  background-color: #296694cb; /* Change to the new hover color */
 }
 
-/* Footer */
+
 footer {
-  background-color: #efeeee; /* Light mode footer */
+  background-color: #faf9f6; /* Updated background color for footer */
   padding: 20px;
   text-align: center;
   margin-top: auto;
@@ -185,124 +186,123 @@ footer .footer-email:hover {
   color: #892525cb;
 }
 
-/* Dark Mode Styling (Switched) */
-body.dark-mode {
-  background-color: #000;
-  color: #fff;
+/* Mobile Optimization */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 products per row on medium screens */
+  }
 }
 
-body.dark-mode header {
-  background-color: #111;
+@media (max-width: 800px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 products per row on smaller screens */
+  }
 }
 
-body.dark-mode footer {
-  background-color: #111;
+@media (max-width: 500px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  header nav {
+    justify-content: center;
+    gap: 5px;
+    margin-top: 15px;
+  }
+
+  header nav a {
+    font-size: 1.1rem;
+    margin: 0 5px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr; /* 1 product per row on very small screens */
+  }
+
+  .product img {
+    width: 100%; /* Ensure images fit the container */
+    height: auto;
+    object-fit: cover;
+  }
+
+  .product-info h3 {
+    font-size: 1.3rem; /* Adjust title size for smaller screens */
+  }
+
+  .product-info p {
+    font-size: 1rem; /* Adjust description size for smaller screens */
+  }
+
+  .btn {
+    padding: 8px 15px; /* Adjust button padding for smaller screens */
+    font-size: 1rem; /* Adjust button text size */
+  }
+
+  .cta-btn {
+    font-size: 1.3rem; /* Adjust CTA button size on mobile */
+    padding: 12px 20px; /* Adjust padding */
+  }
 }
 
-body.dark-mode .hero {
-  background-color: #111;
+/* Custom Play Button Styling */
+.audio-player {
+  position: relative;
+  margin-top: 10px;
 }
 
-body.dark-mode .product-grid {
-  border: none;
-}
-
-body.dark-mode .product img {
-  border-color: #666;
-}
-
-body.dark-mode .play-pause {
-  background-color: #e03a3a;
-}
-
-body.dark-mode .play-pause:hover {
-  background-color: #e00000;
-}
-/* Light Mode (Default) */
-body {
-  background-color: #fff; /* Light mode background */
-  color: #000;
-}
-
-header {
-  background-color: #fff; /* Same as main background */
-}
-
-/* Dark Mode */
-body.dark-mode {
-  background-color: #000; /* Dark mode background */
-  color: #fff;
-}
-
-body.dark-mode header {
-  background-color: #000; /* Match dark mode background */
-}
-/* Mode Switch Styling */
-.mode-switch {
+.controls {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.mode-link {
-  text-decoration: none;
-  color: inherit;
-  font-size: 1.2rem;
+.play-pause {
+  background-color: #bf3636cb; /* Set the background to #bf3636cb */
+  border: none;
   cursor: pointer;
-  padding: 5px;
-  transition: color 0.3s ease-in-out;
+  padding: 15px;
+  width: 50px;
+  height: 50px;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%; /* Make the button circular */
+  color: white; /* Icon color */
 }
 
-/* Highlight the active mode just like nav links */
-.mode-link.current {
-  font-weight: bold;
-  text-decoration: underline;
+.play-pause i {
+  font-size: 24px; /* Size of the icon */
 }
 
-/* Light Mode Styles */
-body {
-  background-color: #fff;
-  color: #000;
+.play-pause:hover {
+  transform: scale(1.1); /* Slight grow effect on hover */
+  background-color: #832424cb; /* Darker red on hover */
 }
 
-header {
-  background-color: #fff; /* Matches body background */
-  border-bottom: none; /* Removes any border when switching */
+.play-pause:focus {
+  outline: none;
 }
 
-/* Dark Mode Styles */
-body.dark-mode {
-  background-color: #000;
-  color: #fff;
+/* Play icon (triangle) */
+.play-pause i {
+  content: '\f04b'; /* FontAwesome play icon */
 }
 
-body.dark-mode header {
-  background-color: #000;
-  border-bottom: none; /* Remove border in dark mode */
+.play-pause.playing i {
+  content: '\f04c'; /* FontAwesome pause icon */
 }
 
-body.dark-mode .mode-link.current {
-  text-decoration: underline;
-  font-weight: bold;
+.play-pause i::before {
+  content: '\f04b'; /* Play button is triangle */
 }
 
-/* Make sure other dark mode elements are properly adjusted */
-body.dark-mode .product-grid {
-  border-color: transparent;
-}
-
-body.dark-mode .product img {
-  border-color: #bf3636cb;
-}
-
-body.dark-mode .cta-btn {
-  background-color: #832424cb;
-}
-
-body.dark-mode .btn {
-  background-color: #cb14668f;
-}
-
-body.dark-mode .btn:hover {
-  background-color: #ca1366b4;
+/* If you are using FontAwesome, this will ensure it works, without text */
+.play-pause i:before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900; /* Ensure icons are bold */
 }

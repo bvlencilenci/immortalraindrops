@@ -6,23 +6,27 @@
     <title>Immortal Raindrops</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
 </head>
 <body>
     <!-- Header -->
-    <header>
-        <h1>Immortal Raindrops</h1>
+    <header> 
+        <!-- Mode Switch (Left Side) -->
+        <div class="mode-switch">
+            <a href="#" class="mode-link current" data-mode="dark">Dark</a>/
+            <a href="#" class="mode-link" data-mode="light">Light</a>
+        </div>
         
+        <h1>Immortal Raindrops</h1>
+      
         <nav>
             <a href="index.html" class="current">Home</a>
             <a href="archive.html">Archive</a>
             <a href="roster.html">Roster</a>
             <a href="cart.html">Cart</a>
         </nav>
-        
-
     </header>
     
+
     <!-- Product Grid Section (12 Products, 4 per row) -->
     <section id="shop-now" class="product-grid">
         <!-- Product 1 -->
@@ -258,5 +262,6 @@
     </footer>
 
     <script src="audioPlayer.js"></script>
+    <script src="themeSwitch.js"></script>
 </body>
 </html>
