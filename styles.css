@@ -37,18 +37,18 @@ header nav a {
 header nav a:not(:last-child)::after {
   content: " |"; /* Add pipe after each link */
   margin-left: 10px; /* Space between the link and the pipe */
-}
-
-/* Optional: Style to remove the last link margin */
-header nav a:last-child {
-  margin-right: 0;
+  color: inherit; /* Ensure pipe has the same color as the text */
 }
 
 /* Active Link Styling - Bold and Underline without color change */
 header nav a.current {
   font-weight: bold; /* Makes the active link bold */
   text-decoration: underline; /* Underline the active link */
-  color: inherit; /* Keep the color unchanged */
+}
+
+/* Optional: Style to remove the last link margin */
+header nav a:last-child {
+  margin-right: 0;
 }
 
 /* Hero Section */
@@ -119,13 +119,8 @@ header nav a.current {
 footer {
   background-color: #111;
   padding: 20px;
-  text-align: center; /* Centers the text */
-  display: flex;
-  justify-content: center; /* Centers content horizontally */
-  align-items: center; /* Centers content vertically */
-  flex-direction: column; /* Stack content vertically */
+  text-align: center;
 }
-
 
 footer p {
   margin: 0;
@@ -141,15 +136,4 @@ footer p {
   text-decoration: underline;
 }
 
-/* Responsive Design */
-@media (max-width: 800px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
-  }
-}
-
-@media (max-width: 500px) {
-  .product-grid {
-    grid-template-columns: 1fr; /* 1 item per row on extra small screens */
-  }
-}
+/* Res */
