@@ -30,34 +30,10 @@ nav a:hover {
   text-decoration: underline;
 }
 
-/* Hero Section */
-.hero {
-  background-color: #111;
-  padding: 50px 20px;
-  text-align: center;
-}
-
-.hero h2 {
-  font-size: 2.5em;
-}
-
-.cta-btn {
-  background-color: #1DB954;
-  color: #fff;
-  padding: 15px 25px;
-  text-decoration: none;
-  font-size: 1.5em;
-  border-radius: 5px;
-}
-
-.cta-btn:hover {
-  background-color: #2dbf7d;
-}
-
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 items per row (can change this number to adjust items per row) */
+  grid-template-columns: repeat(4, 1fr);
   gap: 30px;
   padding: 30px;
   text-align: center;
@@ -93,6 +69,26 @@ nav a:hover {
   background-color: #2dbf7d;
 }
 
+/* Archive Section */
+.archive-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 30px;
+  text-align: center;
+}
+
+.archive-item img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+audio {
+  margin-top: 10px;
+}
+
 /* Footer */
 footer {
   background-color: #111;
@@ -116,13 +112,13 @@ footer p {
 
 /* Responsive Design */
 @media (max-width: 800px) {
-  .product-grid {
-      grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
+  .product-grid, .archive-container {
+      grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 500px) {
-  .product-grid {
-      grid-template-columns: 1fr; /* 1 item per row on extra small screens */
+  .product-grid, .archive-container {
+      grid-template-columns: 1fr;
   }
 }
