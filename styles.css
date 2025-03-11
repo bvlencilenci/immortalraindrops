@@ -37,21 +37,27 @@ header nav {
 }
 
 header nav a {
+  display: flex;
+  align-items: center;
   text-decoration: none;
   color: inherit;
   font-size: 1.2rem;
   padding: 5px;
 }
 
-header nav a:not(:last-child)::after {
-  content: " |";
-  margin-left: 6px;
-  color: inherit;
-}
-
 header nav a.current {
   font-weight: bold;
   text-decoration: underline;
+}
+
+header nav a:not(:last-child)::after {
+  content: " |";
+  margin-left: 50px;
+  margin-right: 10px; /* Adjust the margin to move the pipe to the right */
+  color: inherit;
+  font-size: 1.5rem; /* Increase the size of the pipe */
+  font-weight: normal; /* Make sure the pipe is not bold */
+  text-decoration: none; /* Remove underline from the pipe */
 }
 
 .hero {
@@ -208,4 +214,86 @@ footer .footer-email:hover {
     height: auto;
     object-fit: cover;
   }
+
+  .product-info h3 {
+    font-size: 1.3rem; /* Adjust title size for smaller screens */
+  }
+
+  .product-info p {
+    font-size: 1rem; /* Adjust description size for smaller screens */
+  }
+
+  .btn {
+    padding: 8px 15px; /* Adjust button padding for smaller screens */
+    font-size: 1rem; /* Adjust button text size */
+  }
+
+  .cta-btn {
+    font-size: 1.3rem; /* Adjust CTA button size on mobile */
+    padding: 12px 20px; /* Adjust padding */
+  }
 }
+
+/* Custom Play Button Styling */
+.audio-player {
+  position: relative;
+  margin-top: 10px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.play-pause {
+  background-color: #bf3636cb; /* Set the background to #bf3636cb */
+  border: none;
+  cursor: pointer;
+  padding: 15px;
+  width: 50px;
+  height: 50px;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%; /* Make the button circular */
+  color: white; /* Icon color */
+}
+
+.play-pause i {
+  font-size: 24px; /* Size of the icon */
+}
+
+.play-pause:hover {
+  transform: scale(1.1); /* Slight grow effect on hover */
+  background-color: #832424cb; /* Darker red on hover */
+}
+
+.play-pause:focus {
+  outline: none;
+}
+
+/* Play icon (triangle) */
+.play-pause i {
+  content: '\f04b'; /* FontAwesome play icon */
+}
+
+.play-pause.playing i {
+  content: '\f04c'; /* FontAwesome pause icon */
+}
+
+.play-pause i::before {
+  content: '\f04b'; /* Play button is triangle */
+}
+
+/* If you are using FontAwesome, this will ensure it works, without text */
+.play-pause i:before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900; /* Ensure icons are bold */
+}
+
+
+
