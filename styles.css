@@ -48,6 +48,7 @@ header nav a:last-child {
 header nav a.current {
   font-weight: bold; /* Makes the active link bold */
   text-decoration: underline; /* Underline the active link */
+  color: inherit; /* Keep the color unchanged */
 }
 
 /* Hero Section */
@@ -111,28 +112,4 @@ header nav a.current {
 }
 
 .btn:hover {
-  background-color: #832424cb; /* Darker rose for hover effect */
-}
-
-/* Footer */
-footer {
-  background-color: #111;
-  padding: 20px;
-  text-align: center;
-}
-
-footer p {
-  margin: 0;
-}
-
-.social-links a {
-  color: #bf3636cb; /* Rose color for links */
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-.social-links a:hover {
-  text-decoration: underline;
-}
-
-/* Res
+  background-color: #832424cb; /* Darker rose 
