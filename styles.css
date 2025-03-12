@@ -8,7 +8,7 @@ html, body {
 }
 
 body {
-  font-family: Inter, sans-serif;
+  font-family: 'Gill Sans', sans-serif;
   background-color: #fff; /* Light mode is default */
   color: #000;
   flex: 1;
