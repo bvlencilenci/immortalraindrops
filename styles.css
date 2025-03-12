@@ -251,23 +251,29 @@ body.dark-mode .mode-link[data-theme="dark"] {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 10px; /* Optional padding adjustment for mobile */
+    padding: 10px;
   }
 
   header nav {
     display: flex;
     justify-content: center;
-    gap: 10px; /* Adjust space between buttons */
+    gap: 10px;
     margin-top: 15px;
     flex-wrap: nowrap; /* Prevent wrapping */
-    overflow-x: auto; /* Prevents content overflow */
-    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+    overflow: hidden; /* Hide overflow */
+    width: 100%; /* Ensure the nav is full width */
   }
 
   header nav a {
-    font-size: 1rem; /* Smaller font size to fit in the row */
+    font-size: 1rem; /* Adjust font size to fit better */
     margin: 0 5px;
     white-space: nowrap; /* Prevent text from wrapping */
+    padding: 5px 10px; /* Adjust padding to reduce button size */
+  }
+
+  header nav a.current {
+    font-weight: bold;
+    text-decoration: underline;
   }
 
   .product-grid {
