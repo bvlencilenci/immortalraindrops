@@ -1,69 +1,63 @@
-// Import necessary Firebase modules and the initialized services
-import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-storage.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-firestore.js";
-import { db, storage } from './firebase.js'; // import firebase config
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-// Function to upload beat data
-async function uploadBeatData(beatData, imageFile, audioFile) {
-  try {
-    // Upload the image to Firebase Storage
-    const imageStorageRef = ref(storage, `beats/images/${imageFile.name}`);
-    const imageUploadTask = uploadBytesResumable(imageStorageRef, imageFile);
+// Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCt3InzocitfJcKken1EYLJbihwBECtYcI",
+  authDomain: "immortal-raindops-databa.firebaseapp.com",
+  databaseURL: "https://immortal-raindops-databa-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "immortal-raindops-databa",
+  storageBucket: "immortal-raindops-databa.firebasestorage.app",
+  messagingSenderId: "1098265239221",
+  appId: "1:1098265239221:web:a039a4802a6d6133df28fc",
+  measurementId: "G-RQGZEWFS6F"
+};
 
-    // Wait for the image upload to complete
-    await imageUploadTask;
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-    // Get the download URL of the uploaded image
-    const imageURL = await getDownloadURL(imageStorageRef);
+// Handle Form Submission
+document.getElementById("beatForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    // Upload the audio to Firebase Storage
-    const audioStorageRef = ref(storage, `beats/audio/${audioFile.name}`);
-    const audioUploadTask = uploadBytesResumable(audioStorageRef, audioFile);
+    const beatName = document.getElementById("beatName").value;
+    const beatPrice = document.getElementById("beatPrice").value;
+    const imageFile = document.getElementById("imageFile").files[0];
+    const audioFile = document.getElementById("audioFile").files[0];
 
-    // Wait for the audio upload to complete
-    await audioUploadTask;
+    if (!beatName || !beatPrice || !imageFile || !audioFile) {
+        alert("All fields are required!");
+        return;
+    }
 
-    // Get the download URL of the uploaded audio
-    const audioURL = await getDownloadURL(audioStorageRef);
+    try {
+        // Upload image
+        const imageRef = ref(storage, `images/${imageFile.name}`);
+        await uploadBytes(imageRef, imageFile);
+        const imageUrl = await getDownloadURL(imageRef);
 
-    // Add the beat data to Firestore
-    const beatsCollection = collection(db, "beats");
-    await addDoc(beatsCollection, {
-      name: beatData.name,
-      price: beatData.price,
-      createdAt: serverTimestamp(),
-      image: imageURL,
-      audio: audioURL,
-    });
+        // Upload audio
+        const audioRef = ref(storage, `audio/${audioFile.name}`);
+        await uploadBytes(audioRef, audioFile);
+        const audioUrl = await getDownloadURL(audioRef);
 
-    console.log("Beat uploaded successfully!");
-  } catch (error) {
-    console.error("Error uploading beat: ", error);
-  }
-}
+        // Store metadata in Firestore
+        const beatDoc = await addDoc(collection(db, "beats"), {
+            name: beatName,
+            price: parseFloat(beatPrice),
+            imageUrl,
+            audioUrl,
+            timestamp: new Date()
+        });
 
-// Handle form submission
-function handleFormSubmit(event) {
-  event.preventDefault(); // Prevent the form from refreshing the page
-
-  const beatName = document.getElementById('beatName').value;
-  const beatPrice = document.getElementById('beatPrice').value;
-  const imageFile = document.getElementById('imageFile').files[0];
-  const audioFile = document.getElementById('audioFile').files[0];
-
-  // Ensure files are selected before uploading
-  if (imageFile && audioFile) {
-    const beatData = {
-      name: beatName,
-      price: beatPrice
-    };
-
-    // Upload beat data
-    uploadBeatData(beatData, imageFile, audioFile);
-  } else {
-    alert("Please select both an image and an audio file.");
-  }
-}
-
-// Attach event listener to form
-document.getElementById('beatForm').addEventListener('submit', handleFormSubmit);
+        alert("Beat uploaded successfully!");
+        document.getElementById("beatForm").reset();
+    } catch (error) {
+        console.error("Upload failed:", error);
+        alert("Error uploading beat!");
+    }
+});
+console.error("Upload failed:", error.message);
