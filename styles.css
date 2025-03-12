@@ -8,7 +8,7 @@ html, body {
 }
 
 body {
-  font-family: 'Gill Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: #fff; /* Light mode is default */
   color: #000;
   flex: 1;
@@ -17,12 +17,13 @@ body {
 
 /* Header */
 header {
+  font-family: 'Gill Sans', sans-serif; /* Header Font */
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
   flex-wrap: wrap;
-  background-color: inherit; /* Same as body */
+  background-color: inherit; /* Same as body *//
 }
 
 /* Navigation */
@@ -149,6 +150,7 @@ header nav a:not(:last-child)::after {
 
 /* Footer */
 footer {
+  font-family: 'Inter', sans-serif; /* Footer Font */
   background-color: #efeeee;
   padding: 20px;
   text-align: center;
@@ -244,18 +246,6 @@ body.dark-mode .mode-link[data-theme="dark"] {
 }
 
 /* Mobile Optimization */
-@media (max-width: 1024px) {
-  .product-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 800px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 500px) {
   header {
     flex-direction: column;
@@ -264,9 +254,11 @@ body.dark-mode .mode-link[data-theme="dark"] {
   }
 
   header nav {
+    display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 10px; /* Adjust space between buttons */
     margin-top: 15px;
+    flex-wrap: nowrap; /* Prevent wrapping */
   }
 
   header nav a {
@@ -297,49 +289,6 @@ body.dark-mode .mode-link[data-theme="dark"] {
   }
 }
 
-/* Audio Progress Bar (Slider) */
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 5px;
-  background: #ddd;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.1s ease;
-}
-
-input[type="range"]:focus {
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  background: #efb2b2cb;
-  height: 5px;
-  border-radius: 5px;
-}
-
-input[type="range"]::-moz-range-track {
-  background: #dc9090cb;
-  height: 5px;
-  border-radius: 5px;
-}
-
-input[type="range"]::-ms-track {
-  background: #cc7373cb;
-  height: 5px;
-  border-radius: 5px;
-  border-color: transparent;
-}
-
-/* Remove the thumb completely */
-input[type="range"]::-webkit-slider-thumb,
-input[type="range"]::-moz-range-thumb,
-input[type="range"]::-ms-thumb {
-  width: 0;
-  height: 0;
-  background: transparent;
-}
 
 /* Glitch Effect Animation */
 @keyframes glitch {
