@@ -21,10 +21,11 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 10px 15px;
   flex-wrap: nowrap; /* Prevent wrapping of navigation items */
   background-color: inherit;
   overflow: hidden; /* Prevent scrolling */
+  width: 100%;
 }
 
 /* Navigation */
@@ -32,8 +33,9 @@ header nav {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   flex-wrap: nowrap; /* Prevent wrapping on small screens */
+  width: 100%; /* Take full width */
 }
 
 /* Navigation Links */
@@ -42,8 +44,9 @@ header nav a {
   align-items: center;
   text-decoration: none;
   color: inherit;
-  font-size: 1.2rem;
+  font-size: 1rem;
   padding: 5px;
+  white-space: nowrap; /* Prevent text from wrapping */
 }
 
 /* Active Link Styles */
@@ -52,20 +55,33 @@ header nav a.current {
   text-decoration: underline;
 }
 
-/* Mobile View - Prevent wrapping, maintain one row */
-@media (max-width: 768px) {
-  header nav {
-      justify-content: space-between; /* Ensure there’s space between items */
-      gap: 10px;
-      width: 100%; /* Take full width */
+/* Mobile View */
+@media (max-width: 500px) {
+  header {
+      padding: 10px 5px; /* Adjust padding for smaller screens */
   }
   
-  header {
-      overflow: visible; /* Allow the content to expand if necessary */
+  header nav {
+      gap: 5px; /* Reduce gap between items on small screens */
   }
   
   header nav a {
-      font-size: 1rem; /* Reduce font size for smaller devices */
+      font-size: 0.9rem; /* Reduce font size for smaller screens */
+  }
+}
+
+/* Tablet View (max-width: 768px) */
+@media (max-width: 768px) {
+  header {
+      padding: 10px 10px; /* Slightly more padding for tablet */
+  }
+
+  header nav {
+      gap: 10px; /* Slightly larger gap for tablets */
+  }
+
+  header nav a {
+      font-size: 1rem; /* Font size for tablet screens */
   }
 }
 
