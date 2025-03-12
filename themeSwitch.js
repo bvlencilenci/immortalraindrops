@@ -29,3 +29,33 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   });
 });
+const modeLinks = document.querySelectorAll('.mode-link');
+const body = document.body;
+
+// Check localStorage for saved mode
+const savedMode = localStorage.getItem('theme');
+if (savedMode === 'dark') {
+  body.classList.add('dark-mode');
+  document.querySelector('.mode-link[data-theme="dark"]').classList.add('active');
+} else {
+  body.classList.remove('dark-mode');
+  document.querySelector('.mode-link[data-theme="light"]').classList.add('active');
+}
+
+// Toggle mode when clicking
+modeLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isDarkMode = link.getAttribute('data-theme') === 'dark';
+
+    // Apply mode
+    body.classList.toggle('dark-mode', isDarkMode);
+
+    // Save mode to localStorage
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+
+    // Update active mode styling
+    modeLinks.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});

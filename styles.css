@@ -103,7 +103,7 @@ header nav a:not(:last-child)::after {
 
 .cta-btn:hover {
   background-color: #832424cb;
-  animation: glitch 0.4s ease-in-out forwards; /* Shorter duration and stops at final state */
+  animation: glitch 0.4s ease-in-out forwards;
 }
 
 /* Standard Button Styles */
@@ -119,7 +119,7 @@ header nav a:not(:last-child)::after {
 
 .btn:hover {
   background-color: #cb14668f;
-  animation: glitch 0.4s ease-in-out forwards; /* Shorter duration and stops at final state */
+  animation: glitch 0.4s ease-in-out forwards;
 }
 
 /* Product Grid */
@@ -174,7 +174,7 @@ footer .social-links a:hover {
 footer .footer-email {
   color: #bf3636cb;
   text-decoration: none;
-  margin-top: 10px; /* Adjusted to reduce gap */
+  margin-top: 10px;
 }
 
 footer .footer-email:hover {
@@ -222,6 +222,7 @@ body.dark-mode footer {
   gap: 5px;
 }
 
+/* Fix: Only underline and bold the active mode */
 .mode-link {
   text-decoration: none;
   color: inherit;
@@ -231,7 +232,13 @@ body.dark-mode footer {
   transition: color 0.3s ease-in-out;
 }
 
-.mode-link.current {
+/* Ensure only one mode link is highlighted */
+body:not(.dark-mode) .mode-link[data-theme="light"] {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+body.dark-mode .mode-link[data-theme="dark"] {
   font-weight: bold;
   text-decoration: underline;
 }
@@ -292,8 +299,8 @@ body.dark-mode footer {
 
 /* Audio Progress Bar (Slider) */
 input[type="range"] {
-  -webkit-appearance: none;  /* For WebKit-based browsers like Chrome and Safari */
-  appearance: none;          /* For other browsers */
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   height: 5px;
   background: #ddd;
@@ -342,46 +349,38 @@ input[type="range"]::-ms-thumb {
   75% { transform: translateX(-2px); opacity: 0.9; }
   100% { transform: translateX(0); opacity: 1; }
 }
-/* Remove the thumb completely */
-input[type="range"]::-webkit-slider-thumb {
-  display: none;
+/* Mode Switch */
+.mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-input[type="range"]::-moz-range-thumb {
-  display: none;
+/* Mode Link Styles */
+.mode-link {
+  text-decoration: none;
+  color: inherit;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s ease-in-out;
 }
 
-input[type="range"]::-ms-thumb {
-  display: none;
-}
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-top: 20px;
+/* Default active mode (light mode) */
+.mode-link[data-theme="light"].active {
+  font-weight: bold;
+  text-decoration: underline;
 }
 
-.beat-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: center;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* Active mode when dark mode is selected */
+body.dark-mode .mode-link[data-theme="dark"] {
+  font-weight: bold;
+  text-decoration: underline;
 }
 
-.beat-card img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
+/* Remove highlight from inactive mode */
+body.dark-mode .mode-link[data-theme="light"] {
+  font-weight: normal;
+  text-decoration: none;
 }
 
-.beat-card h3 {
-  font-size: 1.2em;
-  margin: 10px 0;
-}
-
-.beat-card p {
-  font-size: 1em;
-  color: #333;
-}
