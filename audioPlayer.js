@@ -1,51 +1,82 @@
-document.addEventListener('DOMContentLoaded', function () {
-  // Loop through all audio players
-  for (let i = 1; i <= 12; i++) {
-      const audioPlayer = document.getElementById(`audio${i}`);
-      const playPauseBtn = document.getElementById(`playPauseBtn${i}`);
-      const seekBar = document.getElementById(`seekBar${i}`);
-      const currentTime = document.getElementById(`current-time${i}`);
-      const duration = document.getElementById(`duration${i}`);
-      
-      // Update duration display when audio metadata is loaded
-      audioPlayer.addEventListener('loadedmetadata', function () {
-          const durationFormatted = formatTime(audioPlayer.duration);
-          duration.textContent = durationFormatted;
-      });
+function displayBeats() {
+    const beats = JSON.parse(localStorage.getItem("beats")) || [];
+    const archiveContainer = document.getElementById("archiveContainer");
+    archiveContainer.innerHTML = ""; // Clear any existing content
 
-      // Play/Pause button functionality
-      playPauseBtn.addEventListener('click', function () {
-          if (audioPlayer.paused) {
-              audioPlayer.play();
-              playPauseBtn.textContent = 'Pause';
-          } else {
-              audioPlayer.pause();
-              playPauseBtn.textContent = 'Play';
-          }
-      });
+    beats.forEach(beat => {
+        const archiveItem = document.createElement("div");
+        archiveItem.classList.add("archive-item");
 
-      // Update seek bar as audio plays
-      audioPlayer.addEventListener('timeupdate', function () {
-          const currentTimeFormatted = formatTime(audioPlayer.currentTime);
-          currentTime.textContent = currentTimeFormatted;
+        // Beat Name
+        const beatTitle = document.createElement("h2");
+        beatTitle.textContent = beat.name;
+        archiveItem.appendChild(beatTitle);
 
-          const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-          seekBar.style.background = `linear-gradient(to right, #bf3636cb ${progress}%, #ddd ${progress}%)`;  // Fill up the progress bar without showing thumb
-      });
+        // Beat Image with audio controls
+        const beatImageContainer = document.createElement("div");
+        beatImageContainer.classList.add("beat-image-container");
 
-      // Optional: Allow clicking on the progress bar to seek
-      seekBar.addEventListener('click', function (e) {
-          const rect = seekBar.getBoundingClientRect();
-          const offsetX = e.clientX - rect.left;
-          const newTime = (offsetX / rect.width) * audioPlayer.duration;
-          audioPlayer.currentTime = newTime;
-      });
-  }
+        const beatImage = document.createElement("img");
+        beatImage.src = beat.imageSrc;
+        beatImage.alt = beat.name;
+        beatImage.classList.add("beat-image");
+        beatImageContainer.appendChild(beatImage);
 
-  // Format time as mm:ss
-  function formatTime(seconds) {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = Math.floor(seconds % 60);
-      return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  }
-});
+        // Audio Player Controls on the Image
+        const audioControls = document.createElement("div");
+        audioControls.classList.add("audio-controls");
+        
+        // Play Button as a triangle icon
+        const playButton = document.createElement("button");
+        playButton.classList.add("play-btn");
+        playButton.innerHTML = '<i class="fas fa-play"></i>';  // FontAwesome triangle icon
+        audioControls.appendChild(playButton);
+
+        const audioProgress = document.createElement("input");
+        audioProgress.type = "range";
+        audioProgress.classList.add("audio-progress");
+        audioProgress.value = 0;
+        audioProgress.max = 100;
+        audioControls.appendChild(audioProgress);
+
+        beatImageContainer.appendChild(audioControls);
+        archiveItem.appendChild(beatImageContainer);
+
+        // Audio Source
+        const audio = document.createElement("audio");
+        audio.src = beat.audioSrc;
+        audio.preload = "metadata";
+        beatImageContainer.dataset.audio = audio; // Store the audio in the container for easy access
+
+        // Price
+        const priceElement = document.createElement("p");
+        priceElement.textContent = `$${beat.price.toFixed(2)}`;
+        archiveItem.appendChild(priceElement);
+
+        // Append to archive container
+        archiveContainer.appendChild(archiveItem);
+
+        // Add event listeners for play/pause and audio progress
+        playButton.addEventListener("click", () => {
+            if (audio.paused) {
+                audio.play();
+                playButton.innerHTML = '<i class="fas fa-pause"></i>'; // Change icon to pause
+            } else {
+                audio.pause();
+                playButton.innerHTML = '<i class="fas fa-play"></i>'; // Change icon back to play
+            }
+        });
+
+        audio.addEventListener("timeupdate", () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            audioProgress.value = progress;
+        });
+
+        audioProgress.addEventListener("input", (event) => {
+            const progress = event.target.value;
+            audio.currentTime = (audio.duration / 100) * progress;
+        });
+    });
+}
+
+window.onload = displayBeats;

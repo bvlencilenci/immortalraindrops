@@ -344,3 +344,83 @@ body.dark-mode .mode-link[data-theme="light"] {
   text-decoration: none;
 }
 
+/* Archive Container */
+.archive-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Default: 4 items per row */
+  gap: 20px;
+  padding: 20px;
+  justify-items: center; /* Align items to the center */
+  margin: 0 auto; /* Center container */
+}
+
+/* Make the archive item more to the right */
+.archive-item {
+  position: relative;
+  width: 90%; /* Adjust width to make room for alignment */
+  display: inline-block;
+  margin: 10px;
+  justify-self: center; /* Align each item to the center of the grid */
+}
+
+/* Responsive Layout: Tablet (2 items per row) */
+@media (max-width: 1024px) {
+  .archive-container {
+      grid-template-columns: repeat(2, 1fr); /* 2 items per row on tablets */
+  }
+}
+
+/* Responsive Layout: Mobile (1 item per row) */
+@media (max-width: 768px) {
+  .archive-container {
+      grid-template-columns: 1fr; /* 1 item per row on mobile */
+  }
+}
+
+/* General Archive Item Styling */
+.archive-item {
+  width: 100%; /* Take full width in mobile view */
+  max-width: 350px; /* Set a max-width to prevent large items */
+  margin: 10px;
+}
+
+.beat-image-container {
+  position: relative;
+}
+
+.beat-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.audio-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+}
+
+.play-btn {
+  background: transparent;
+  border: none;
+  font-size: 30px;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.play-btn:hover {
+  color: #ff5733; /* Change this color as needed */
+}
+
+.audio-progress {
+  width: 80%;
+  margin-left: 10px;
+  cursor: pointer;
+}

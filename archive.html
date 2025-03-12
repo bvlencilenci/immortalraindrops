@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive - Immortal Raindrops</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -19,9 +20,8 @@
         <div class="mode-switch">
             <a href="#" class="mode-link active" data-theme="light">Light</a>/
             <a href="#" class="mode-link" data-theme="dark">Dark</a>
-          </div>
-          
-        
+        </div>
+
         <h1>Immortal Raindrops</h1>
 
         <nav>
@@ -54,8 +54,10 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="themeSwitch.js"></script>
-    <script src="audioPlayer.js"></script>
+    <script src="initializeData.js"></script>
+<script src="themeSwitch.js"></script>
+<script src="audioPlayer.js"></script>
+
     <script>
         function displayBeats() {
             const beats = JSON.parse(localStorage.getItem("beats")) || [];
@@ -71,35 +73,69 @@
                 beatTitle.textContent = beat.name;
                 archiveItem.appendChild(beatTitle);
 
-                // Beat Image
+                // Beat Image with audio controls
+                const beatImageContainer = document.createElement("div");
+                beatImageContainer.classList.add("beat-image-container");
+
                 const beatImage = document.createElement("img");
                 beatImage.src = beat.imageSrc;
                 beatImage.alt = beat.name;
-                archiveItem.appendChild(beatImage);
+                beatImage.classList.add("beat-image");
+                beatImageContainer.appendChild(beatImage);
 
-                // Audio Player
-                const audioPlayer = document.createElement("div");
-                audioPlayer.classList.add("custom-audio-player");
+                // Audio Player Controls on the Image
+                const audioControls = document.createElement("div");
+                audioControls.classList.add("audio-controls");
+                const playButton = document.createElement("button");
+                playButton.classList.add("play-btn");
+                playButton.textContent = "Play";
+                audioControls.appendChild(playButton);
+
+                const audioProgress = document.createElement("input");
+                audioProgress.type = "range";
+                audioProgress.classList.add("audio-progress");
+                audioProgress.value = 0;
+                audioProgress.max = 100;
+                audioControls.appendChild(audioProgress);
+
+                beatImageContainer.appendChild(audioControls);
+                archiveItem.appendChild(beatImageContainer);
+
+                // Audio Source
                 const audio = document.createElement("audio");
-                audio.preload = "metadata";
                 audio.src = beat.audioSrc;
-                audio.controls = true;
-                audioPlayer.appendChild(audio);
-                archiveItem.appendChild(audioPlayer);
+                audio.preload = "metadata";
+                beatImageContainer.dataset.audio = audio; // Store the audio in the container for easy access
 
                 // Price
                 const priceElement = document.createElement("p");
                 priceElement.textContent = `$${beat.price.toFixed(2)}`;
                 archiveItem.appendChild(priceElement);
 
-                // "Bag It" button
-                const bagItButton = document.createElement("button");
-                bagItButton.classList.add("btn");
-                bagItButton.textContent = "Bag It";
-                archiveItem.appendChild(bagItButton);
-
+                
                 // Append to archive container
                 archiveContainer.appendChild(archiveItem);
+
+                // Add event listeners for play/pause and audio progress
+                playButton.addEventListener("click", () => {
+                    if (audio.paused) {
+                        audio.play();
+                        playButton.textContent = "Pause";
+                    } else {
+                        audio.pause();
+                        playButton.textContent = "Play";
+                    }
+                });
+
+                audio.addEventListener("timeupdate", () => {
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    audioProgress.value = progress;
+                });
+
+                audioProgress.addEventListener("input", (event) => {
+                    const progress = event.target.value;
+                    audio.currentTime = (audio.duration / 100) * progress;
+                });
             });
         }
 
