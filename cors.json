@@ -1,0 +1,17 @@
+[
+  {
+    "origin": [
+      "http://immortalraindrops.com",
+      "https://immortalraindrops.com"
+    ],
+    "responseHeader": [
+      "Content-Type"
+    ],
+    "method": [
+      "GET",
+      "POST",
+      "OPTIONS"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]
