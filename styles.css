@@ -69,7 +69,6 @@ header nav a.current {
   }
 }
 
-
 /* Hero Section */
 .hero {
   background-color: #ddd; /* Light mode */
@@ -245,105 +244,6 @@ body.dark-mode .mode-link[data-theme="dark"] {
   text-decoration: underline;
 }
 
-/* Mobile Optimization */
-@media (max-width: 500px) {
-  header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 10px;
-  }
-
-  header nav {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: nowrap; /* Prevent wrapping */
-    overflow: hidden; /* Hide overflow */
-    width: 100%; /* Ensure the nav is full width */
-  }
-
-  header nav a {
-    font-size: 1rem; /* Adjust font size to fit better */
-    margin: 0 5px;
-    white-space: nowrap; /* Prevent text from wrapping */
-    padding: 5px 10px; /* Adjust padding to reduce button size */
-  }
-
-  header nav a.current {
-    font-weight: bold;
-    text-decoration: underline;
-  }
-
-  .product-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .product-info h3 {
-    font-size: 1.3rem;
-  }
-
-  .product-info p {
-    font-size: 1rem;
-  }
-
-  .btn {
-    padding: 8px 15px;
-    font-size: 1rem;
-  }
-
-  .cta-btn {
-    font-size: 1.3rem;
-    padding: 12px 20px;
-  }
-}
-
-
-
-/* Glitch Effect Animation */
-@keyframes glitch {
-  0% { transform: translateX(0); opacity: 1; }
-  25% { transform: translateX(-2px); opacity: 0.9; }
-  50% { transform: translateX(2px); opacity: 0.8; }
-  75% { transform: translateX(-2px); opacity: 0.9; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-/* Mode Switch */
-.mode-switch {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-/* Mode Link Styles */
-.mode-link {
-  text-decoration: none;
-  color: inherit;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 5px;
-  transition: color 0.3s ease-in-out;
-}
-
-/* Default active mode (light mode) */
-.mode-link[data-theme="light"].active {
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-/* Active mode when dark mode is selected */
-body.dark-mode .mode-link[data-theme="dark"] {
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-/* Remove highlight from inactive mode */
-body.dark-mode .mode-link[data-theme="light"] {
-  font-weight: normal;
-  text-decoration: none;
-}
-
 /* General Archive Item Styling */
 .archive-item {
   position: relative;
@@ -389,9 +289,11 @@ body.dark-mode .mode-link[data-theme="light"] {
       grid-template-columns: 1fr; /* 1 item per row on mobile */
   }
 }
+
+/* Adjusting Beat Image Size */
 .beat-image {
-  width: 1200px;  /* Set exact width */
-  height: 1200px; /* Set exact height */
+  width: 1200px;  /* Set exact width for the image */
+  height: 1200px; /* Set exact height for the image */
   object-fit: cover;
   border-radius: 8px;
 }

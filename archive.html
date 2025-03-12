@@ -4,26 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive - Immortal Raindrops</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap" rel="stylesheet">
+    <style>
+        /* ... Your CSS styles ... */
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.24.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.24.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script> 
 </head>
 <body>
-
     <!-- Header -->
     <header>
-        <!-- Mode Switch -->
+        <!-- Mode Switch (Left Side) -->
         <div class="mode-switch">
             <a href="#" class="mode-link active" data-theme="light">Light</a>/
             <a href="#" class="mode-link" data-theme="dark">Dark</a>
         </div>
 
         <h1>Immortal Raindrops</h1>
-
         <nav>
             <a href="index.html">Home</a>
             <a href="archive.html" class="current">Archive</a>
@@ -32,11 +30,7 @@
         </nav>
     </header>
 
-    <h1>Archive</h1>
-
-    <section class="archive-container" id="archiveContainer">
-        <!-- Archive items will be dynamically inserted here -->
-    </section>
+    <div class="archive-container"></div> <!-- Empty container -->
 
     <!-- Footer -->
     <footer>
@@ -44,102 +38,47 @@
             <p><strong>Get in touch with us at:</strong></p>
             <p><a href="mailto:contact@immortalraindrops.com" class="footer-email">contact@immortalraindrops.com</a></p>
         </div>
-
+        
         <p>&copy; 2025 Immortal Raindrops</p>
-
+        
         <div class="social-links">
             <a href="https://www.instagram.com/theimmortalraindrops" target="_blank">Instagram</a> |
             <a href="https://soundcloud.com/immortal-raindrops" target="_blank">SoundCloud</a>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="initializeData.js"></script>
-<script src="themeSwitch.js"></script>
-<script src="audioPlayer.js"></script>
-
+    <script src="audioPlayer.js"></script>
+    <script src="themeSwitch.js"></script>
     <script>
-        function displayBeats() {
-            const beats = JSON.parse(localStorage.getItem("beats")) || [];
-            const archiveContainer = document.getElementById("archiveContainer");
-            archiveContainer.innerHTML = "";
+        document.addEventListener('DOMContentLoaded', function() {
+            // ... Navigation highlighting script ...
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const db = firebase.firestore();
+            const archiveContainer = document.querySelector('.archive-container');
 
-            beats.forEach(beat => {
-                const archiveItem = document.createElement("div");
-                archiveItem.classList.add("archive-item");
-
-                // Beat Name
-                const beatTitle = document.createElement("h2");
-                beatTitle.textContent = beat.name;
-                archiveItem.appendChild(beatTitle);
-
-                // Beat Image with audio controls
-                const beatImageContainer = document.createElement("div");
-                beatImageContainer.classList.add("beat-image-container");
-
-                const beatImage = document.createElement("img");
-                beatImage.src = beat.imageSrc;
-                beatImage.alt = beat.name;
-                beatImage.classList.add("beat-image");
-                beatImageContainer.appendChild(beatImage);
-
-                // Audio Player Controls on the Image
-                const audioControls = document.createElement("div");
-                audioControls.classList.add("audio-controls");
-                const playButton = document.createElement("button");
-                playButton.classList.add("play-btn");
-                playButton.textContent = "Play";
-                audioControls.appendChild(playButton);
-
-                const audioProgress = document.createElement("input");
-                audioProgress.type = "range";
-                audioProgress.classList.add("audio-progress");
-                audioProgress.value = 0;
-                audioProgress.max = 100;
-                audioControls.appendChild(audioProgress);
-
-                beatImageContainer.appendChild(audioControls);
-                archiveItem.appendChild(beatImageContainer);
-
-                // Audio Source
-                const audio = document.createElement("audio");
-                audio.src = beat.audioSrc;
-                audio.preload = "metadata";
-                beatImageContainer.dataset.audio = audio; // Store the audio in the container for easy access
-
-                // Price
-                const priceElement = document.createElement("p");
-                priceElement.textContent = `$${beat.price.toFixed(2)}`;
-                archiveItem.appendChild(priceElement);
-
-                
-                // Append to archive container
-                archiveContainer.appendChild(archiveItem);
-
-                // Add event listeners for play/pause and audio progress
-                playButton.addEventListener("click", () => {
-                    if (audio.paused) {
-                        audio.play();
-                        playButton.textContent = "Pause";
-                    } else {
-                        audio.pause();
-                        playButton.textContent = "Play";
-                    }
+            try {
+                const querySnapshot = await db.collection('beats').get();
+                querySnapshot.forEach(doc => {
+                    const beatData = doc.data();
+                    const archiveItem = `
+                        <div class="archive-item">
+                            <a href="${beatData.url}">
+                                <div class="beat-image-container">
+                                    <img src="${beatData.imageUrl}" alt="${beatData.title}">
+                                </div>
+                            </a>
+                        </div>
+                    `;
+                    archiveContainer.innerHTML += archiveItem;
                 });
-
-                audio.addEventListener("timeupdate", () => {
-                    const progress = (audio.currentTime / audio.duration) * 100;
-                    audioProgress.value = progress;
-                });
-
-                audioProgress.addEventListener("input", (event) => {
-                    const progress = event.target.value;
-                    audio.currentTime = (audio.duration / 100) * progress;
-                });
-            });
-        }
-
-        window.onload = displayBeats;
+            } catch (error) {
+                console.error("Error fetching beats from Firestore:", error);
+                archiveContainer.innerHTML = "<p>Error loading archive. Please try again later.</p>"; // User-friendly error message
+            }
+        });
     </script>
 </body>
 </html>
