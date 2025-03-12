@@ -16,7 +16,6 @@ body {
 }
 
 /* Header */
-/* Header */
 header {
   font-family: 'Gill Sans', sans-serif;
   display: flex;
@@ -25,7 +24,7 @@ header {
   padding: 10px 20px;
   flex-wrap: nowrap; /* Prevent wrapping of navigation items */
   background-color: inherit;
-  overflow-x: auto; /* Allows horizontal scroll if needed */
+  overflow: hidden; /* Prevent scrolling */
 }
 
 /* Navigation */
@@ -56,13 +55,13 @@ header nav a.current {
 /* Mobile View - Prevent wrapping, maintain one row */
 @media (max-width: 768px) {
   header nav {
-      justify-content: flex-start;
+      justify-content: space-between; /* Ensure there’s space between items */
       gap: 10px;
-      margin-top: 5px;
+      width: 100%; /* Take full width */
   }
   
   header {
-      overflow-x: auto; /* Enable horizontal scrolling for small devices */
+      overflow: visible; /* Allow the content to expand if necessary */
   }
   
   header nav a {
