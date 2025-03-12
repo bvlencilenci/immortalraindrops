@@ -30,7 +30,7 @@
 
     <script>
         // Event listener to handle the form submission
-        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+        document.getElementById("uploadForm").addEventListener("submit", async function(event) {
             event.preventDefault();
 
             // Get values from form fields
@@ -39,31 +39,39 @@
             const audioFile = document.getElementById("audio").files[0];
             const imageFile = document.getElementById("image").files[0];
 
-            // Generate unique ID for the new beat (can use a timestamp or any other method)
-            const beatId = new Date().getTime();
+            if (!beatName || !price || !audioFile || !imageFile) {
+                alert("All fields are required!");
+                return;
+            }
 
-            // Store the beat data in localStorage (or send it to the server if needed)
-            const beatData = {
-                id: beatId,
-                name: beatName,
-                price: price,
-                audioSrc: URL.createObjectURL(audioFile),
-                imageSrc: URL.createObjectURL(imageFile),
-            };
+            try {
+                // Upload audio and image files to Firebase Storage
+                const audioRef = storage.ref(`beats/${audioFile.name}`);
+                const imageRef = storage.ref(`images/${imageFile.name}`);
 
-            // Retrieve the existing beats from localStorage (if any)
-            let beats = JSON.parse(localStorage.getItem("beats")) || [];
+                await audioRef.put(audioFile);
+                await imageRef.put(imageFile);
 
-            // Add the new beat data to the array
-            beats.push(beatData);
+                // Get download URLs for audio and image
+                const audioURL = await audioRef.getDownloadURL();
+                const imageURL = await imageRef.getDownloadURL();
 
-            // Save the updated beats array back to localStorage
-            localStorage.setItem("beats", JSON.stringify(beats));
+                // Save beat data in Firestore
+                await db.collection("beats").add({
+                    name: beatName,
+                    price: price,
+                    audio: audioURL,
+                    image: imageURL,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
 
-            // Clear the form after submission
-            document.getElementById("uploadForm").reset();
+                alert("Beat uploaded successfully!");
+                window.location.href = "index.html"; // Redirect to homepage after successful upload
 
-            alert("Beat uploaded successfully!");
+            } catch (error) {
+                console.error("Error uploading beat:", error);
+                alert("Error uploading beat.");
+            }
         });
     </script>
 </body>

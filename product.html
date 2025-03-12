@@ -1,0 +1,32 @@
+<h1 id="beatTitle"></h1>
+<img id="beatImage" width="300">
+<p id="beatPrice"></p>
+<audio id="beatAudio" controls></audio>
+
+<script>
+async function loadBeat() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const beatId = urlParams.get("id"); // Get the beat ID from URL
+
+    if (!beatId) {
+        document.body.innerHTML = "<h1>Beat Not Found</h1>";
+        return;
+    }
+
+    // Fetch the beat data from Firestore
+    const doc = await db.collection("beats").doc(beatId).get();
+
+    if (!doc.exists) {
+        document.body.innerHTML = "<h1>Beat Not Found</h1>";
+        return;
+    }
+
+    const beat = doc.data();
+    document.getElementById("beatTitle").textContent = beat.name;
+    document.getElementById("beatPrice").textContent = `Price: $${beat.price.toFixed(2)}`;
+    document.getElementById("beatImage").src = beat.image;
+    document.getElementById("beatAudio").src = beat.audio;
+}
+
+loadBeat(); // Call function to load beat data
+</script>

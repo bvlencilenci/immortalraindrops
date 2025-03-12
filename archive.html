@@ -5,13 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive - Immortal Raindrops</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <!-- Header -->
     <header>
+        <!-- Mode Switch -->
+        <div class="mode-switch">
+            <a href="#" class="mode-link current" data-mode="dark">Dark</a> /
+            <a href="#" class="mode-link" data-mode="light">Light</a>
+        </div>
+        
         <h1>Immortal Raindrops</h1>
+
         <nav>
             <a href="index.html">Home</a>
             <a href="archive.html" class="current">Archive</a>
+            <a href="roster.html">Roster</a>
             <a href="cart.html">Cart</a>
         </nav>
     </header>
@@ -22,16 +37,30 @@
         <!-- Archive items will be dynamically inserted here -->
     </section>
 
+    <!-- Footer -->
     <footer>
+        <div class="contact-info">
+            <p><strong>Get in touch with us at:</strong></p>
+            <p><a href="mailto:contact@immortalraindrops.com" class="footer-email">contact@immortalraindrops.com</a></p>
+        </div>
+
         <p>&copy; 2025 Immortal Raindrops</p>
+
+        <div class="social-links">
+            <a href="https://www.instagram.com/youraccount" target="_blank" rel="noopener noreferrer">Instagram</a> |
+            <a href="https://soundcloud.com/youraccount" target="_blank" rel="noopener noreferrer">SoundCloud</a>
+        </div>
     </footer>
 
+    <!-- Scripts -->
+    <script src="themeSwitch.js"></script>
+    <script src="audioPlayer.js"></script>
     <script>
-        // Function to create and display archive items
         function displayBeats() {
             const beats = JSON.parse(localStorage.getItem("beats")) || [];
+            const archiveContainer = document.getElementById("archiveContainer");
+            archiveContainer.innerHTML = "";
 
-            // Loop through all the beats and create archive items
             beats.forEach(beat => {
                 const archiveItem = document.createElement("div");
                 archiveItem.classList.add("archive-item");
@@ -55,20 +84,6 @@
                 audio.src = beat.audioSrc;
                 audio.controls = true;
                 audioPlayer.appendChild(audio);
-
-                // Add the play button and progress bar (optional)
-                const playButton = document.createElement("button");
-                playButton.classList.add("play-button");
-                playButton.textContent = "Play";
-                audioPlayer.appendChild(playButton);
-
-                const progressBar = document.createElement("div");
-                progressBar.classList.add("progress-bar");
-                const progressFill = document.createElement("div");
-                progressFill.classList.add("progress-fill");
-                progressBar.appendChild(progressFill);
-                audioPlayer.appendChild(progressBar);
-
                 archiveItem.appendChild(audioPlayer);
 
                 // Price
@@ -83,11 +98,10 @@
                 archiveItem.appendChild(bagItButton);
 
                 // Append to archive container
-                document.getElementById("archiveContainer").appendChild(archiveItem);
+                archiveContainer.appendChild(archiveItem);
             });
         }
 
-        // Call the function to display beats when the page loads
         window.onload = displayBeats;
     </script>
 </body>
