@@ -8,71 +8,27 @@
 <body>
     <h1>Upload Your Beat</h1>
 
-    <form id="uploadForm">
+    <form id="beatForm">
         <label for="beatName">Beat Name:</label>
         <input type="text" id="beatName" required>
         <br>
 
-        <label for="price">Price:</label>
-        <input type="number" id="price" step="0.01" required>
+        <label for="beatPrice">Price:</label>
+        <input type="number" id="beatPrice" step="0.01" required>
         <br>
 
-        <label for="audio">Audio File:</label>
-        <input type="file" id="audio" accept="audio/*" required>
+        <label for="imageFile">Image File:</label>
+        <input type="file" id="imageFile" accept="image/*" required>
         <br>
 
-        <label for="image">Image File:</label>
-        <input type="file" id="image" accept="image/*" required>
+        <label for="audioFile">Audio File:</label>
+        <input type="file" id="audioFile" accept="audio/*" required>
         <br>
 
         <button type="submit">Upload</button>
     </form>
 
-    <script>
-        // Event listener to handle the form submission
-        document.getElementById("uploadForm").addEventListener("submit", async function(event) {
-            event.preventDefault();
-
-            // Get values from form fields
-            const beatName = document.getElementById("beatName").value;
-            const price = parseFloat(document.getElementById("price").value);
-            const audioFile = document.getElementById("audio").files[0];
-            const imageFile = document.getElementById("image").files[0];
-
-            if (!beatName || !price || !audioFile || !imageFile) {
-                alert("All fields are required!");
-                return;
-            }
-
-            try {
-                // Upload audio and image files to Firebase Storage
-                const audioRef = storage.ref(`beats/${audioFile.name}`);
-                const imageRef = storage.ref(`images/${imageFile.name}`);
-
-                await audioRef.put(audioFile);
-                await imageRef.put(imageFile);
-
-                // Get download URLs for audio and image
-                const audioURL = await audioRef.getDownloadURL();
-                const imageURL = await imageRef.getDownloadURL();
-
-                // Save beat data in Firestore
-                await db.collection("beats").add({
-                    name: beatName,
-                    price: price,
-                    audio: audioURL,
-                    image: imageURL,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                alert("Beat uploaded successfully!");
-                window.location.href = "index.html"; // Redirect to homepage after successful upload
-
-            } catch (error) {
-                console.error("Error uploading beat:", error);
-                alert("Error uploading beat.");
-            }
-        });
-    </script>
+    <!-- Import Firebase SDK and other necessary scripts -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>
