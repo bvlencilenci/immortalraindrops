@@ -5,13 +5,9 @@ html, body {
   padding: 0;
   display: flex;
   flex-direction: column;
-}
-
-body {
   font-family: Inter, sans-serif;
-  background-color: #fff; /* Light mode is default */
+  background-color: #fff;
   color: #000;
-  flex: 1;
   overflow-x: hidden;
 }
 
@@ -20,58 +16,37 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  flex-wrap: wrap;
-  background-color: inherit; /* Same as body */
+  padding: 15px 20px;
+  background-color: inherit;
 }
 
 /* Navigation */
 header nav {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 5px 0;
 }
 
 header nav a {
-  display: flex;
-  align-items: center;
   text-decoration: none;
   color: inherit;
-  font-size: 1.2rem;
-  padding: 5px;
+  font-size: 1rem;
+  padding: 5px 10px;
 }
 
-/* Current Link Styles */
 header nav a.current {
   font-weight: bold;
   text-decoration: underline;
 }
 
-/* Current Link Colors (Light and Dark Modes) */
-body:not(.dark-mode) header nav a.current {
-  color: #000; /* Black color for light mode */
-}
-
-body.dark-mode header nav a.current {
-  color: #fff; /* White color for dark mode */
-}
-
-/* Navigation Separator */
-header nav a:not(:last-child)::after {
-  content: " |";
-  margin-left: 50px;
-  margin-right: 10px;
-  color: inherit;
-  font-size: 1.5rem;
-  font-weight: normal;
-  text-decoration: none;
-}
-
 /* Hero Section */
 .hero {
-  background-color: #ddd; /* Light mode */
+  background-color: #ddd;
   padding: 50px 20px;
   text-align: center;
 }
@@ -85,64 +60,52 @@ header nav a:not(:last-child)::after {
 .cta-btn, .btn {
   font-family: "Big Shoulders Stencil", sans-serif;
   font-weight: 700;
-  font-style: normal;
   display: inline-block;
   border-radius: 5px;
   transition: background-color 0.3s ease;
 }
 
-/* CTA Button Styles */
 .cta-btn {
   background-color: #130f80cb;
   color: #fff;
-  padding: 15px 25px;
+  padding: 12px 20px;
   text-decoration: none;
-  font-size: 1.5rem;
-  border: 2px solid #130f80cb; /* Border to match the background */
+  font-size: 1.2rem;
+  border: 2px solid #130f80cb;
 }
 
 .cta-btn:hover {
   background-color: #832424cb;
-  animation: glitch 0.4s ease-in-out forwards; /* Shorter duration and stops at final state */
 }
 
-/* Standard Button Styles */
 .btn {
   background-color: #ca1366b4;
   color: #fff;
-  padding: 10px 20px;
+  padding: 8px 15px;
   text-decoration: none;
   display: block;
   width: 100%;
+  text-align: center;
   margin-top: 10px;
 }
 
 .btn:hover {
   background-color: #cb14668f;
-  animation: glitch 0.4s ease-in-out forwards; /* Shorter duration and stops at final state */
 }
 
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
-  padding: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  padding: 20px;
   text-align: center;
-}
-
-.product {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
 .product img {
   width: 100%;
   height: auto;
   object-fit: cover;
-  max-width: 100%;
-  max-height: 100%;
   border: 2px solid #bf3636cb;
   border-radius: 10px;
 }
@@ -159,7 +122,6 @@ footer .social-links {
   display: flex;
   gap: 6px;
   justify-content: center;
-  margin-top: 1px;
 }
 
 footer .social-links a {
@@ -167,18 +129,9 @@ footer .social-links a {
   text-decoration: none;
 }
 
-footer .social-links a:hover {
-  color: #892525cb;
-}
-
 footer .footer-email {
   color: #bf3636cb;
   text-decoration: none;
-  margin-top: 10px; /* Adjusted to reduce gap */
-}
-
-footer .footer-email:hover {
-  color: #892525cb;
 }
 
 /* Dark Mode */
@@ -187,16 +140,8 @@ body.dark-mode {
   color: #fff;
 }
 
-body.dark-mode header {
-  background-color: #000;
-}
-
 body.dark-mode .hero {
   background-color: #111;
-}
-
-body.dark-mode .product img {
-  border-color: #666;
 }
 
 body.dark-mode .cta-btn {
@@ -207,165 +152,41 @@ body.dark-mode .btn {
   background-color: #cb14668f;
 }
 
-body.dark-mode .btn:hover {
-  background-color: #ca1366b4;
-}
-
-body.dark-mode footer {
-  background-color: #111;
-}
-
-/* Mode Switch */
-.mode-switch {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.mode-link {
-  text-decoration: none;
-  color: inherit;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 5px;
-  transition: color 0.3s ease-in-out;
-}
-
-.mode-link.current {
-  font-weight: bold;
-  text-decoration: underline;
-}
-
 /* Mobile Optimization */
-@media (max-width: 1024px) {
-  .product-grid {
-    grid-template-columns: repeat(3, 1fr);
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
   }
-}
 
-@media (max-width: 800px) {
+  header nav {
+    justify-content: center;
+    padding: 5px;
+  }
+
+  header nav a {
+    font-size: 0.9rem;
+    padding: 5px;
+  }
+
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 500px) {
-  header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  header nav {
-    justify-content: center;
-    gap: 5px;
-    margin-top: 15px;
-  }
-
-  header nav a {
-    font-size: 1.1rem;
-    margin: 0 5px;
-  }
-
   .product-grid {
     grid-template-columns: 1fr;
   }
 
-  .product-info h3 {
-    font-size: 1.3rem;
-  }
-
-  .product-info p {
-    font-size: 1rem;
-  }
-
   .btn {
-    padding: 8px 15px;
     font-size: 1rem;
+    padding: 8px;
   }
 
   .cta-btn {
-    font-size: 1.3rem;
-    padding: 12px 20px;
-  }
-}
-
-/* Audio Progress Bar (Slider) */
-input[type="range"] {
-  -webkit-appearance: none;  /* For WebKit-based browsers like Chrome and Safari */
-  appearance: none;          /* For other browsers */
-  width: 100%;
-  height: 5px;
-  background: #ddd;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.1s ease;
-}
-
-input[type="range"]:focus {
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  background: #efb2b2cb;
-  height: 5px;
-  border-radius: 5px;
-}
-
-input[type="range"]::-moz-range-track {
-  background: #dc9090cb;
-  height: 5px;
-  border-radius: 5px;
-}
-
-input[type="range"]::-ms-track {
-  background: #cc7373cb;
-  height: 5px;
-  border-radius: 5px;
-  border-color: transparent;
-}
-
-/* Remove the thumb completely */
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;  /* Remove thumb for WebKit browsers */
-  appearance: none;          /* Remove thumb for other browsers */
-  width: 0;
-  height: 0;
-  background: transparent;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 0;
-  height: 0;
-  background: transparent;
-}
-
-input[type="range"]::-ms-thumb {
-  width: 0;
-  height: 0;
-  background: transparent;
-}
-
-/* Glitch Effect Animation */
-@keyframes glitch {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  25% {
-    transform: translateX(-2px);
-    opacity: 0.9;
-  }
-  50% {
-    transform: translateX(2px);
-    opacity: 0.8;
-  }
-  75% {
-    transform: translateX(-2px);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
+    font-size: 1.1rem;
+    padding: 10px 15px;
   }
 }

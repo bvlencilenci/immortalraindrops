@@ -3,39 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Beats</title>
+    <title>Upload Beat - Immortal Raindrops</title>
 </head>
 <body>
-    <header>
-        <h1>Upload New Beat</h1>
-    </header>
+    <h1>Upload Your Beat</h1>
 
-    <!-- Password Prompt (Initially Hidden) -->
-    <div id="password-prompt">
-        <label for="password">Enter Password:</label>
-        <input type="password" id="password" />
-        <button onclick="checkPassword()">Submit</button>
-    </div>
+    <form id="uploadForm">
+        <label for="beatName">Beat Name:</label>
+        <input type="text" id="beatName" required>
+        <br>
 
-    <!-- Upload Form (Initially Hidden) -->
-    <div id="upload-section" style="display: none;">
-        <form id="upload-form">
-            <label for="beat-name">Beat Name:</label>
-            <input type="text" id="beat-name" name="beat-name" required><br><br>
+        <label for="price">Price:</label>
+        <input type="number" id="price" step="0.01" required>
+        <br>
 
-            <label for="beat-price">Price:</label>
-            <input type="number" id="beat-price" name="beat-price" required step="0.01"><br><br>
+        <label for="audio">Audio File:</label>
+        <input type="file" id="audio" accept="audio/*" required>
+        <br>
 
-            <label for="beat-file">Upload Beat (MP3 only):</label>
-            <input type="file" id="beat-file" name="beat-file" accept="audio/mp3" required><br><br>
+        <label for="image">Image File:</label>
+        <input type="file" id="image" accept="image/*" required>
+        <br>
 
-            <button type="submit">Upload Beat</button>
-        </form>
-    </div>
+        <button type="submit">Upload</button>
+    </form>
 
-    <!-- Product Grid where beats will be displayed -->
-    <section id="shop-now" class="product-grid"></section>
+    <script>
+        // Event listener to handle the form submission
+        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
 
-    <script src="uploadScript.js"></script>
+            // Get values from form fields
+            const beatName = document.getElementById("beatName").value;
+            const price = parseFloat(document.getElementById("price").value);
+            const audioFile = document.getElementById("audio").files[0];
+            const imageFile = document.getElementById("image").files[0];
+
+            // Generate unique ID for the new beat (can use a timestamp or any other method)
+            const beatId = new Date().getTime();
+
+            // Store the beat data in localStorage (or send it to the server if needed)
+            const beatData = {
+                id: beatId,
+                name: beatName,
+                price: price,
+                audioSrc: URL.createObjectURL(audioFile),
+                imageSrc: URL.createObjectURL(imageFile),
+            };
+
+            // Retrieve the existing beats from localStorage (if any)
+            let beats = JSON.parse(localStorage.getItem("beats")) || [];
+
+            // Add the new beat data to the array
+            beats.push(beatData);
+
+            // Save the updated beats array back to localStorage
+            localStorage.setItem("beats", JSON.stringify(beats));
+
+            // Clear the form after submission
+            document.getElementById("uploadForm").reset();
+
+            alert("Beat uploaded successfully!");
+        });
+    </script>
 </body>
 </html>
