@@ -16,14 +16,16 @@ body {
 }
 
 /* Header */
+/* Header */
 header {
-  font-family: 'Gill Sans', sans-serif; /* Header Font */
+  font-family: 'Gill Sans', sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  flex-wrap: wrap;
-  background-color: inherit; /* Same as body *//
+  padding: 10px 20px;
+  flex-wrap: nowrap; /* Prevent wrapping of navigation items */
+  background-color: inherit;
+  overflow-x: auto; /* Allows horizontal scroll if needed */
 }
 
 /* Navigation */
@@ -32,9 +34,10 @@ header nav {
   justify-content: flex-start;
   align-items: center;
   gap: 15px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Prevent wrapping on small screens */
 }
 
+/* Navigation Links */
 header nav a {
   display: flex;
   align-items: center;
@@ -44,31 +47,29 @@ header nav a {
   padding: 5px;
 }
 
-/* Current Link Styles */
+/* Active Link Styles */
 header nav a.current {
   font-weight: bold;
   text-decoration: underline;
 }
 
-/* Current Link Colors (Light and Dark Modes) */
-body:not(.dark-mode) header nav a.current {
-  color: #000; /* Black color for light mode */
+/* Mobile View - Prevent wrapping, maintain one row */
+@media (max-width: 768px) {
+  header nav {
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 5px;
+  }
+  
+  header {
+      overflow-x: auto; /* Enable horizontal scrolling for small devices */
+  }
+  
+  header nav a {
+      font-size: 1rem; /* Reduce font size for smaller devices */
+  }
 }
 
-body.dark-mode header nav a.current {
-  color: #fff; /* White color for dark mode */
-}
-
-/* Navigation Separator */
-header nav a:not(:last-child)::after {
-  content: " |";
-  margin-left: 50px;
-  margin-right: 10px;
-  color: inherit;
-  font-size: 1.5rem;
-  font-weight: normal;
-  text-decoration: none;
-}
 
 /* Hero Section */
 .hero {
