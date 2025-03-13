@@ -3,94 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Roster - Immortal Raindrops</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        header nav a.current {
-            color: #ffffff;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        /* Roster Styling */
-        .roster-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 members per row */
-            gap: 30px;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .member {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .member img {
-            width: 100%;
-            max-width: 200px;
-            height: auto;
-            border-radius: 10px;
-            border: 2px solid #bf3636cb;
-        }
-
-        .member-name {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .member-role {
-            font-size: 1.2em;
-            color: #bf3636cb;
-            margin-bottom: 10px;
-        }
-
-        .social-links a {
-            color: #bf3636cb;
-            text-decoration: none;
-            margin: 0 5px;
-        }
-
-        .social-links a:hover {
-            color: #892525cb;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 800px) {
-            .roster-container {
-                grid-template-columns: repeat(2, 1fr); /* 2 members per row on medium screens */
-            }
-        }
-
-        @media (max-width: 500px) {
-            .roster-container {
-                grid-template-columns: 1fr; /* 1 member per row on small screens */
-            }
-        }
+        /* Your existing CSS */
     </style>
 </head>
 <body>
     <!-- Header -->
     <header>
-         <!-- Mode Switch (Left Side) -->
-         <div class="mode-switch">
-            <a href="#" class="mode-link active" data-theme="light">Light</a>/
-            <a href="#" class="mode-link" data-theme="dark">Dark</a>
-          </div>
-          
+        <!-- Mode Switch (Left Side) -->
+        <div class="mode-toggle">
+            <span id="light-mode" class="active">Light</span> /
+            <span id="dark-mode">Dark</span>
+        </div>
+        
         <h1>Immortal Raindrops</h1>
         <nav>
             <a href="index.html">Home</a>
             <a href="archive.html">Archive</a>
             <a href="roster.html" class="current">Roster</a>
-            <a href="cart.html" >Cart</a>
+            <a href="cart.html">Cart</a>
         </nav>
     </header>
 
-    <h1> </h1>
+    <h1> <blank></blank></h1>
 
     <div class="roster-container">
         <!-- Member 1 -->
@@ -117,18 +55,18 @@
         
         <!-- Member 5 -->
         <div class="member">
-          <img src="member5.jpg" alt="medicine roentgen">
-          <div class="member-name">Medicine Roentgen</div>
-          <div class="member-role">Producer</div>
-          <div class="social-links">
-              <a href="#" target="_blank">Telegram</a> |
-              <a href="https://on.soundcloud.com/NeHZnn85g7g6VU5c6" target="_blank">SoundCloud</a>
-          </div>
-      </div>
+            <img src="member5.jpg" alt="medicine roentgen">
+            <div class="member-name">Medicine Roentgen</div>
+            <div class="member-role">Producer</div>
+            <div class="social-links">
+                <a href="#" target="_blank">Telegram</a> |
+                <a href="https://on.soundcloud.com/NeHZnn85g7g6VU5c6" target="_blank">SoundCloud</a>
+            </div>
+        </div>
 
         <!-- Member 3 -->
         <div class="member">
-            <img src="member3.jpg" alt="20yrsold">
+            <img src="20yrsoldpic.jpg" alt="20yrsold">
             <div class="member-name">20yrsold</div>
             <div class="member-role">SK8</div>
             <div class="social-links">
@@ -139,7 +77,7 @@
 
         <!-- Member 4 -->
         <div class="member">
-            <img src="member4.jpg" alt="auxide">
+            <img src="auxidepic.jpg" alt="auxide">
             <div class="member-name">Auxide</div>
             <div class="member-role">Backend Developer</div>
             <div class="social-links">
@@ -147,8 +85,6 @@
                 <a href="https://on.soundcloud.com/1qSc5L5zz92A6VRV9" target="_blank">SoundCloud</a>
             </div>
         </div>
-
-        
 
         <!-- Member 6 -->
         <div class="member">
@@ -177,19 +113,45 @@
       </div>
   </footer>
 
+    <!-- Scripts -->
+    <script src="themeSwitch.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const navLinks = document.querySelectorAll('header nav a');
-            const currentPath = window.location.pathname;
-
+            
+            // Get the current page path (only filename)
+            const currentPath = window.location.pathname.split('/').pop(); // Get the filename, e.g., 'roster.html'
+            
             navLinks.forEach(link => {
+                // Compare the link's href with the current page path (filename)
                 if (link.getAttribute('href') === currentPath) {
                     link.classList.add('current');
                 }
             });
+
+            // Dark mode and light mode switching (Add to body class based on saved preference)
+            const savedMode = localStorage.getItem('theme');
+            if (savedMode === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.add('light-mode');
+            }
+
+            // Toggle theme mode
+            document.getElementById('light-mode').addEventListener('click', function() {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            });
+
+            document.getElementById('dark-mode').addEventListener('click', function() {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            });
         });
     </script>
-     <script src="audioPlayer.js"></script>
-     <script src="themeSwitch.js"></script>
+    
+    <script src="audioPlayer.js"></script>
 </body>
 </html>
