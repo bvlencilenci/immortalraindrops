@@ -276,10 +276,11 @@ header nav a.current {
   color: black; /* Keep current link black in light mode */
 }
 .member img {
-  width: 100%;
-  max-width: 90%; /* 90% of the original size */
-  height: auto;
-  border-radius: 3px;
-  border: 2px solid #bf3636cb;
+  .member img {
+    width: 100%; /* Ensures the image fills its container */
+    height: auto; /* Maintains aspect ratio */
+    border-radius: 3px; /* Sharp corners */
+    border: 2px solid #bf3636cb; /* Border with color */
+  }
 
 }
