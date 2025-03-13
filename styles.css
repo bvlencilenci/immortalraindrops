@@ -276,11 +276,11 @@ header nav a.current {
   color: black; /* Keep current link black in light mode */
 }
 .member img {
-  .member img {
-    width: 100%; /* Ensures the image fills its container */
-    height: auto; /* Maintains aspect ratio */
-    border-radius: 3px; /* Sharp corners */
-    border: 2px solid #bf3636cb; /* Border with color */
-  }
-
+  width: 100%; /* Ensures the image fills its container */
+  height: 100%; /* Ensures the image maintains the height of the container */
+  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+  border-radius: 3px; /* Sharp corners */
+  border: 2px solid #bf3636cb; /* Border with color */
 }
+
+
