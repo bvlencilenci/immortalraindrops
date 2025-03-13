@@ -1,10 +1,10 @@
 # Enable mod_rewrite
 RewriteEngine On
 
-# Hide .html extension from the URL
-RewriteCond %{REQUEST_FILENAME} !-d
+# Remove .html extension from URLs (internally)
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)/$ $1.html [L,QSA]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^/]+)$ $1.html [L,QSA]
 
 # Redirect .html URLs to the clean URL without .html
 RewriteCond %{THE_REQUEST} \s/([^/]+)\.html [NC]
