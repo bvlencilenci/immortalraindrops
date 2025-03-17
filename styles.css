@@ -181,6 +181,8 @@ header nav a.current {
   border: 2px solid #bf3636cb;
   display: block; /* Ensure block-level display */
   margin: 10px; /* Adjusted margin to add spacing around the image and keep it centered */
+  margin-left: 5px;
+  margin-right: 5px;
 }
 /* Light Mode */
 body {
