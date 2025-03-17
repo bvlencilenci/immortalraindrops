@@ -70,14 +70,14 @@ header nav a.current {
   /* Logo for mobile */
   header .logo {
     font-size: 1.2rem; /* Adjust font size for mobile */
-    margin-bottom: 10px; /* Space between logo and nav */
+    margin-bottom: 1px; /* Space between logo and nav */
     text-align: center;
   }
 
   /* Navigation */
   header nav {
     justify-content: center;
-    margin-top: 10px; /* Space between logo and navigation links */
+    margin-top: 1px; /* Space between logo and navigation links */
     width: 100%;
   }
 
@@ -93,7 +93,7 @@ header nav a.current {
     gap: 10px;
     font-size: 1rem;
     position: absolute;
-    top: 10px;
+    top: 0px;
     left: 50%;
     transform: translateX(-50%);
   }
