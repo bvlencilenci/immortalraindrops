@@ -179,10 +179,9 @@ header nav a.current {
   height: 500px; /* Fixed height */
   object-fit: cover;
   border: 2px solid #bf3636cb;
-  margin: 0 auto;  /* Center the image horizontally */
-  display: block; /* Ensure block-level display to center it */
+  display: block; /* Ensure block-level display */
+  margin: 10px auto; /* Adjusted margin to add spacing around the image and keep it centered */
 }
-
 /* Light Mode */
 body {
   background-color: #fff;
