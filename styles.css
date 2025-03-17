@@ -110,7 +110,7 @@ header nav a.current {
     grid-template-columns: 1fr !important; /* Force 1 item per row */
     gap: 20px;
     padding: 15px;
-    margin-top: 120px; /* Space for fixed header */
+    margin-top: 70px; /* Space for fixed header */
     justify-items: center; /* Center the items horizontally */
     align-items: center; /* Center the items vertically */
   }
