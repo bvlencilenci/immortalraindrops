@@ -102,15 +102,23 @@ header nav a.current {
     margin-top: 70px; /* Space for fixed header */
     justify-items: center; /* Center the items horizontally */
     align-items: center; /* Center the items vertically */
+    text-align: center; /* Ensure text is centered */
   }
 
   /* Footer adjustments */
   footer {
     margin-top: 20px; /* Space between body and footer */
   }
+
+  /* Center individual product/member items */
+  .product, .member {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
 }
-
-
 
 /* Desktop Styles (min-width 769px) */
 @media (min-width: 769px) {
@@ -332,5 +340,3 @@ footer .footer-email:hover {
   font-weight: bold;
   text-decoration: underline;
 }
-
-
