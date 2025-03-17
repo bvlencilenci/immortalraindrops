@@ -78,7 +78,7 @@ header nav a.current {
   /* Navigation */
   header nav {
     justify-content: center;
-    margin-top: 1px; /* Space between logo and navigation links */
+    margin-top: 0px; /* Space between logo and navigation links */
     width: 100%;
   }
 
@@ -354,4 +354,9 @@ footer .footer-email:hover {
 .mode-toggle span.active {
   font-weight: bold;
   text-decoration: underline;
+}
+
+/* Hide scrolling until page is fully loaded */
+body {
+  overflow: hidden;
 }
