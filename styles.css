@@ -70,6 +70,7 @@ header nav a.current {
   /* Logo for mobile */
   header .logo {
     font-size: 1.2rem; /* Adjust font size for mobile */
+    margin-top: 10px; 
     margin-bottom: 1px; /* Space between logo and nav */
     text-align: center;
   }
