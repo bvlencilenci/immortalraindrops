@@ -180,7 +180,7 @@ header nav a.current {
   object-fit: cover;
   border: 2px solid #bf3636cb;
   display: block; /* Ensure block-level display */
-  margin: 10px auto; /* Adjusted margin to add spacing around the image and keep it centered */
+  margin: 10px; /* Adjusted margin to add spacing around the image and keep it centered */
 }
 /* Light Mode */
 body {
