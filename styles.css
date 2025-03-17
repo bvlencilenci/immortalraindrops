@@ -65,7 +65,7 @@ header nav a.current {
     padding: 10px; /* Reduced padding for a thinner header */
     height: auto; /* Remove fixed height */
     align-items: center; /* Center all items */
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Adjust spacing between header and body */
   }
 
   /* Logo for mobile */
@@ -88,18 +88,6 @@ header nav a.current {
     padding: 5px;
   }
 
-  /* Mode Toggle */
-  .mode-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    position: absolute;
-    top: 0px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
   /* Ensure the rest of the page content can scroll properly */
   body {
     margin-top: 50px; /* Adjust space for the fixed header */
@@ -115,25 +103,13 @@ header nav a.current {
     justify-items: center; /* Center the items horizontally */
     align-items: center; /* Center the items vertically */
   }
+
+  /* Footer adjustments */
+  footer {
+    margin-top: 20px; /* Space between body and footer */
+  }
 }
 
-/* Make sure each item is centered */
-.product, .member {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-}
-
-/* Center the images */
-.product img, .member img, .beat-image {
-  max-width: 100%;  /* Ensure image is responsive */
-  height: auto;  /* Maintain aspect ratio */
-  border: 2px solid #bf3636cb;
-  object-fit: cover; /* Maintain aspect ratio */
-  border-radius: 3px;
-}
 
 
 /* Desktop Styles (min-width 769px) */
