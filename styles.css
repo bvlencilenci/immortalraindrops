@@ -97,7 +97,7 @@ header nav a.current {
   /* Adjust layout for products and roster to 1 item per row */
   .product-grid, .roster-container {
     display: grid;
-    grid-template-columns: 1fr !important; /* Force 1 item per row */
+    grid-template-columns: 1fr; /* Force 1 item per row */
     gap: 20px;
     padding: 15px;
     margin-top: 70px; /* Space for fixed header */
@@ -122,6 +122,17 @@ header nav a.current {
     text-align: center;
     width: 100%; /* Ensure full width */
     box-sizing: border-box; /* Prevent content from overflowing */
+  }
+
+  /* Ensure images maintain fixed width and height without being skewed */
+  .product img,
+  .member img,
+  .beat-image {
+    width: 400px;  /* Fixed width */
+    height: 500px; /* Fixed height */
+    object-fit: cover;
+    border: 2px solid #bf3636cb;
+    margin: 0 auto;  /* Center the image horizontally */
   }
 }
 
@@ -167,6 +178,7 @@ header nav a.current {
   height: 500px; /* Fixed height */
   object-fit: cover;
   border: 2px solid #bf3636cb;
+  margin: 0 auto;  /* Center the image horizontally */
 }
 
 /* Light Mode */
