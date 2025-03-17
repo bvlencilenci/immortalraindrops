@@ -333,7 +333,4 @@ footer .footer-email:hover {
   text-decoration: underline;
 }
 
-/* Hide scrolling until page is fully loaded */
-body {
-  overflow: hidden;
-}
+
