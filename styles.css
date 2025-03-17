@@ -97,7 +97,7 @@ header nav a.current {
   /* Adjust layout for products and roster to 1 item per row */
   .product-grid, .roster-container {
     display: grid;
-    grid-template-columns: 1fr; /* Force 1 item per row */
+    grid-template-columns: 1fr !important; /* Force 1 item per row */
     gap: 20px;
     padding: 15px;
     margin-top: 70px; /* Space for fixed header */
@@ -133,6 +133,7 @@ header nav a.current {
     object-fit: cover;
     border: 2px solid #bf3636cb;
     margin: 0 auto;  /* Center the image horizontally */
+    display: block; /* Ensure block-level display to center it */
   }
 }
 
@@ -179,6 +180,7 @@ header nav a.current {
   object-fit: cover;
   border: 2px solid #bf3636cb;
   margin: 0 auto;  /* Center the image horizontally */
+  display: block; /* Ensure block-level display to center it */
 }
 
 /* Light Mode */
