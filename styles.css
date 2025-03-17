@@ -65,6 +65,7 @@ header nav a.current {
     padding: 10px; /* Reduced padding for a thinner header */
     height: auto; /* Remove fixed height */
     align-items: center; /* Center all items */
+    margin-bottom: 20px;
   }
 
   /* Logo for mobile */
