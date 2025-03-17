@@ -9,6 +9,7 @@ html, body {
   background-color: #fff; /* Default light mode */
   color: #000; /* Default light mode */
   overflow-x: hidden;
+  box-sizing: border-box; /* Ensure padding and borders are included in element width */
 }
 
 /* Header */
@@ -103,6 +104,8 @@ header nav a.current {
     justify-items: center; /* Center the items horizontally */
     align-items: center; /* Center the items vertically */
     text-align: center; /* Ensure text is centered */
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box; /* Prevent content from overflowing */
   }
 
   /* Footer adjustments */
@@ -117,6 +120,8 @@ header nav a.current {
     align-items: center;
     flex-direction: column;
     text-align: center;
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box; /* Prevent content from overflowing */
   }
 }
 
