@@ -101,7 +101,7 @@ header nav a.current {
 
   /* Ensure the rest of the page content can scroll properly */
   body {
-    margin-top: 100px; /* Adjust space for the fixed header */
+    margin-top: 50px; /* Adjust space for the fixed header */
   }
 
   /* Adjust layout for products and roster to 1 item per row */
