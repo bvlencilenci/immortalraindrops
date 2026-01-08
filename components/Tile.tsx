@@ -21,6 +21,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     togglePlay,
     restartTrack,
     skipTrack,
+    skipBack,
     seek,
     duration,
     seekTo,
@@ -185,7 +186,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             >
               <div className="absolute top-[-4px] bottom-[-4px] w-full bg-transparent z-30" />
               <div
-                className="absolute top-0 left-0 h-full bg-white transition-all duration-100 ease-linear pointer-events-auto"
+                className="absolute top-0 left-0 h-full bg-white pointer-events-auto"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -205,9 +206,9 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               {/* Controls: Mechanical Symbols replaced with SVGs */}
               <div className="flex items-center gap-1 md:gap-2">
                 <button
-                  onClick={(e) => { e.stopPropagation(); restartTrack(); }}
+                  onClick={(e) => { e.stopPropagation(); skipBack(); }}
                   className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
-                  title="Restart"
+                  title="Previous / Restart"
                 >
                   <img src="/skip-back.svg" alt="Restart" className="w-4 h-4 invert opacity-80" />
                 </button>

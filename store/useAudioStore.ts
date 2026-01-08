@@ -30,6 +30,8 @@ interface AudioStore {
   togglePlay: () => void;
   restartTrack: () => void;
   skipTrack: () => void;
+  previousTrack: () => void;
+  skipBack: () => void;
   adjustVolume: (vol: number) => void;
   updateSeek: () => void;
   seekTo: (time: number) => void;
@@ -164,6 +166,29 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const nextTrack = playlist[nextIndex];
 
     playTrack(nextTrack.id, nextTrack.url, nextTrack.title, nextTrack.artist);
+  },
+
+  previousTrack: () => {
+    const { playlist, currentlyPlayingId, playTrack } = get();
+    if (!playlist.length || !currentlyPlayingId) return;
+
+    const currentIndex = playlist.findIndex(t => t.id === currentlyPlayingId);
+    const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+    const prevTrack = playlist[prevIndex];
+
+    playTrack(prevTrack.id, prevTrack.url, prevTrack.title, prevTrack.artist);
+  },
+
+  skipBack: () => {
+    const { howl, seek, previousTrack } = get();
+    if (!howl) return;
+
+    if (seek < 2) {
+      howl.seek(0);
+      set({ seek: 0 });
+    } else {
+      previousTrack();
+    }
   },
 
   adjustVolume: (vol) => {
