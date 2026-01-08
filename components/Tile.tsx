@@ -218,33 +218,35 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </div>
               </div>
 
-              {/* Center: Playback Group (Borderless) */}
-              <div className="flex items-center gap-4 justify-center flex-1">
-                <button
-                  onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                  className="w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity"
-                  title="Back"
-                >
-                  <img src="/skip-back.svg" alt="Back" className="w-3.5 h-3.5 invert opacity-70" />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className="w-9 h-9 flex items-center justify-center hover:opacity-60 transition-opacity"
-                  title={isPlaying ? "Pause" : "Play"}
-                >
-                  <img
-                    src={isPlaying ? "/pause.svg" : "/play.svg"}
-                    alt={isPlaying ? "Pause" : "Play"}
-                    className="w-4 h-4 invert opacity-80"
-                  />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity"
-                  title="Forward"
-                >
-                  <img src="/skip-forward.svg" alt="Forward" className="w-3.5 h-3.5 invert opacity-70" />
-                </button>
+              {/* Center: Playback Group (White Container, Black Icons) */}
+              <div className="flex items-center justify-center flex-1">
+                <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                    className="w-7 h-7 flex items-center justify-center hover:opacity-50 transition-opacity"
+                    title="Back"
+                  >
+                    <img src="/skip-back.svg" alt="Back" className="w-3 h-3 opacity-90" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                    className="w-8 h-8 flex items-center justify-center hover:opacity-50 transition-opacity"
+                    title={isPlaying ? "Pause" : "Play"}
+                  >
+                    <img
+                      src={isPlaying ? "/pause.svg" : "/play.svg"}
+                      alt={isPlaying ? "Pause" : "Play"}
+                      className="w-3.5 h-3.5 opacity-90"
+                    />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                    className="w-7 h-7 flex items-center justify-center hover:opacity-50 transition-opacity"
+                    title="Forward"
+                  >
+                    <img src="/skip-forward.svg" alt="Forward" className="w-3 h-3 opacity-90" />
+                  </button>
+                </div>
               </div>
 
               {/* Right: Under-Icon Volume Fader */}
