@@ -41,27 +41,15 @@ const Header = () => {
         <h1 className="font-mono text-xs text-white uppercase tracking-[0.3em] whitespace-nowrap mr-8">
           Immortal Raindrops
         </h1>
-        <div className="flex flex-col min-w-0 border-l border-white/10 pl-6 py-1 scrolling-metadata-mask overflow-hidden max-w-[400px]">
+        <div className="flex flex-col min-w-0 border-l border-white/10 pl-6 py-1 overflow-hidden max-w-[400px]">
           {trackTitle ? (
-            <div className="animate-marquee whitespace-nowrap flex flex-col justify-center h-full">
-              <div className="flex items-center">
-                <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none">
-                  {trackArtist}
-                </span>
-                <span className="mx-8 text-white/10 opacity-0">•</span>
-                <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none">
-                  {trackArtist}
-                </span>
-              </div>
-              <div className="flex items-center mt-1">
-                <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-none">
-                  {trackTitle}
-                </span>
-                <span className="mx-8 text-white/10 opacity-0">•</span>
-                <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-none">
-                  {trackTitle}
-                </span>
-              </div>
+            <div className="flex flex-col justify-center h-full">
+              <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none truncate">
+                {trackArtist}
+              </span>
+              <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-none mt-1 truncate">
+                {trackTitle}
+              </span>
             </div>
           ) : (
             <span className="font-mono text-[9px] md:text-xs text-white/10 uppercase tabular-nums">
