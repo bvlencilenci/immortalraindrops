@@ -17,34 +17,33 @@ const Header = () => {
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
 
   return (
-    <header className="fixed top-0 right-0 w-full md:w-1/2 h-16 z-50 pointer-events-none">
-      {/* Background container - allows clicks through on empty space if needed, 
-                 but for player controls we need events. 
-                 Using a constrained width container for the actual player part?
-                 The request says "Fixed at the top-right quarter". 
-                 Let's make the background extend but keep it subtle or just the player elements?
-                 "Fixed at the top-right quarter of the screen" implies it might not be full width?
-                 "w-full md:w-1/2" covers right half on desktop.
+    <header className="fixed top-0 right-0 w-full md:w-1/2 lg:w-1/4 h-16 z-50 pointer-events-none">
+      {/* 
+                Master Player Container 
+                - Top Right fixed position (controlled by parent `right-0 w...`)
+                - 80% transparency + blur
              */}
+      <div className="w-full h-full bg-[#050505cc] backdrop-blur-md border-b border-l border-[#222] pointer-events-auto relative flex items-center shadow-lg">
 
-      <div className="w-full h-full bg-black/80 backdrop-blur-md border-b border-[#222] pointer-events-auto relative flex items-center justify-between px-6">
-
-        {/* Metadata */}
-        <div className="flex flex-col flex-1 overflow-hidden mr-8">
+        {/* Metadata: Left aligned relative to this block */}
+        <div className="flex flex-col flex-1 overflow-hidden pl-4 pr-20"> {/* pr-20 to clear volume area */}
           {trackTitle ? (
-            <div className="font-mono text-sm leading-tight truncate">
+            <div className="font-mono text-xs md:text-sm leading-tight truncate">
               <span className="text-[#888] lowercase mr-2">- {trackArtist || 'unknown'}</span>
               <span className="text-white font-bold uppercase tracking-widest">{trackTitle}</span>
             </div>
           ) : (
-            <div className="font-mono text-xs text-[#444] uppercase tracking-widest">
+            <div className="font-mono text-xs text-[#444] uppercase tracking-widest pl-4">
               Immortal Raindrops
             </div>
           )}
         </div>
 
-        {/* Volume Fader - Horizontal for Header */}
-        <div className="w-24 md:w-32 flex items-center mr-[5%]">
+        {/* Volume Fader: Precision Placement */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto"
+          style={{ right: '6%', width: '60px', transform: 'translateY(-50%) rotate(-90deg)' }}
+        >
           <input
             type="range"
             min="0"
@@ -63,7 +62,6 @@ const Header = () => {
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-
       </div>
     </header>
   );
