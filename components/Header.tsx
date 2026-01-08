@@ -17,32 +17,38 @@ const Header = () => {
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
 
   return (
-    <header className="fixed top-0 right-0 w-full md:w-1/2 lg:w-1/4 h-16 z-50 pointer-events-none">
-      {/* 
-                Master Player Container 
-                - Top Right fixed position (controlled by parent `right-0 w...`)
-                - 80% transparency + blur
-             */}
-      <div className="w-full h-full bg-[#050505cc] backdrop-blur-md border-b border-l border-[#222] pointer-events-auto relative flex items-center shadow-lg">
+    <header className="fixed top-0 left-0 w-full h-[60px] z-[100] border-b border-[#222] bg-[#050505cc] backdrop-blur-md flex">
+      {/* 1. Branding Section (Left 75%) */}
+      <div className="flex-1 flex items-center pl-6 border-r border-[#222]">
+        <h1 className="font-mono text-xs text-[#444] uppercase tracking-[0.3em]">
+          Immortal Raindrops // Archive_Node_01
+        </h1>
+      </div>
 
-        {/* Metadata: Left aligned relative to this block */}
-        <div className="flex flex-col flex-1 overflow-hidden pl-4 pr-20"> {/* pr-20 to clear volume area */}
+      {/* 2. Master Player Section (Right 25%) */}
+      <div className="w-1/4 h-full relative flex items-center overflow-hidden">
+        {/* Metadata: artist (lower) - TITLE (UPPER) */}
+        <div className="flex flex-col h-full justify-center pl-6 pr-16 overflow-hidden">
           {trackTitle ? (
-            <div className="font-mono text-xs md:text-sm leading-tight truncate">
-              <span className="text-[#888] lowercase mr-2">- {trackArtist || 'unknown'}</span>
-              <span className="text-white font-bold uppercase tracking-widest">{trackTitle}</span>
-            </div>
+            <>
+              <span className="font-mono text-[10px] text-neutral-400 lowercase truncate leading-none mb-1">
+                - {trackArtist || 'unknown'}
+              </span>
+              <span className="font-mono text-xs font-bold text-white uppercase tracking-widest truncate leading-none">
+                {trackTitle}
+              </span>
+            </>
           ) : (
-            <div className="font-mono text-xs text-[#444] uppercase tracking-widest pl-4">
-              Immortal Raindrops
-            </div>
+            <span className="font-mono text-xs text-[#444] uppercase tracking-widest">
+              Standby_
+            </span>
           )}
         </div>
 
-        {/* Volume Fader: Precision Placement */}
+        {/* Universal Volume: Needle Slider at far right (6% margin) */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto"
-          style={{ right: '6%', width: '60px', transform: 'translateY(-50%) rotate(-90deg)' }}
+          className="header-volume-container h-10 w-[1px] bg-white/20 absolute right-[6%] top-1/2 -translate-y-1/2 transform rotate-0"
+          style={{ width: '40px', right: '6%', transform: 'translateY(-50%) rotate(-90deg)' }}
         >
           <input
             type="range"
@@ -51,17 +57,26 @@ const Header = () => {
             step="0.01"
             value={volume}
             onChange={(e) => adjustVolume(parseFloat(e.target.value))}
-            className="retro-range w-full"
+            className="header-needle-range w-full h-full cursor-pointer"
           />
         </div>
+      </div>
 
-        {/* Filling Seeker Bar (Bottom edge) */}
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/10">
-          <div
-            className="h-full bg-white transition-all duration-100 ease-linear"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
+      {/* Master Seeker: 1px line at the bottom edge */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[1px] bg-white/10 cursor-pointer group/seeker h-2 flex items-end"
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const percent = x / rect.width;
+          seekTo(percent * duration);
+        }}
+      >
+        <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/10" />
+        <div
+          className="h-[1px] bg-white transition-all duration-100 ease-linear pointer-events-none relative"
+          style={{ width: `${progressPercent}%` }}
+        />
       </div>
     </header>
   );

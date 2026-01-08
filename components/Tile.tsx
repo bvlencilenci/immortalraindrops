@@ -155,92 +155,77 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             />
           </div>
 
-          {/* Explicit Metadata Overlay for Active Tile (Hover-Off) */}
+          {/* Metadata Overlay (Artist Top, Title Bottom when NOT Hovering) */}
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6 transition-opacity duration-300 opacity-100 group-hover:opacity-0">
             <div className="space-y-1">
-              <p className="font-mono text-xs text-neutral-400 lowercase tracking-widest">
+              <p className="font-mono text-[10px] text-neutral-400 lowercase tracking-widest">
                 {artist}
               </p>
-              <p className="font-mono text-sm font-bold text-neutral-300 uppercase tracking-tighter line-clamp-2">
+              <p className="font-mono text-xs font-bold text-neutral-300 uppercase tracking-tighter line-clamp-2">
                 {title}
               </p>
             </div>
           </div>
 
-          {/* In-Tile HUD (z-20) - Hidden by default, Show on Hover */}
+          {/* In-Tile HUD (z-20) - 12% height, tactical interface */}
           <div className={`
-                absolute bottom-0 left-0 w-full h-[15%] min-h-[56px] z-20
+                absolute bottom-0 left-0 w-full h-[12%] min-h-[48px] z-20
                 bg-[#050505cc] backdrop-blur-md
-                border-t border-[#222]
+                border-t border-white/10
                 flex flex-col
                 transition-opacity duration-300
                 opacity-0 group-hover:opacity-100
+                hud-wrapper
             `}>
-            {/* 1. Filling Seek Bar (Relative Container) */}
+            {/* 1. Filling Seek Bar (Top of HUD) */}
             <div
-              className="relative w-full h-1 bg-white/10 cursor-pointer group/seek"
+              className="relative w-full h-[2px] bg-white/5 cursor-pointer group/seek"
               onClick={handleSeek}
             >
               <div className="absolute top-[-4px] bottom-[-4px] w-full bg-transparent z-30" />
-              {/* Filling Progress */}
               <div
                 className="absolute top-0 left-0 h-full bg-white transition-all duration-100 ease-linear pointer-events-none"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
 
-            {/* 2. Main Controls Row */}
-            <div className="flex items-center justify-between h-full px-2 pt-1 pb-1">
-              {/* Metadata: Artist (Top) -> Title (Bottom) */}
-              <div className="flex flex-col w-2/5 overflow-hidden leading-none justify-center pl-4">
-                <span className="font-mono text-[10px] text-[#888] lowercase truncate">
-                  {artist}
-                </span>
+            {/* 2. Main Row */}
+            <div className="flex items-center justify-between flex-1 px-4">
+              {/* Metadata: Title Top, Artist Bottom (Hover Flip) */}
+              <div className="flex flex-col flex-1 min-w-0 pr-4 leading-none self-center">
                 <span className="font-mono text-xs text-white font-bold uppercase tracking-widest truncate">
                   {title}
                 </span>
+                <span className="font-mono text-[10px] text-neutral-400 lowercase truncate mt-0.5">
+                  {artist}
+                </span>
               </div>
 
-              {/* Controls */}
-              <div className="flex items-center gap-2 justify-center">
+              {/* Controls: Mechanical Symbols */}
+              <div className="flex items-center gap-1 md:gap-2">
                 <button
                   onClick={(e) => { e.stopPropagation(); restartTrack(); }}
-                  className="hud-btn w-6 h-6 text-sm flex items-center justify-center"
+                  className="w-10 h-10 md:w-8 md:h-8 flex items-center justify-center border border-white/20 hover:border-white hover:bg-white/10 transition-colors"
                   title="Restart"
                 >
-                  ⟲
+                  <span className="font-mono text-sm leading-none opacity-80">⟲</span>
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className={`hud-btn w-6 h-6 text-sm flex items-center justify-center ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
+                  className={`w-10 h-10 md:w-8 md:h-8 flex items-center justify-center border border-white/20 hover:border-white hover:bg-white/10 transition-colors ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
                   title={isPlaying ? "Pause" : "Play"}
                 >
-                  {isBuffering ? '●' : (isPlaying ? '||' : '▶')}
+                  <span className="font-mono text-sm leading-none opacity-80">
+                    {isBuffering ? '●' : (isPlaying ? '||' : '▶')}
+                  </span>
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="hud-btn w-6 h-6 text-sm flex items-center justify-center"
+                  className="w-10 h-10 md:w-8 md:h-8 flex items-center justify-center border border-white/20 hover:border-white hover:bg-white/10 transition-colors"
                   title="Skip"
                 >
-                  →
+                  <span className="font-mono text-sm leading-none opacity-80">→</span>
                 </button>
-              </div>
-
-              {/* Vertical Volume - Keeping it as requested */}
-              <div className="h-full w-6 flex items-center justify-center relative">
-                <div className="absolute w-[40px] h-[10px] -rotate-90 origin-center flex items-center justify-center">
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={(e) => adjustVolume(parseFloat(e.target.value))}
-                    onClick={(e) => e.stopPropagation()}
-                    className="retro-range"
-                    style={{ transform: 'scaleX(0.8)' }}
-                  />
-                </div>
               </div>
             </div>
           </div>
@@ -259,7 +244,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             </div>
           )}
 
-          {/* Metadata Overlay (Inactive) */}
+          {/* Metadata Overlay (Artist Top, Title Bottom) */}
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6">
             <div className="space-y-1">
               <p className="font-mono text-[10px] text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors">
