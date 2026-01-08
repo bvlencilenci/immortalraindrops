@@ -191,12 +191,12 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
             {/* 2. Main Controls Row */}
             <div className="flex items-center justify-between h-full px-2 pt-1 pb-1">
-              {/* Metadata */}
+              {/* Metadata: Title (Top) -> Artist (Bottom) */}
               <div className="flex flex-col w-2/5 overflow-hidden leading-none justify-center pl-4">
-                <span className="font-mono text-[10px] text-white font-bold uppercase tracking-widest truncate">
+                <span className="font-mono text-xs text-white font-bold uppercase tracking-widest truncate">
                   {title}
                 </span>
-                <span className="font-mono text-[8px] text-[#888] lowercase truncate">
+                <span className="font-mono text-[10px] text-[#888] lowercase truncate">
                   {artist}
                 </span>
               </div>
@@ -262,10 +262,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           {/* Metadata Overlay (Inactive) */}
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6">
             <div className="space-y-1">
-              <p className="font-mono text-xs text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors">
+              <p className="font-mono text-[10px] text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors">
                 {artist}
               </p>
-              <p className="font-mono text-sm font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors line-clamp-2">
+              <p className="font-mono text-xs font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors line-clamp-2">
                 {title}
               </p>
             </div>
