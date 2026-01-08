@@ -185,7 +185,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
           {/* In-Tile HUD (z-20) - Restricted to top ~12% Hardware HUD */}
           <div className={`
-                absolute top-0 left-0 w-full h-[15%] min-h-[58px] z-20
+                absolute top-0 left-0 w-full h-[18%] min-h-[64px] z-20
                 bg-[#050505cc] backdrop-blur-md
                 border-b border-white/10
                 flex items-center justify-between px-1 relative
@@ -202,38 +202,34 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 className="absolute top-0 left-0 h-full bg-white pointer-events-auto"
                 style={{ width: `${progressPercent}%` }}
               />
-              {/* Timer Indented 4px from Right, on seeker path */}
-              <div className="absolute top-[4px] right-1">
-                <span className="font-mono text-[8px] text-white/40 tabular-nums uppercase pr-0.5">
-                  {formatTime(seek)} / {formatTime(duration)}
-                </span>
-              </div>
             </div>
 
-            {/* Content Row: Metadata (Left) | Controls (Center) | Volume (Right Expanding) */}
-            <div className="w-full flex items-center justify-between px-3 mt-2">
+            {/* Content Row: Metadata (Left) | Controls (Center) | Volume (Right Under-Icon) */}
+            <div className="w-full flex items-center justify-between px-3 h-full pt-1">
               {/* Left: Metadata with 4px indent */}
               <div className="flex flex-col min-w-0 leading-tight flex-1">
-                <span className="font-mono text-[10px] md:text-xs font-bold text-white uppercase tracking-widest truncate">
-                  {title}
-                </span>
-                <span className="font-mono text-[8px] md:text-[10px] text-neutral-400 lowercase truncate">
-                  {artist}
-                </span>
+                <div className="flex flex-col pl-1">
+                  <span className="font-mono text-[10px] md:text-xs font-bold text-white uppercase tracking-widest truncate">
+                    {title}
+                  </span>
+                  <span className="font-mono text-[8px] md:text-[10px] text-neutral-400 lowercase truncate">
+                    {artist}
+                  </span>
+                </div>
               </div>
 
-              {/* Center: Playback Group */}
+              {/* Center: Playback Group (Borderless) */}
               <div className="flex items-center gap-4 justify-center flex-1">
                 <button
                   onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                  className="mechanical-btn w-8 h-8 flex items-center justify-center"
+                  className="w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity"
                   title="Back"
                 >
                   <img src="/skip-back.svg" alt="Back" className="w-3.5 h-3.5 invert opacity-70" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className="mechanical-btn w-9 h-9 flex items-center justify-center"
+                  className="w-9 h-9 flex items-center justify-center hover:opacity-60 transition-opacity"
                   title={isPlaying ? "Pause" : "Play"}
                 >
                   <img
@@ -244,20 +240,20 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="mechanical-btn w-8 h-8 flex items-center justify-center"
+                  className="w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity"
                   title="Forward"
                 >
                   <img src="/skip-forward.svg" alt="Forward" className="w-3.5 h-3.5 invert opacity-70" />
                 </button>
               </div>
 
-              {/* Right: Volume Expanding Cluster */}
-              <div className="flex items-center flex-1 justify-end group/tile-vol">
-                <div className="flex items-center gap-2">
-                  <img src={getVolumeIcon()} alt="Vol" className="w-3 h-3 invert opacity-60" />
-                  <div className="w-0 group-hover/tile-vol:w-16 overflow-hidden transition-all duration-300 ease-out">
+              {/* Right: Under-Icon Volume Fader */}
+              <div className="flex items-center flex-1 justify-end">
+                <div className="relative group/vol-tile w-10 h-full flex flex-col items-center justify-center">
+                  <img src={getVolumeIcon()} alt="Vol" className="w-3 h-3 invert opacity-60 cursor-pointer" />
+                  <div className="absolute top-[40px] w-0 group-hover/vol-tile:w-16 overflow-hidden transition-all duration-300 ease-out flex items-center justify-center">
                     <div
-                      className="ml-2 h-[2px] w-12 bg-white/10 relative cursor-pointer"
+                      className="h-[1px] w-12 bg-white/20 relative cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         const rect = e.currentTarget.getBoundingClientRect();
