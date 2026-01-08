@@ -149,7 +149,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           {/* In-Tile HUD (z-10) */}
           <div className={`
                 absolute bottom-0 left-0 w-full h-[12%] min-h-[48px] z-10
-                bg-black/90
+                bg-[#050505cc] backdrop-blur-md
                 border-t border-[#222]
                 flex flex-col
             `}>
@@ -159,7 +159,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               onClick={handleSeek}
             >
               {/* Hit area */}
-              <div className="absolute top-[-3px] bottom-[-3px] w-full bg-transparent z-20" />
+              <div className="absolute top-[-4px] bottom-[-4px] w-full bg-transparent z-20" />
 
               <div
                 className="h-full bg-white transition-all duration-100 ease-linear pointer-events-none"
@@ -170,7 +170,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             {/* 2. Main Controls Row */}
             <div className="flex items-center justify-between h-full px-2 pt-1 pb-1">
               {/* Metadata */}
-              <div className="flex flex-col w-2/5 overflow-hidden leading-none justify-center pl-2">
+              <div className="flex flex-col w-2/5 overflow-hidden leading-none justify-center pl-4">
                 <span className="font-mono text-[10px] text-white font-bold uppercase tracking-widest truncate">
                   {title}
                 </span>
@@ -180,24 +180,24 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               </div>
 
               {/* Controls */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-center">
                 <button
                   onClick={(e) => { e.stopPropagation(); restartTrack(); }}
-                  className="hud-btn w-6 h-6 text-sm"
+                  className="hud-btn w-6 h-6 text-sm flex items-center justify-center"
                   title="Restart"
                 >
                   ⟲
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className="hud-btn w-6 h-6 text-sm"
+                  className="hud-btn w-6 h-6 text-sm flex items-center justify-center"
                   title={isPlaying ? "Pause" : "Play"}
                 >
                   {isPlaying ? '||' : '▶'}
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="hud-btn w-6 h-6 text-sm"
+                  className="hud-btn w-6 h-6 text-sm flex items-center justify-center"
                   title="Skip"
                 >
                   →
@@ -205,12 +205,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               </div>
 
               {/* Vertical Volume */}
-              <div className="h-full w-4 flex items-center justify-center relative">
-                {/* 
-                          Vertical Slider trick: 
-                          Use standard range input, rotate -90deg.
-                          Needs absolute positioning wrapper to maintain layout flow.
-                        */}
+              <div className="h-full w-6 flex items-center justify-center relative">
                 <div className="absolute w-[40px] h-[10px] -rotate-90 origin-center flex items-center justify-center">
                   <input
                     type="range"
@@ -221,7 +216,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                     onChange={(e) => adjustVolume(parseFloat(e.target.value))}
                     onClick={(e) => e.stopPropagation()}
                     className="retro-range"
-                    style={{ transform: 'scaleX(0.8)' }} // optional scaling
+                    style={{ transform: 'scaleX(0.8)' }}
                   />
                 </div>
               </div>
