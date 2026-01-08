@@ -226,18 +226,41 @@ input[type=range].header-needle-range {
 
 input[type=range].header-needle-range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 8px;
-  width: 8px;
-  border-radius: 50%;
+  height: 4px;
+  /* Exact 4px square specified */
+  width: 4px;
+  border-radius: 0;
+  /* Square needle handle */
   background: white;
   cursor: pointer;
-  margin-top: -3.5px;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+  margin-top: -1.5px;
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 input[type=range].header-needle-range::-webkit-slider-runnable-track {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.4);
   border: none;
+}
+
+/* Mechanical Switch Classes */
+.mechanical-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.1s ease;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mechanical-btn:hover {
+  border-color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mechanical-btn:active {
+  transform: translate(1px, 1px);
+  /* Mechanical Switch feedback */
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import Image from 'next/image';
 import { Howler } from 'howler';
@@ -28,6 +28,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     adjustVolume,
     isBuffering
   } = useAudioStore();
+  const [hudVisible, setHudVisible] = useState(false);
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,6 +40,11 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
     if (Howler.ctx && Howler.ctx.state === 'suspended') {
       Howler.ctx.resume();
+    }
+
+    if (!hudVisible) {
+      setHudVisible(true);
+      return;
     }
 
     if (isActive) {
@@ -161,37 +167,38 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               <p className="font-mono text-[10px] text-neutral-400 lowercase tracking-widest">
                 {artist}
               </p>
-              <p className="font-mono text-xs font-bold text-neutral-300 uppercase tracking-tighter line-clamp-2">
+              <p className="font-mono text-[10px] sm:text-xs font-bold text-neutral-300 uppercase tracking-tighter line-clamp-2">
                 {title}
               </p>
             </div>
           </div>
 
           {/* In-Tile HUD (z-20) - 12% height, tactical interface */}
+          {/* HUD only visible on hover IF track is playing */}
           <div className={`
                 absolute bottom-0 left-0 w-full h-[12%] min-h-[48px] z-20
                 bg-[#050505cc] backdrop-blur-md
                 border-t border-white/10
                 flex flex-col
                 transition-opacity duration-300
-                opacity-0 group-hover:opacity-100
+                ${hudVisible ? 'opacity-100' : 'opacity-0'}
                 hud-wrapper
             `}>
-            {/* 1. Filling Seek Bar (Top of HUD) */}
+            {/* 1. Tactical Seeker: 2px solid white bar at top */}
             <div
               className="relative w-full h-[2px] bg-white/5 cursor-pointer group/seek"
               onClick={handleSeek}
             >
               <div className="absolute top-[-4px] bottom-[-4px] w-full bg-transparent z-30" />
               <div
-                className="absolute top-0 left-0 h-full bg-white transition-all duration-100 ease-linear pointer-events-none"
+                className="absolute top-0 left-0 h-full bg-white transition-all duration-100 ease-linear pointer-events-auto"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
 
             {/* 2. Main Row */}
             <div className="flex items-center justify-between flex-1 px-4">
-              {/* Metadata: Title Top, Artist Bottom (Hover Flip) */}
+              {/* Metadata flip: TITLE top, artist bottom */}
               <div className="flex flex-col flex-1 min-w-0 pr-4 leading-none self-center">
                 <span className="font-mono text-xs text-white font-bold uppercase tracking-widest truncate">
                   {title}
@@ -205,14 +212,14 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               <div className="flex items-center gap-1 md:gap-2">
                 <button
                   onClick={(e) => { e.stopPropagation(); restartTrack(); }}
-                  className="w-10 h-10 md:w-8 md:h-8 flex items-center justify-center border border-white/20 hover:border-white hover:bg-white/10 transition-colors"
+                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8"
                   title="Restart"
                 >
                   <span className="font-mono text-sm leading-none opacity-80">⟲</span>
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className={`w-10 h-10 md:w-8 md:h-8 flex items-center justify-center border border-white/20 hover:border-white hover:bg-white/10 transition-colors ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
+                  className={`mechanical-btn w-10 h-10 md:w-8 md:h-8 ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
                   title={isPlaying ? "Pause" : "Play"}
                 >
                   <span className="font-mono text-sm leading-none opacity-80">
@@ -221,7 +228,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="w-10 h-10 md:w-8 md:h-8 flex items-center justify-center border border-white/20 hover:border-white hover:bg-white/10 transition-colors"
+                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8"
                   title="Skip"
                 >
                   <span className="font-mono text-sm leading-none opacity-80">→</span>
