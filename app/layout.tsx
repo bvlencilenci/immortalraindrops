@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import AudioBar from '../components/AudioBar';
+import Header from '../components/Header';
 
 export const metadata: Metadata = {
   title: 'Immortal Raindrops',
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased min-h-screen">
         {children}
-        <AudioBar />
+        <Header />
       </body>
     </html>
   );

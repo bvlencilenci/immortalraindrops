@@ -34,12 +34,16 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   // Handle Play/Interaction
-  const handleInteraction = (e?: React.MouseEvent) => {
+  const handleInteraction = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Stop propagation? Wait, the tile itself is the clickable area.
+
     if (Howler.ctx && Howler.ctx.state === 'suspended') {
       Howler.ctx.resume();
     }
 
-    if (!isActive) {
+    if (isActive) {
+      togglePlay();
+    } else {
       playTrack(id, url, title, artist);
     }
   };
@@ -53,10 +57,14 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     seekTo(percent * duration);
   };
 
+  // ... Visualizer Effect (unchanged) ...
   useEffect(() => {
     let animationFrameId: number;
 
     const initVisualizer = async () => {
+      // Visualizer logic needs to run if isActive, regardless of playing state technically to keep it alive?
+      // But standard Howler analyser data might stop if paused.
+      // Keeping existing logic for now.
       if (!isActive || !canvasRef.current || !isPlaying) return;
 
       try {
@@ -139,7 +147,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     >
       {isActive ? (
         <>
-          {/* Visualizer Layer (z-0) */}
+          {/* Visualizer Layer (z-0) - Persistent */}
           <div className="absolute inset-0 z-0 w-full h-full">
             <canvas
               ref={canvasRef}
@@ -147,23 +155,36 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             />
           </div>
 
-          {/* In-Tile HUD (z-10) */}
+          {/* Explicit Metadata Overlay for Active Tile (Hover-Off) */}
+          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6 transition-opacity duration-300 opacity-100 group-hover:opacity-0">
+            <div className="space-y-1">
+              <p className="font-mono text-xs text-neutral-400 lowercase tracking-widest">
+                {artist}
+              </p>
+              <p className="font-mono text-sm font-bold text-neutral-300 uppercase tracking-tighter line-clamp-2">
+                {title}
+              </p>
+            </div>
+          </div>
+
+          {/* In-Tile HUD (z-20) - Hidden by default, Show on Hover */}
           <div className={`
-                absolute bottom-0 left-0 w-full h-[12%] min-h-[48px] z-10
+                absolute bottom-0 left-0 w-full h-[15%] min-h-[56px] z-20
                 bg-[#050505cc] backdrop-blur-md
                 border-t border-[#222]
                 flex flex-col
+                transition-opacity duration-300
+                opacity-0 group-hover:opacity-100
             `}>
-            {/* 1. Seek Bar (Full Width Top) */}
+            {/* 1. Filling Seek Bar (Relative Container) */}
             <div
-              className="relative w-full h-[2px] bg-[#222] cursor-pointer group/seek"
+              className="relative w-full h-1 bg-white/10 cursor-pointer group/seek"
               onClick={handleSeek}
             >
-              {/* Hit area */}
-              <div className="absolute top-[-4px] bottom-[-4px] w-full bg-transparent z-20" />
-
+              <div className="absolute top-[-4px] bottom-[-4px] w-full bg-transparent z-30" />
+              {/* Filling Progress */}
               <div
-                className="h-full bg-white transition-all duration-100 ease-linear pointer-events-none"
+                className="absolute top-0 left-0 h-full bg-white transition-all duration-100 ease-linear pointer-events-none"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -205,7 +226,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </button>
               </div>
 
-              {/* Vertical Volume */}
+              {/* Vertical Volume - Keeping it as requested */}
               <div className="h-full w-6 flex items-center justify-center relative">
                 <div className="absolute w-[40px] h-[10px] -rotate-90 origin-center flex items-center justify-center">
                   <input
