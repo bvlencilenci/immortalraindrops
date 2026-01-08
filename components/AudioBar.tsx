@@ -40,21 +40,24 @@ const AudioBar = () => {
       <div className="flex items-center justify-center w-1/3 gap-4">
         <button
           onClick={restartTrack}
-          className="hud-btn px-2 py-1 uppercase"
+          className="hud-btn w-8 h-8 text-lg"
+          title="Restart"
         >
-          RESTART
+          ⟲
         </button>
         <button
           onClick={togglePlay}
-          className="hud-btn px-4 py-1 uppercase font-bold"
+          className="hud-btn w-10 h-8 text-lg font-bold"
+          title={isPlaying ? "Pause" : "Play"}
         >
-          {isPlaying ? 'PAUSE' : 'PLAY'}
+          {isPlaying ? '||' : '▶'}
         </button>
         <button
           onClick={skipTrack}
-          className="hud-btn px-2 py-1 uppercase"
+          className="hud-btn w-8 h-8 text-lg"
+          title="Skip"
         >
-          SKIP
+          →
         </button>
       </div>
 

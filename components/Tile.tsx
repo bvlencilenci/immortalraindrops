@@ -19,7 +19,13 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     currentlyPlayingId,
     isPlaying,
     togglePlay,
-    restartTrack
+    restartTrack,
+    skipTrack,
+    seek,
+    duration,
+    seekTo,
+    volume,
+    adjustVolume
   } = useAudioStore();
 
   const isActive = currentlyPlayingId === id;
@@ -28,18 +34,22 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
   // Handle Play/Interaction
   const handleInteraction = (e?: React.MouseEvent) => {
-    // Ensure Audio Context is unlocked
     if (Howler.ctx && Howler.ctx.state === 'suspended') {
       Howler.ctx.resume();
     }
 
-    if (isActive) {
-      // If already active, maybe toggle play? 
-      // But strict generic interaction usually implies "Select"
-      // We let the HUD handle specific controls.
-    } else {
+    if (!isActive) {
       playTrack(id, url, title, artist);
     }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const bar = e.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percent = Math.min(Math.max(0, clickX / rect.width), 1);
+    seekTo(percent * duration);
   };
 
   useEffect(() => {
@@ -55,9 +65,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         const ctx = Howler.ctx;
         if (!ctx) return;
 
-        // Visualizer wiring...
         const { analyser, howl } = useAudioStore.getState();
-        let sourceNode: MediaElementAudioSourceNode | null = null;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (howl as any)?._sounds?.[0];
 
@@ -65,14 +73,14 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           const audioNode = sound._node;
           audioNode.crossOrigin = "anonymous";
           try {
-            sourceNode = ctx.createMediaElementSource(audioNode);
+            const sourceNode = ctx.createMediaElementSource(audioNode);
             const analyserNode = ctx.createAnalyser();
             sourceNode.connect(analyserNode);
             analyserNode.connect(ctx.destination);
             sound._visualizerConnected = true;
             sound._analyser = analyserNode;
           } catch (e) {
-            if (!sound._analyser) console.warn("Visualizer connect warn", e);
+            if (!sound._analyser) { /* ignore */ }
           }
         }
 
@@ -82,11 +90,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           const canvas = canvasRef.current;
           const { width, height } = canvas.parentElement?.getBoundingClientRect() || { width: 300, height: 300 };
 
-          const visualizer = butterchurn.createVisualizer(ctx, canvas, {
-            width,
-            height
-          });
-
+          const visualizer = butterchurn.createVisualizer(ctx, canvas, { width, height });
           visualizer.connectAudio(finalAnalyser);
 
           const presets = butterchurnPresets.getPresets();
@@ -119,6 +123,8 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     };
   }, [isActive, isPlaying]);
 
+  const progressPercent = (duration > 0 && isActive) ? (seek / duration) * 100 : 0;
+
   return (
     <div
       onClick={handleInteraction}
@@ -130,13 +136,6 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         ${isActive ? 'z-20' : 'z-0'}
       `}
     >
-      {/* 
-         LAYOUT LOGIC:
-         1. Always: Borderless.
-         2. Inactive: Cover Image + Metadata Overlay (Old style).
-         3. Active: Full Canvas + HUD.
-      */}
-
       {isActive ? (
         <>
           {/* Visualizer Layer (z-0) */}
@@ -149,44 +148,88 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
           {/* In-Tile HUD (z-10) */}
           <div className={`
-                absolute bottom-0 left-0 w-full h-[10%] min-h-[32px] z-10
-                bg-black/60 backdrop-blur-md
-                flex items-center justify-between px-2
+                absolute bottom-0 left-0 w-full h-[12%] min-h-[48px] z-10
+                bg-black/90
                 border-t border-[#222]
-                ${isPlaying ? 'animate-pulse-border' : ''}
+                flex flex-col
             `}>
-            {/* Metadata */}
-            <div className="flex flex-col w-2/3 overflow-hidden leading-none justify-center">
-              <span className="font-mono text-[10px] text-green-400 uppercase truncate">
-                {artist}
-              </span>
-              <span className="font-mono text-xs text-white font-bold uppercase tracking-tighter truncate">
-                {title}
-              </span>
+            {/* 1. Seek Bar (Full Width Top) */}
+            <div
+              className="relative w-full h-[2px] bg-[#222] cursor-pointer group/seek"
+              onClick={handleSeek}
+            >
+              {/* Hit area */}
+              <div className="absolute top-[-3px] bottom-[-3px] w-full bg-transparent z-20" />
+
+              <div
+                className="h-full bg-white transition-all duration-100 ease-linear pointer-events-none"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
 
-            {/* Micro Controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={(e) => { e.stopPropagation(); restartTrack(); }}
-                className="hud-btn w-6 h-6 text-[10px]"
-                title="Restart"
-              >
-                R
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                className="hud-btn w-6 h-6 font-bold text-[10px]"
-                title={isPlaying ? "Pause" : "Play"}
-              >
-                {isPlaying ? '||' : '>'}
-              </button>
+            {/* 2. Main Controls Row */}
+            <div className="flex items-center justify-between h-full px-2 pt-1 pb-1">
+              {/* Metadata */}
+              <div className="flex flex-col w-2/5 overflow-hidden leading-none justify-center pl-2">
+                <span className="font-mono text-[10px] text-white font-bold uppercase tracking-widest truncate">
+                  {title}
+                </span>
+                <span className="font-mono text-[8px] text-[#888] lowercase truncate">
+                  {artist}
+                </span>
+              </div>
+
+              {/* Controls */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => { e.stopPropagation(); restartTrack(); }}
+                  className="hud-btn w-6 h-6 text-sm"
+                  title="Restart"
+                >
+                  ⟲
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                  className="hud-btn w-6 h-6 text-sm"
+                  title={isPlaying ? "Pause" : "Play"}
+                >
+                  {isPlaying ? '||' : '▶'}
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                  className="hud-btn w-6 h-6 text-sm"
+                  title="Skip"
+                >
+                  →
+                </button>
+              </div>
+
+              {/* Vertical Volume */}
+              <div className="h-full w-4 flex items-center justify-center relative">
+                {/* 
+                          Vertical Slider trick: 
+                          Use standard range input, rotate -90deg.
+                          Needs absolute positioning wrapper to maintain layout flow.
+                        */}
+                <div className="absolute w-[40px] h-[10px] -rotate-90 origin-center flex items-center justify-center">
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={(e) => adjustVolume(parseFloat(e.target.value))}
+                    onClick={(e) => e.stopPropagation()}
+                    className="retro-range"
+                    style={{ transform: 'scaleX(0.8)' }} // optional scaling
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </>
       ) : (
         <>
-          {/* Cover Image Background */}
           {coverImage && (
             <div className="absolute inset-0 z-0 opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-500">
               <Image
@@ -200,9 +243,9 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           )}
 
           {/* Metadata Overlay (Inactive) */}
-          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference">
+          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6">
             <div className="space-y-1">
-              <p className="font-mono text-xs text-neutral-400 uppercase tracking-widest group-hover:text-white transition-colors">
+              <p className="font-mono text-xs text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors">
                 {artist}
               </p>
               <p className="font-mono text-sm font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors line-clamp-2">

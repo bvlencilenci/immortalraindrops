@@ -31,6 +31,7 @@ interface AudioStore {
   skipTrack: () => void;
   adjustVolume: (vol: number) => void;
   updateSeek: () => void;
+  seekTo: (time: number) => void;
 }
 
 export const useAudioStore = create<AudioStore>((set, get) => ({
@@ -174,6 +175,14 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     if (howl && isPlaying) {
       set({ seek: howl.seek() as number });
       requestAnimationFrame(get().updateSeek);
+    }
+  },
+
+  seekTo: (time: number) => {
+    const { howl } = get();
+    if (howl) {
+      howl.seek(time);
+      set({ seek: time });
     }
   }
 }));
