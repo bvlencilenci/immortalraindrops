@@ -37,7 +37,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full h-[64px] z-[100] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 relative overflow-hidden border-none text-white">
+    <header className="fixed top-0 left-0 w-full h-[64px] z-[100] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 border-none text-white">
       {/* 1. Identity & Metadata Group */}
       <div className="flex items-center z-20 overflow-hidden pl-1 h-full">
         <h1 className="font-mono text-xs uppercase tracking-[0.3em] whitespace-nowrap pl-1">
@@ -45,15 +45,13 @@ const Header = () => {
         </h1>
 
         {isPlayerActive && (
-          <div className="flex flex-col py-1 overflow-hidden max-w-[400px] ml-12">
-            <div className="flex flex-col justify-center h-full">
-              <span className="font-mono text-[9px] md:text-xs text-neutral-400 lowercase leading-none truncate pl-1">
-                {trackArtist}
-              </span>
-              <span className="font-mono text-xs md:text-xl font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
-                {trackTitle}
-              </span>
-            </div>
+          <div className="flex flex-col py-1 overflow-hidden max-w-[400px] ml-12 h-full justify-center">
+            <span className="font-mono text-[9px] md:text-xs text-neutral-400 lowercase leading-none truncate pl-1">
+              {trackArtist}
+            </span>
+            <span className="font-mono text-xs md:text-xl font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
+              {trackTitle}
+            </span>
           </div>
         )}
       </div>
@@ -62,28 +60,28 @@ const Header = () => {
       {isPlayerActive && (
         <div className="flex items-center gap-6 z-20 pr-1 h-full">
           {/* Playback Controls */}
-          <div className="flex items-center gap-1 bg-transparent border-none">
+          <div className="flex items-center gap-1 bg-transparent border-none h-full">
             <button
               onClick={(e) => { e.stopPropagation(); skipBack(); }}
-              className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="w-10 h-10 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
               title="Previous / Restart"
             >
               <img src="/skip-back.svg" alt="Back" className="w-4 h-4 invert opacity-80" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-              className="w-10 h-10 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="w-12 h-12 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
               title={isPlaying ? "Pause" : "Play"}
             >
               <img
                 src={isPlaying ? "/pause.svg" : "/play.svg"}
                 alt={isPlaying ? "Pause" : "Play"}
-                className="w-5 h-5 invert opacity-80"
+                className="w-6 h-6 invert opacity-80"
               />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-              className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="w-10 h-10 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
               title="Skip"
             >
               <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 invert opacity-80" />
@@ -107,7 +105,7 @@ const Header = () => {
                 />
               </button>
 
-              <div className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-32 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center pl-1">
+              <div className="absolute top-[calc(50%+14px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-32 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center">
                 <input
                   type="range"
                   min="0"

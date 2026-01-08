@@ -155,160 +155,71 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       onClick={handleInteraction}
       className={`
         group relative aspect-square w-full
-        bg-[#0a0a0a]
+        bg-black
         cursor-pointer overflow-hidden
         outline-none border-none shadow-none
         ${isActive ? 'z-20' : 'z-0'}
       `}
     >
-      {isActive ? (
-        <>
-          {/* Visualizer Layer (z-0) - Persistent */}
-          <div className="absolute inset-0 z-0 w-full h-full">
-            <canvas
-              ref={canvasRef}
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Metadata Overlay (Artist Top, Title Bottom when NOT Hovering) */}
-          <div className={`absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pb-8 transition-opacity duration-300 ${isPlaying ? 'group-hover:opacity-0' : ''}`}>
-            <div className="flex flex-col leading-tight pl-1">
-              <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase tracking-widest truncate">
-                {artist}
-              </span>
-              <span className="font-mono text-[12px] md:text-lg font-bold text-neutral-300 uppercase tracking-tighter truncate">
-                {title}
-              </span>
-            </div>
-          </div>
-
-          {/* In-Tile HUD (z-20) - Restricted to top ~12% Hardware HUD */}
-          <div className={`
-                absolute top-0 left-0 w-full h-[18%] min-h-[64px] z-20
-                bg-[#050505cc] backdrop-blur-md
-                border-b border-white/10
-                flex items-center justify-between px-1 relative
-                transition-opacity duration-300
-                opacity-0 ${isPlaying ? 'group-hover:opacity-100' : ''}
-                hud-wrapper
-            `}>
-            {/* 1. Tactical Seeker: 2px solid white bar at top-0 */}
-            <div
-              className="absolute top-0 left-0 w-full h-[2px] bg-white/5 cursor-pointer group/seek z-30"
-              onClick={handleSeek}
-            >
-              <div
-                className="absolute top-0 left-0 h-full bg-white pointer-events-auto"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-
-            {/* Content Row: Metadata (Left) | Controls (Center) | Volume (Right Under-Icon) */}
-            <div className="w-full flex items-center justify-between px-3 h-full pt-1">
-              {/* Left: Metadata with 4px indent */}
-              <div className="flex flex-col min-w-0 leading-tight flex-1">
-                <div className="flex flex-col pl-1">
-                  <span className="font-mono text-xl md:text-4xl font-bold text-white uppercase tracking-widest truncate pl-1">
-                    {title}
-                  </span>
-                  <span className="font-mono text-sm md:text-xl text-neutral-400 lowercase truncate pl-1">
-                    {artist}
-                  </span>
-                </div>
-              </div>
-
-              {/* Center: Playback Group (Transparent, Floating Icons) */}
-              <div className="flex items-center justify-center flex-1">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                    className="w-7 h-7 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
-                    title="Back"
-                  >
-                    <img src="/skip-back.svg" alt="Back" className="w-4 h-4 invert opacity-80" />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                    className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
-                    title={isPlaying ? "Pause" : "Play"}
-                  >
-                    <img
-                      src={isPlaying ? "/pause.svg" : "/play.svg"}
-                      alt={isPlaying ? "Pause" : "Play"}
-                      className="w-5 h-5 invert opacity-80"
-                    />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                    className="w-7 h-7 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
-                    title="Forward"
-                  >
-                    <img src="/skip-forward.svg" alt="Forward" className="w-4 h-4 invert opacity-80" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Right: Under-Icon Volume Fader (Timer Removed) */}
-              <div className="flex items-center group/volume relative h-full pr-1">
-                <div className="relative flex items-center h-full">
-                  <button
-                    className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative z-10"
-                    onClick={(e) => { e.stopPropagation(); adjustVolume(volume > 0 ? 0 : 0.5); }}
-                  >
-                    <img
-                      src={getVolumeIcon()}
-                      alt="Volume"
-                      className="w-4 h-4 invert opacity-80"
-                    />
-                  </button>
-
-                  {/* The "Hardware HUD" fader (appears under icon on hover) */}
-                  <div className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-32 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center pl-1">
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.01"
-                      value={volume}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        adjustVolume(parseFloat(e.target.value));
-                      }}
-                      className="w-full h-full bg-transparent appearance-none cursor-pointer fader-thumb pointer-events-auto"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          {coverImage && (
-            <div className="absolute inset-0 z-0 opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-500">
+      {/* 1. Visual Base (Milkdrop or Cover) - Edge-to-Edge */}
+      <div className="absolute inset-0 z-0">
+        {isActive ? (
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          coverImage && (
+            <div className="relative w-full h-full opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-500">
               <Image
                 src={coverImage}
                 alt={title}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 50vw, 20vw"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
-          )}
+          )
+        )}
+      </div>
 
-          {/* Metadata Overlay (Artist Top, Title Bottom) - TOP-LEFT CORNER SLOT */}
-          <div className="absolute top-0 left-0 right-0 z-10 h-[30%] flex flex-col justify-start p-6 pointer-events-none mix-blend-difference">
-            <div className="flex flex-col leading-tight pl-1">
-              <span className="font-mono text-xl md:text-2xl text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate pl-1">
+      {/* 2. Dim Overlay (Hover Only) */}
+      <div className="absolute inset-0 z-10 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+      {/* 3. Hover-Only Metadata Animation (Architectural Scale) */}
+      <div className="absolute inset-0 z-20 flex flex-col justify-start p-0 pointer-events-none overflow-hidden">
+        <div className="flex flex-col h-[30%] w-full justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
+          <div className="whitespace-nowrap overflow-hidden pl-1">
+            <div className="inline-block animate-marquee-hardware leading-[0.8] tracking-tighter">
+              <span className="font-mono text-[4vw] md:text-[2vw] text-neutral-400 lowercase mr-8">
                 {artist}
               </span>
-              <span className="font-mono text-3xl md:text-5xl font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors truncate pl-1">
+              <span className="font-mono text-[8vw] md:text-[4vw] font-bold text-white uppercase mr-8">
+                {title}
+              </span>
+              {/* Duplication for marquee */}
+              <span className="font-mono text-[4vw] md:text-[2vw] text-neutral-400 lowercase mr-8">
+                {artist}
+              </span>
+              <span className="font-mono text-[8vw] md:text-[4vw] font-bold text-white uppercase mr-8">
                 {title}
               </span>
             </div>
           </div>
-        </>
+          {/* Hardware Indent Safety Marker */}
+          <div className="absolute top-0 left-0 w-1 h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
+      </div>
+
+      {/* 4. Subtle Playback Indicator */}
+      {isActive && isPlaying && (
+        <div className="absolute bottom-4 right-4 z-20 pointer-events-none opacity-60">
+          <div className="flex gap-1 items-end h-4">
+            <div className="w-1 bg-white animate-[music-bar_0.8s_ease-in-out_infinite]" />
+            <div className="w-1 bg-white animate-[music-bar_0.6s_ease-in-out_infinite_0.1s]" />
+            <div className="w-1 bg-white animate-[music-bar_1.1s_ease-in-out_infinite_0.2s]" />
+          </div>
+        </div>
       )}
     </div>
   );
