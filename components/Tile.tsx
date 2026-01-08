@@ -202,30 +202,32 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </span>
               </div>
 
-              {/* Controls: Mechanical Symbols */}
+              {/* Controls: Mechanical Symbols replaced with SVGs */}
               <div className="flex items-center gap-1 md:gap-2">
                 <button
                   onClick={(e) => { e.stopPropagation(); restartTrack(); }}
-                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8"
+                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
                   title="Restart"
                 >
-                  <span className="font-mono text-sm leading-none opacity-80">⟲</span>
+                  <img src="/skip-back.svg" alt="Restart" className="w-4 h-4 invert opacity-80" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className={`mechanical-btn w-10 h-10 md:w-8 md:h-8 ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
+                  className={`mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center ${isBuffering ? 'animate-pulse' : ''}`}
                   title={isPlaying ? "Pause" : "Play"}
                 >
-                  <span className="font-mono text-sm leading-none opacity-80">
-                    {isBuffering ? '●' : (isPlaying ? '||' : '▶')}
-                  </span>
+                  <img
+                    src={isPlaying ? "/pause.svg" : "/play.svg"}
+                    alt={isPlaying ? "Pause" : "Play"}
+                    className={`w-4 h-4 invert opacity-80 ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
+                  />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8"
+                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
                   title="Skip"
                 >
-                  <span className="font-mono text-sm leading-none opacity-80">→</span>
+                  <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 invert opacity-80" />
                 </button>
               </div>
             </div>

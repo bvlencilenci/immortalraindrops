@@ -42,22 +42,25 @@ const Header = () => {
         </div>
 
         {/* Universal Volume: Needle Slider at far right (6% margin) */}
-        <div
-          className="absolute right-[6%] h-10 w-[20px] flex items-center justify-center cursor-pointer group/volume"
-          onClick={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const y = e.clientY - rect.top;
-            const percent = 1 - (y / rect.height);
-            adjustVolume(percent);
-          }}
-        >
-          {/* Track: 1px vertical line */}
-          <div className="absolute h-full w-[1px] bg-white/30" />
-          {/* Needle: 4px white square */}
+        <div className="absolute right-[6%] flex items-center gap-3">
+          <img src="/speaker-simple-high.svg" alt="Volume" className="w-4 h-4 invert opacity-60" />
           <div
-            className="absolute w-1 h-1 bg-white shadow-[0_0_4px_rgba(255,255,255,0.5)] pointer-events-none"
-            style={{ bottom: `${volume * 100}%`, transform: 'translateY(50%)' }}
-          />
+            className="h-10 w-[20px] flex items-center justify-center cursor-pointer group/volume relative"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const y = e.clientY - rect.top;
+              const percent = 1 - (y / rect.height);
+              adjustVolume(percent);
+            }}
+          >
+            {/* Track: 1px vertical line */}
+            <div className="absolute h-full w-[1px] bg-white/30" />
+            {/* Needle: 4px white square */}
+            <div
+              className="absolute w-1 h-1 bg-white shadow-[0_0_4px_rgba(255,255,255,0.5)] pointer-events-none"
+              style={{ bottom: `${volume * 100}%`, transform: 'translateY(50%)' }}
+            />
+          </div>
         </div>
       </div>
 
