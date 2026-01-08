@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import Image from 'next/image';
 import { Howler } from 'howler';
@@ -25,105 +25,79 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     const initVisualizer = async () => {
       if (!isActive || !canvasRef.current || !isPlaying) return;
 
-      // Visualizer Setup
       try {
-        // Dynamic imports for browser-only libraries
         const butterchurn = (await import('butterchurn')).default;
         const butterchurnPresets = (await import('butterchurn-presets')).default;
 
-        // We need the audio context and a source node.
-        // With Howler html5: true, this is tricky.
-        // Assumption: Store/Howler has exposed the context.
         const ctx = Howler.ctx;
         if (!ctx) return;
 
-        // We need to find the node. 
-        // This is a hacky way to find the node associated with the currently playing sound.
-        // In a real robust app we'd pass this via store.
-        // But let's try to get it from the store's howl instance if we exported it?
-        // Actually, for this demo, let's assume we can get an Analyser from the store if we implement the wiring there.
-        // OR we just perform standard visualization.
-
-        // To properly visualize with html5: true, we MUST have created a MediaElementSource.
-        // If that logic isn't perfect in the store, visualizer will fail.
-        // Let's implement a fallback "Fake" visualizer or try to hook it up? 
-        // User requested: "Ensure Howler audio node is connected".
-
-        // Let's assume the store successfully sets up an AnalyserNode and exposes it.
-        // We need to update useAudioStore to expose `analyser`. 
+        // Assuming store sets up analyser or we mock it.
+        // If we rely on useAudioStore.analyser:
         const { analyser, howl } = useAudioStore.getState();
 
-        // If we have an analyser, we can use it.
-        // If not, we try to create one from the howl access.
+        // Ensure connection logic (similar to previous step)
         let sourceNode: MediaElementAudioSourceNode | null = null;
-
-        // Attempt to wire if not already wired
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (howl as any)?._sounds?.[0];
+
         if (sound && sound._node && !sound._visualizerConnected) {
           const audioNode = sound._node;
           audioNode.crossOrigin = "anonymous";
-
           try {
-            // This might fail if already created elsewhere.
             sourceNode = ctx.createMediaElementSource(audioNode);
             const analyserNode = ctx.createAnalyser();
             sourceNode.connect(analyserNode);
             analyserNode.connect(ctx.destination);
-
-            // Mark as connected to avoid double connection
             sound._visualizerConnected = true;
             sound._analyser = analyserNode;
           } catch (e) {
-            // If already connected, maybe we stored it on the sound object?
-            if (sound._analyser) {
-              // reuse
-            } else {
-              console.warn("Could not connect visualizer", e);
-            }
+            if (!sound._analyser) console.warn("Visualizer connect error", e);
           }
         }
 
         const finalAnalyser = (sound && sound._analyser) ? sound._analyser : analyser;
 
         if (finalAnalyser) {
-          const visualizer = butterchurn.createVisualizer(ctx, canvasRef.current, {
-            width: canvasRef.current.width,
-            height: canvasRef.current.height
+          const canvas = canvasRef.current;
+          const { width, height } = canvas.parentElement?.getBoundingClientRect() || { width: 300, height: 300 };
+
+          const visualizer = butterchurn.createVisualizer(ctx, canvas, {
+            width,
+            height
           });
 
           visualizer.connectAudio(finalAnalyser);
 
-          // Load a preset
           const presets = butterchurnPresets.getPresets();
           const presetKeys = Object.keys(presets);
           const randomPreset = presets[presetKeys[Math.floor(Math.random() * presetKeys.length)]];
-          visualizer.loadPreset(randomPreset, 0.0); // 0.0 blend time
+          visualizer.loadPreset(randomPreset, 0.0);
 
           visualizerRef.current = visualizer;
 
           const loop = () => {
             if (visualizerRef.current) {
+              // Resize capability?
+              // visualizer.setCanvasSize(width, height) if resized.
+              // For now, fixed on init.
               visualizerRef.current.render();
               animationFrameId = requestAnimationFrame(loop);
             }
           };
           loop();
         }
-
       } catch (e) {
         console.error("Visualizer Init Failed", e);
       }
     };
 
     if (isActive && isPlaying) {
-      // slight delay to ensure audio node is ready
-      setTimeout(initVisualizer, 500);
+      setTimeout(initVisualizer, 200);
     }
 
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      // We don't destroy the visualizer instance per se, but we stop rendering.
       visualizerRef.current = null;
     };
   }, [isActive, isPlaying]);
@@ -137,43 +111,53 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         cursor-pointer overflow-hidden
         transition-colors duration-100 ease-linear
         ${isActive ? 'bg-black' : 'hover:bg-[#111] hover:border-white/20'}
-        flex flex-col justify-end p-4
         rounded-none
       `}
     >
+      {/* 
+         LAYOUT LOGIC:
+         1. Active: Full Canvas visualizer. No text, no image.
+         2. Inactive: Cover Image (dimmed) + Metadata Overlay.
+      */}
+
       {isActive ? (
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-10 w-full h-full">
           <canvas
             ref={canvasRef}
-            width={300}
-            height={300}
-            className="w-full h-full object-cover opacity-80"
+            className="w-full h-full object-cover"
           />
         </div>
       ) : (
-        coverImage && (
-          <div className="absolute inset-0 z-0 opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-500">
-            <Image
-              src={coverImage}
-              alt={title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 50vw, 20vw"
-            />
+        <>
+          {/* Cover Image Background */}
+          {coverImage && (
+            <div className="absolute inset-0 z-0 opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-500">
+              <Image
+                src={coverImage}
+                alt={title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 20vw"
+              />
+            </div>
+          )}
+
+          {/* Metadata Overlay (Only when inactive) */}
+          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference">
+            <div className="space-y-1">
+              <p className="font-mono text-xs text-neutral-400 uppercase tracking-widest group-hover:text-white transition-colors">
+                - {artist}
+              </p>
+              <p className="font-mono text-sm font-bold text-neutral-300 group-hover:text-green-500 transition-colors line-clamp-2">
+                - {title}
+              </p>
+            </div>
           </div>
-        )
+
+          {/* Corner Accent */}
+          <div className="absolute top-0 right-0 w-2 h-2 border-l border-b border-[#222] group-hover:border-white/20 transition-colors" />
+        </>
       )}
-
-      <div className="z-10 flex flex-col gap-1 items-start relative mix-blend-difference">
-        <span className="font-mono text-xs text-neutral-500 uppercase tracking-widest group-hover:text-white transition-colors">
-          {artist}
-        </span>
-        <span className={`font-mono text-sm font-bold transition-colors line-clamp-2 ${isActive ? 'text-green-500' : 'text-neutral-300 group-hover:text-green-500'}`}>
-          {title}
-        </span>
-      </div>
-
-      <div className={`absolute top-0 right-0 w-2 h-2 border-l border-b ${isActive ? 'border-green-500' : 'border-[#222] group-hover:border-white/20'} transition-colors`} />
     </div>
   );
 };
