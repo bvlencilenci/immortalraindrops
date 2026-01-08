@@ -25,7 +25,8 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     duration,
     seekTo,
     volume,
-    adjustVolume
+    adjustVolume,
+    isBuffering
   } = useAudioStore();
 
   const isActive = currentlyPlayingId === id;
@@ -190,10 +191,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className="hud-btn w-6 h-6 text-sm flex items-center justify-center"
+                  className={`hud-btn w-6 h-6 text-sm flex items-center justify-center ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
                   title={isPlaying ? "Pause" : "Play"}
                 >
-                  {isPlaying ? '||' : '▶'}
+                  {isBuffering ? '●' : (isPlaying ? '||' : '▶')}
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}

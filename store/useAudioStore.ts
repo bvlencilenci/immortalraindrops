@@ -14,6 +14,7 @@ interface AudioStore {
   trackTitle: string | null;
   trackArtist: string | null;
   isPlaying: boolean;
+  isBuffering: boolean;
   duration: number;
   seek: number;
   volume: number;
@@ -39,6 +40,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   trackTitle: null,
   trackArtist: null,
   isPlaying: false,
+  isBuffering: false,
   duration: 0,
   seek: 0,
   volume: 1.0,
@@ -72,17 +74,21 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       }
     }
 
+    // Set Buffering State
+    set({ isBuffering: true });
+
     const newHowl = new Howl({
       src: [url],
       html5: true,
       preload: 'metadata', // Optimize for large files
+      pool: 1, // Minimize resource usage
       format: ['mp3'],
       xhr: {
         withCredentials: false // Crucial for Archive.org CORS
       },
       volume: volume,
       onplay: () => {
-        set({ isPlaying: true, duration: newHowl.duration() });
+        set({ isPlaying: true, isBuffering: false, duration: newHowl.duration() });
         requestAnimationFrame(get().updateSeek);
 
         // Visualizer Connection
@@ -94,24 +100,25 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         }
       },
       onend: () => {
-        set({ isPlaying: false, seek: 0 });
+        set({ isPlaying: false, seek: 0, isBuffering: false });
         get().skipTrack();
       },
       onpause: () => {
-        set({ isPlaying: false });
+        set({ isPlaying: false, isBuffering: false });
       },
       onstop: () => {
-        set({ isPlaying: false, seek: 0 });
+        set({ isPlaying: false, seek: 0, isBuffering: false });
       },
       onload: () => {
-        set({ duration: newHowl.duration() });
+        set({ duration: newHowl.duration(), isBuffering: false });
       },
       onloaderror: (id, err) => {
         console.error("Howl Load Error", id, err);
-        // Optional: Notify user or try next track
+        set({ isBuffering: false });
       },
       onplayerror: (id, err) => {
         console.error("Howl Play Error", id, err);
+        set({ isBuffering: false });
         // Unlock audio context again just in case
         if (Howler.ctx && Howler.ctx.state === 'suspended') {
           Howler.ctx.resume();
