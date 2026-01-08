@@ -31,10 +31,10 @@ const Header = () => {
         <div className="flex flex-col h-full justify-center pl-6 pr-16 overflow-hidden">
           {trackTitle ? (
             <>
-              <span className="font-mono text-[10px] text-neutral-400 lowercase truncate leading-none mb-1">
+              <span className="font-mono text-[10px] md:text-xs lg:text-sm text-neutral-400 lowercase truncate leading-none mb-1">
                 - {trackArtist}
               </span>
-              <span className="font-mono text-xs font-bold text-white uppercase tracking-widest truncate leading-none">
+              <span className="font-mono text-xs md:text-sm lg:text-base font-bold text-white uppercase tracking-widest truncate leading-none">
                 {trackTitle}
               </span>
             </>
