@@ -37,20 +37,30 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 w-full h-[60px] z-[100] border-b border-[#222] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 relative overflow-hidden">
       {/* 1. Identity & Metadata (Left Group with 4px Padding) */}
-      <div className="flex items-center gap-6 z-20 overflow-hidden pl-1">
-        <h1 className="font-mono text-xs text-white uppercase tracking-[0.3em] whitespace-nowrap">
+      <div className="flex items-center z-20 overflow-hidden pl-1">
+        <h1 className="font-mono text-xs text-white uppercase tracking-[0.3em] whitespace-nowrap mr-12">
           Immortal Raindrops
         </h1>
-        <div className="flex flex-col min-w-0 border-l border-white/10 pl-4 py-1">
+        <div className="flex flex-col min-w-0 border-l border-white/10 pl-6 py-1 scrolling-metadata-mask overflow-hidden max-w-[300px]">
           {trackTitle ? (
-            <>
-              <span className="font-mono text-[10px] md:text-xs text-neutral-400 lowercase truncate leading-tight">
-                - {trackArtist}
+            <div className="animate-marquee whitespace-nowrap">
+              <span className="font-mono text-[10px] md:text-xs text-neutral-400 lowercase leading-tight">
+                {trackArtist}
               </span>
-              <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest truncate leading-tight mt-0.5">
+              <span className="mx-4 text-white/20">•</span>
+              <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-tight">
                 {trackTitle}
               </span>
-            </>
+              {/* Duplicate for seamless loop */}
+              <span className="mx-4 text-white/20">•</span>
+              <span className="font-mono text-[10px] md:text-xs text-neutral-400 lowercase leading-tight">
+                {trackArtist}
+              </span>
+              <span className="mx-4 text-white/20">•</span>
+              <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-tight">
+                {trackTitle}
+              </span>
+            </div>
           ) : (
             <span className="font-mono text-[9px] md:text-xs text-white/10 uppercase tabular-nums">
               READY_STATE_01
