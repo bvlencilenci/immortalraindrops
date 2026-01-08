@@ -5,6 +5,7 @@ interface Track {
   title: string;
   artist: string;
   url: string;
+  coverImage?: string;
 }
 
 interface ArchiveGridProps {
@@ -21,6 +22,7 @@ const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
           title={track.title}
           artist={track.artist}
           url={track.url}
+          coverImage={track.coverImage}
         />
       ))}
     </div>
