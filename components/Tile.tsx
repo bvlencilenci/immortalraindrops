@@ -28,7 +28,6 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     adjustVolume,
     isBuffering
   } = useAudioStore();
-  const [hudVisible, setHudVisible] = useState(false);
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -36,15 +35,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
   // Handle Play/Interaction
   const handleInteraction = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stop propagation? Wait, the tile itself is the clickable area.
+    e.stopPropagation();
 
     if (Howler.ctx && Howler.ctx.state === 'suspended') {
       Howler.ctx.resume();
-    }
-
-    if (!hudVisible) {
-      setHudVisible(true);
-      return;
     }
 
     if (isActive) {
@@ -162,7 +156,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           </div>
 
           {/* Metadata Overlay (Artist Top, Title Bottom when NOT Hovering) */}
-          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6 transition-opacity duration-300 opacity-100 group-hover:opacity-0">
+          <div className={`absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6 transition-opacity duration-300 ${isPlaying ? 'group-hover:opacity-0' : ''}`}>
             <div className="space-y-1">
               <p className="font-mono text-[10px] text-neutral-400 lowercase tracking-widest">
                 {artist}
@@ -181,7 +175,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 border-t border-white/10
                 flex flex-col
                 transition-opacity duration-300
-                ${hudVisible ? 'opacity-100' : 'opacity-0'}
+                opacity-0 ${isPlaying ? 'group-hover:opacity-100' : ''}
                 hud-wrapper
             `}>
             {/* 1. Tactical Seeker: 2px solid white bar at top */}
@@ -257,7 +251,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               <p className="font-mono text-[10px] text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors">
                 {artist}
               </p>
-              <p className="font-mono text-xs font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors line-clamp-2">
+              <p className="font-mono text-[10px] sm:text-xs font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors line-clamp-2">
                 {title}
               </p>
             </div>

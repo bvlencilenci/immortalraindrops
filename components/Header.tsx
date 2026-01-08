@@ -43,24 +43,27 @@ const Header = () => {
 
         {/* Universal Volume: Needle Slider at far right (6% margin) */}
         <div
-          className="header-volume-container h-10 w-[1px] absolute right-[6%] top-1/2 -translate-y-1/2"
-          style={{ width: '40px', right: '6%', transform: 'translateY(-50%) rotate(-90deg)' }}
+          className="relative h-10 w-[20px] ml-auto mr-[6%] flex items-center justify-center cursor-pointer group/volume"
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            const percent = 1 - (y / rect.height);
+            adjustVolume(percent);
+          }}
         >
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={(e) => adjustVolume(parseFloat(e.target.value))}
-            className="header-needle-range w-full h-full cursor-pointer absolute opacity-100"
+          {/* Track: 1px vertical line */}
+          <div className="absolute h-full w-[1px] bg-white/30" />
+          {/* Needle: 4px white square */}
+          <div
+            className="absolute w-1 h-1 bg-white shadow-[0_0_4px_rgba(255,255,255,0.5)] pointer-events-none"
+            style={{ bottom: `${volume * 100}%`, transform: 'translateY(50%)' }}
           />
         </div>
       </div>
 
       {/* Master Seeker: 1px line at the bottom edge */}
       <div
-        className="absolute bottom-0 left-0 w-full h-[2px] cursor-pointer group/seeker z-10 flex items-end"
+        className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-10"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = e.clientX - rect.left;
@@ -68,9 +71,9 @@ const Header = () => {
           seekTo(percent * duration);
         }}
       >
-        <div className="absolute bottom-[1px] left-0 w-full h-[1px] bg-white/10" />
+        <div className="absolute inset-0 bg-white/10" />
         <div
-          className="h-[1px] mb-[1px] bg-white transition-all duration-100 ease-linear pointer-events-auto relative"
+          className="h-full bg-white transition-all duration-100 ease-linear pointer-events-auto relative"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
