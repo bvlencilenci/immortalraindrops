@@ -161,7 +161,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               <p className="font-mono text-[10px] text-neutral-400 lowercase tracking-widest">
                 {artist}
               </p>
-              <p className="font-mono text-[10px] sm:text-xs font-bold text-neutral-300 uppercase tracking-tighter line-clamp-2">
+              <p className="font-mono text-[10px] font-bold text-neutral-300 uppercase tracking-tighter line-clamp-2">
                 {title}
               </p>
             </div>
@@ -194,7 +194,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             <div className="flex items-center justify-between flex-1 px-4">
               {/* Metadata flip: TITLE top, artist bottom */}
               <div className="flex flex-col flex-1 min-w-0 pr-4 leading-none self-center">
-                <span className="font-mono text-xs text-white font-bold uppercase tracking-widest truncate">
+                <span className="font-mono text-[10px] text-white font-bold uppercase tracking-widest truncate">
                   {title}
                 </span>
                 <span className="font-mono text-[10px] text-neutral-400 lowercase truncate mt-0.5">

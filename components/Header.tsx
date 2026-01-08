@@ -43,7 +43,7 @@ const Header = () => {
 
         {/* Universal Volume: Needle Slider at far right (6% margin) */}
         <div
-          className="relative h-10 w-[20px] ml-auto mr-[6%] flex items-center justify-center cursor-pointer group/volume"
+          className="absolute right-[6%] h-10 w-[20px] flex items-center justify-center cursor-pointer group/volume"
           onClick={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
             const y = e.clientY - rect.top;
