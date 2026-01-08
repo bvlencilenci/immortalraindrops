@@ -297,13 +297,13 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             </div>
           )}
 
-          {/* Metadata Overlay (Artist Top, Title Bottom) */}
-          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference">
+          {/* Metadata Overlay (Artist Top, Title Bottom) - TOP-LEFT CORNER SLOT */}
+          <div className="absolute top-0 left-0 right-0 z-10 h-[30%] flex flex-col justify-start p-6 pointer-events-none mix-blend-difference">
             <div className="flex flex-col leading-tight pl-1">
-              <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate">
+              <span className="font-mono text-xl md:text-2xl text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate">
                 {artist}
               </span>
-              <span className="font-mono text-[12px] md:text-lg font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors truncate">
+              <span className="font-mono text-3xl md:text-5xl font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors truncate">
                 {title}
               </span>
             </div>
