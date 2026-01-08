@@ -10,7 +10,8 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: monospace; /* Brutalist requirement */
+  font-family: monospace;
+  /* Brutalist requirement */
   overflow-x: hidden;
 }
 
@@ -23,11 +24,9 @@ body::after {
   left: 0;
   bottom: 0;
   right: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  );
+  background: linear-gradient(to bottom,
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.25) 50%);
   background-size: 100% 4px;
   z-index: 9999;
   pointer-events: none;
@@ -47,7 +46,8 @@ body::before {
   background: transparent url('http://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
   background-repeat: repeat;
   animation: bg-animation .2s infinite;
-  opacity: 0.1; /* Subtle */
+  opacity: 0.1;
+  /* Subtle */
   visibility: visible;
   pointer-events: none;
   z-index: 9998;
@@ -57,21 +57,72 @@ body::before {
   0% {
     background-position: 0 0;
   }
+
   100% {
     background-position: 0 100%;
   }
 }
 
 @keyframes bg-animation {
-    0% { transform: translate(0,0) }
-    10% { transform: translate(-5%,-5%) }
-    20% { transform: translate(-10%,5%) }
-    30% { transform: translate(5%,-10%) }
-    40% { transform: translate(-5%,15%) }
-    50% { transform: translate(-10%,5%) }
-    60% { transform: translate(15%,0) }
-    70% { transform: translate(0,10%) }
-    80% { transform: translate(-15%,0) }
-    90% { transform: translate(10%,5%) }
-    100% { transform: translate(5%,0) }
+  0% {
+    transform: translate(0, 0)
+  }
+
+  10% {
+    transform: translate(-5%, -5%)
+  }
+
+  20% {
+    transform: translate(-10%, 5%)
+  }
+
+  30% {
+    transform: translate(5%, -10%)
+  }
+
+  40% {
+    transform: translate(-5%, 15%)
+  }
+
+  50% {
+    transform: translate(-10%, 5%)
+  }
+
+  60% {
+    transform: translate(15%, 0)
+  }
+
+  70% {
+    transform: translate(0, 10%)
+  }
+
+  80% {
+    transform: translate(-15%, 0)
+  }
+
+  90% {
+    transform: translate(10%, 5%)
+  }
+
+  100% {
+    transform: translate(5%, 0)
+  }
+}
+
+/* HUD Pulse Animation */
+@keyframes pulse-border {
+
+  0%,
+  100% {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  50% {
+    border-color: rgba(255, 255, 255, 1);
+    box-shadow: 0 -1px 8px rgba(255, 255, 255, 0.4);
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

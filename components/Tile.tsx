@@ -14,10 +14,33 @@ interface TileProps {
 }
 
 const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
-  const { playTrack, currentlyPlayingId, isPlaying } = useAudioStore();
+  const {
+    playTrack,
+    currentlyPlayingId,
+    isPlaying,
+    togglePlay,
+    restartTrack
+  } = useAudioStore();
+
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+  // Handle Play/Interaction
+  const handleInteraction = (e?: React.MouseEvent) => {
+    // Ensure Audio Context is unlocked
+    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+      Howler.ctx.resume();
+    }
+
+    if (isActive) {
+      // If already active, maybe toggle play? 
+      // But strict generic interaction usually implies "Select"
+      // We let the HUD handle specific controls.
+    } else {
+      playTrack(id, url, title, artist);
+    }
+  };
 
   useEffect(() => {
     let animationFrameId: number;
@@ -32,11 +55,8 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         const ctx = Howler.ctx;
         if (!ctx) return;
 
-        // Assuming store sets up analyser or we mock it.
-        // If we rely on useAudioStore.analyser:
+        // Visualizer wiring...
         const { analyser, howl } = useAudioStore.getState();
-
-        // Ensure connection logic (similar to previous step)
         let sourceNode: MediaElementAudioSourceNode | null = null;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (howl as any)?._sounds?.[0];
@@ -52,7 +72,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             sound._visualizerConnected = true;
             sound._analyser = analyserNode;
           } catch (e) {
-            if (!sound._analyser) console.warn("Visualizer connect error", e);
+            if (!sound._analyser) console.warn("Visualizer connect warn", e);
           }
         }
 
@@ -78,9 +98,6 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
           const loop = () => {
             if (visualizerRef.current) {
-              // Resize capability?
-              // visualizer.setCanvasSize(width, height) if resized.
-              // For now, fixed on init.
               visualizerRef.current.render();
               animationFrameId = requestAnimationFrame(loop);
             }
@@ -104,29 +121,69 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
   return (
     <div
-      onClick={() => playTrack(id, url, title, artist)}
+      onClick={handleInteraction}
       className={`
         group relative aspect-square w-full
-        border-r border-b border-[#222] bg-[#0a0a0a]
+        bg-[#0a0a0a]
         cursor-pointer overflow-hidden
-        transition-colors duration-100 ease-linear
-        ${isActive ? 'bg-black' : 'hover:bg-[#111] hover:border-white/20'}
-        rounded-none
+        outline-none border-none shadow-none
+        ${isActive ? 'z-20' : 'z-0'}
       `}
     >
       {/* 
          LAYOUT LOGIC:
-         1. Active: Full Canvas visualizer. No text, no image.
-         2. Inactive: Cover Image (dimmed) + Metadata Overlay.
+         1. Always: Borderless.
+         2. Inactive: Cover Image + Metadata Overlay (Old style).
+         3. Active: Full Canvas + HUD.
       */}
 
       {isActive ? (
-        <div className="absolute inset-0 z-10 w-full h-full">
-          <canvas
-            ref={canvasRef}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <>
+          {/* Visualizer Layer (z-0) */}
+          <div className="absolute inset-0 z-0 w-full h-full">
+            <canvas
+              ref={canvasRef}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* In-Tile HUD (z-10) */}
+          <div className={`
+                absolute bottom-0 left-0 w-full h-[15%] min-h-[48px] z-10
+                bg-black/60 backdrop-blur-md
+                flex items-center justify-between px-3
+                border-t border-white/40
+                ${isPlaying ? 'animate-pulse-border' : ''}
+            `}>
+            {/* Metadata */}
+            <div className="flex flex-col w-2/3 overflow-hidden">
+              <span className="font-mono text-[10px] text-green-400 uppercase truncate">
+                {artist}
+              </span>
+              <span className="font-mono text-xs text-white font-bold uppercase truncate">
+                {title}
+              </span>
+            </div>
+
+            {/* Micro Controls */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); restartTrack(); }}
+                className="text-neutral-400 hover:text-white text-[10px]"
+                title="Restart"
+              >
+                [R]
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                className="text-white hover:text-green-500 font-bold"
+                title={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? '[ || ]' : '[ > ]'}
+              </button>
+            </div>
+          </div>
+        </>
       ) : (
         <>
           {/* Cover Image Background */}
@@ -142,7 +199,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             </div>
           )}
 
-          {/* Metadata Overlay (Only when inactive) */}
+          {/* Metadata Overlay (Inactive) */}
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference">
             <div className="space-y-1">
               <p className="font-mono text-xs text-neutral-400 uppercase tracking-widest group-hover:text-white transition-colors">
@@ -153,9 +210,6 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               </p>
             </div>
           </div>
-
-          {/* Corner Accent */}
-          <div className="absolute top-0 right-0 w-2 h-2 border-l border-b border-[#222] group-hover:border-white/20 transition-colors" />
         </>
       )}
     </div>

@@ -74,6 +74,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const newHowl = new Howl({
       src: [url],
       html5: true,
+      preload: 'metadata', // Optimize for large files
       format: ['mp3'],
       xhr: {
         withCredentials: false // Crucial for Archive.org CORS
