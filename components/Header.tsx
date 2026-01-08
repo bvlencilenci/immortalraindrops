@@ -41,25 +41,27 @@ const Header = () => {
         <h1 className="font-mono text-xs text-white uppercase tracking-[0.3em] whitespace-nowrap mr-12">
           Immortal Raindrops
         </h1>
-        <div className="flex flex-col min-w-0 border-l border-white/10 pl-6 py-1 scrolling-metadata-mask overflow-hidden max-w-[300px]">
+        <div className="flex flex-col min-w-0 border-l border-white/10 pl-6 py-1 scrolling-metadata-mask overflow-hidden max-w-[350px]">
           {trackTitle ? (
-            <div className="animate-marquee whitespace-nowrap">
-              <span className="font-mono text-[10px] md:text-xs text-neutral-400 lowercase leading-tight">
-                {trackArtist}
-              </span>
-              <span className="mx-4 text-white/20">•</span>
-              <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-tight">
-                {trackTitle}
-              </span>
-              {/* Duplicate for seamless loop */}
-              <span className="mx-4 text-white/20">•</span>
-              <span className="font-mono text-[10px] md:text-xs text-neutral-400 lowercase leading-tight">
-                {trackArtist}
-              </span>
-              <span className="mx-4 text-white/20">•</span>
-              <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-tight">
-                {trackTitle}
-              </span>
+            <div className="animate-marquee whitespace-nowrap flex flex-col justify-center h-full">
+              <div className="flex items-center">
+                <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none">
+                  {trackArtist}
+                </span>
+                <span className="mx-6 text-white/10 opacity-0">•</span>
+                <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none">
+                  {trackArtist}
+                </span>
+              </div>
+              <div className="flex items-center mt-1">
+                <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-none">
+                  {trackTitle}
+                </span>
+                <span className="mx-6 text-white/10 opacity-0">•</span>
+                <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest leading-none">
+                  {trackTitle}
+                </span>
+              </div>
             </div>
           ) : (
             <span className="font-mono text-[9px] md:text-xs text-white/10 uppercase tabular-nums">
@@ -133,9 +135,9 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Persistence Layer: Bottom Seeker 1px */}
+      {/* Persistence Layer: Bottom Seeker 2px */}
       <div
-        className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-10"
+        className="absolute bottom-0 left-0 w-full h-[2px] cursor-pointer group/seeker z-10"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = e.clientX - rect.left;
