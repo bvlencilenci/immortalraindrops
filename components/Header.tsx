@@ -73,14 +73,14 @@ const Header = () => {
 
       {/* 2. Console (Right Group) */}
       <div className="flex items-center gap-6 z-20 pr-1 h-full">
-        {/* Playback Controls (White Container, Black Icons) */}
-        <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1">
+        {/* Playback Controls (Transparent Container, Black Icons) */}
+        <div className="flex items-center gap-1 bg-transparent">
           <button
             onClick={(e) => { e.stopPropagation(); skipBack(); }}
             className="w-8 h-8 flex items-center justify-center border-none hover:opacity-50 transition-opacity"
             title="Previous / Restart"
           >
-            <img src="/skip-back.svg" alt="Back" className="w-3.5 h-3.5 opacity-90" />
+            <img src="/skip-back.svg" alt="Back" className="w-4 h-4 opacity-90" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); togglePlay(); }}
@@ -98,7 +98,7 @@ const Header = () => {
             className="w-8 h-8 flex items-center justify-center border-none hover:opacity-50 transition-opacity"
             title="Skip"
           >
-            <img src="/skip-forward.svg" alt="Skip" className="w-3.5 h-3.5 opacity-90" />
+            <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 opacity-90" />
           </button>
         </div>
 
