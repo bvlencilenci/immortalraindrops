@@ -6,6 +6,10 @@ const Header = () => {
   const {
     trackTitle,
     trackArtist,
+    isPlaying,
+    togglePlay,
+    skipTrack,
+    skipBack,
     seek,
     duration,
     volume,
@@ -31,60 +35,93 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full h-[60px] z-[100] border-b border-[#222] bg-[#050505cc] backdrop-blur-md flex">
-      {/* 1. Branding Section (Left 75%) */}
-      <div className="w-3/4 flex items-center pl-6 border-r border-[#222]">
+    <header className="fixed top-0 left-0 w-full h-[60px] z-[100] border-b border-[#222] bg-[#050505cc] backdrop-blur-md flex items-center relative overflow-hidden">
+      {/* 1. Branding (Left aligned) */}
+      <div className="pl-6 z-20">
         <h1 className="font-mono text-xs text-[#444] uppercase tracking-[0.3em]">
           Immortal Raindrops
         </h1>
       </div>
 
-      {/* 2. Master Player Section (Right 25%) */}
-      <div className="w-1/4 h-full relative flex items-center overflow-hidden">
-        {/* Metadata + Timer: artist (lower) - TITLE (UPPER) with pl-6 */}
-        <div className="flex flex-col h-full justify-center pl-6 pr-24 overflow-hidden">
+      {/* 2. Absolute Centered Controls */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-6 z-20">
+        <button
+          onClick={(e) => { e.stopPropagation(); skipBack(); }}
+          className="mechanical-btn w-10 h-10 flex items-center justify-center"
+          title="Previous / Restart"
+        >
+          <img src="/skip-back.svg" alt="Back" className="w-5 h-5 invert opacity-80" />
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+          className="mechanical-btn w-12 h-12 flex items-center justify-center"
+          title={isPlaying ? "Pause" : "Play"}
+        >
+          <img
+            src={isPlaying ? "/pause.svg" : "/play.svg"}
+            alt={isPlaying ? "Pause" : "Play"}
+            className="w-6 h-6 invert opacity-80"
+          />
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+          className="mechanical-btn w-10 h-10 flex items-center justify-center"
+          title="Skip"
+        >
+          <img src="/skip-forward.svg" alt="Skip" className="w-5 h-5 invert opacity-80" />
+        </button>
+
+        {/* Dynamic Expanding Volume: Grows from the icon */}
+        <div className="flex items-center group/vol-expand ml-2">
+          <img src={getVolumeIcon()} alt="Vol" className="w-4 h-4 invert opacity-60 cursor-pointer" />
+          <div className="w-0 group-hover/vol-expand:w-24 overflow-hidden transition-all duration-300 ease-out flex items-center">
+            <div
+              className="ml-3 h-[2px] w-20 bg-white/20 relative cursor-pointer"
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percent = x / rect.width;
+                adjustVolume(percent);
+              }}
+            >
+              <div
+                className="absolute top-0 left-0 h-full bg-white"
+                style={{ width: `${volume * 100}%` }}
+              />
+              <div
+                className="absolute top-1/2 w-1 h-1 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
+                style={{ left: `${volume * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Metadata & Timer (Right side) */}
+      <div className="flex-1 flex items-center justify-end pr-1 z-20 overflow-hidden">
+        <div className="flex flex-col items-end pr-4 max-w-[200px] overflow-hidden">
           {trackTitle ? (
             <>
-              <div className="flex items-baseline gap-3 mb-1">
-                <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase truncate leading-tight">
-                  - {trackArtist}
-                </span>
-                <span className="font-mono text-[9px] md:text-xs text-white/40 tabular-nums">
-                  {formatTime(seek)} / {formatTime(duration)}
-                </span>
-              </div>
-              <span className="font-mono text-xs md:text-lg font-bold text-white uppercase tracking-widest truncate leading-tight">
+              <span className="font-mono text-[10px] md:text-xs text-neutral-400 lowercase truncate leading-tight pl-1">
+                - {trackArtist}
+              </span>
+              <span className="font-mono text-xs md:text-sm font-bold text-white uppercase tracking-widest truncate leading-tight pl-1">
                 {trackTitle}
               </span>
             </>
           ) : (
-            <span className="font-mono text-[9px] md:text-xs text-white/20 tabular-nums">
-              --:-- / --:--
+            <span className="font-mono text-[9px] md:text-xs text-white/10 uppercase tabular-nums">
+              READY_STATE_01
             </span>
           )}
         </div>
+      </div>
 
-        {/* Universal Volume: Needle Slider at far right (6% margin) */}
-        <div className="absolute right-[6%] flex items-center gap-3">
-          <img src={getVolumeIcon()} alt="Volume" className="w-4 h-4 invert opacity-60" />
-          <div
-            className="h-10 w-[20px] flex items-center justify-center cursor-pointer group/volume relative"
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const y = e.clientY - rect.top;
-              const percent = 1 - (y / rect.height);
-              adjustVolume(percent);
-            }}
-          >
-            {/* Track: 1px vertical line */}
-            <div className="absolute h-full w-[1px] bg-white/30" />
-            {/* Needle: 4px white square */}
-            <div
-              className="absolute w-1 h-1 bg-white shadow-[0_0_4px_rgba(255,255,255,0.5)] pointer-events-none"
-              style={{ bottom: `${volume * 100}%`, transform: 'translateY(50%)' }}
-            />
-          </div>
-        </div>
+      {/* Precision Timer: Absolute Far Right Gap 4px */}
+      <div className="absolute right-1 bottom-1 z-30 pointer-events-none pr-1">
+        <span className="font-mono text-[9px] md:text-xs text-white/40 tabular-nums text-right block w-[80px]">
+          {formatTime(seek)} / {formatTime(duration)}
+        </span>
       </div>
 
       {/* Master Seeker: 1px line at the bottom edge */}

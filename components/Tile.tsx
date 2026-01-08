@@ -172,8 +172,8 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           </div>
 
           {/* Metadata Overlay (Artist Top, Title Bottom when NOT Hovering) */}
-          <div className={`absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6 transition-opacity duration-300 ${isPlaying ? 'group-hover:opacity-0' : ''}`}>
-            <div className="flex flex-col leading-tight">
+          <div className={`absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pb-8 transition-opacity duration-300 ${isPlaying ? 'group-hover:opacity-0' : ''}`}>
+            <div className="flex flex-col leading-tight pl-1">
               <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase tracking-widest truncate">
                 {artist}
               </span>
@@ -185,17 +185,17 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
           {/* In-Tile HUD (z-20) - Strategic per-tile interface */}
           <div className={`
-                absolute bottom-0 left-0 w-full h-[30%] min-h-[96px] z-20
+                absolute bottom-0 left-0 w-full h-[35%] min-h-[110px] z-20
                 bg-[#050505cc] backdrop-blur-md
                 border-t border-white/10
                 flex flex-col
                 transition-opacity duration-300
                 opacity-0 ${isPlaying ? 'group-hover:opacity-100' : ''}
-                hud-wrapper px-4 pb-2
+                hud-wrapper px-4 pb-2 relative
             `}>
             {/* 1. Tactical Seeker: 2px solid white bar at top-0 */}
             <div
-              className="absolute top-0 left-0 w-full h-[2px] bg-white/5 cursor-pointer group/seek"
+              className="absolute top-0 left-0 w-full h-[2px] bg-white/5 cursor-pointer group/seek z-30"
               onClick={handleSeek}
             >
               <div
@@ -204,36 +204,9 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               />
             </div>
 
-            {/* 2. Tactical Core: Layout with left volume and central controls */}
-            <div className="flex-1 flex items-center justify-between mt-4">
-
-              {/* Left Wing: Vertical Volume + Icon */}
-              <div className="flex flex-col items-center gap-2">
-                <div
-                  className="h-10 w-[20px] flex items-center justify-center cursor-pointer group/volume relative"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const y = e.clientY - rect.top;
-                    const percent = 1 - (y / rect.height);
-                    adjustVolume(percent);
-                  }}
-                >
-                  <div className="absolute h-full w-[1px] bg-white/30" />
-                  <div
-                    className="absolute w-1 h-1 bg-white shadow-[0_0_4px_rgba(255,255,255,0.5)] pointer-events-none"
-                    style={{ bottom: `${volume * 100}%`, transform: 'translateY(50%)' }}
-                  />
-                </div>
-                <img
-                  src={getVolumeIcon()}
-                  alt="Vol"
-                  className="w-3 h-3 invert opacity-60"
-                />
-              </div>
-
-              {/* Center Wing: Primary Playback Controls */}
-              <div className="flex items-center gap-4">
+            {/* 2. Tactical Core: Centered Controls */}
+            <div className="flex-1 flex flex-col justify-center gap-2 mt-2">
+              <div className="flex items-center justify-center gap-4">
                 <button
                   onClick={(e) => { e.stopPropagation(); skipBack(); }}
                   className="mechanical-btn w-10 h-10 flex items-center justify-center"
@@ -243,7 +216,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className={`mechanical-btn w-12 h-12 flex items-center justify-center ${isBuffering ? 'animate-pulse' : ''}`}
+                  className="mechanical-btn w-12 h-12 flex items-center justify-center"
                   title={isPlaying ? "Pause" : "Play"}
                 >
                   <img
@@ -261,13 +234,38 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </button>
               </div>
 
-              {/* Right Wing: Spacer for balance */}
-              <div className="w-8" />
+              {/* Horizontal Volume Bar centered below controls */}
+              <div className="flex items-center justify-center gap-3">
+                <img
+                  src={getVolumeIcon()}
+                  alt="Vol"
+                  className="w-3 h-3 invert opacity-60"
+                />
+                <div
+                  className="h-1 w-24 bg-white/10 relative cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const percent = x / rect.width;
+                    adjustVolume(percent);
+                  }}
+                >
+                  <div
+                    className="absolute top-0 left-0 h-full bg-white"
+                    style={{ width: `${volume * 100}%` }}
+                  />
+                  <div
+                    className="absolute top-1/2 w-1.5 h-1.5 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
+                    style={{ left: `${volume * 100}%` }}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* 3. Timer readout: Lower precision display */}
             <div className="w-full flex justify-center pb-1">
-              <span className="font-mono text-[10px] text-white/40 tabular-nums tracking-widest">
+              <span className="font-mono text-[10px] text-white/40 tabular-nums tracking-widest uppercase">
                 {formatTime(seek)} / {formatTime(duration)}
               </span>
             </div>
@@ -288,8 +286,8 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           )}
 
           {/* Metadata Overlay (Artist Top, Title Bottom) */}
-          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6">
-            <div className="flex flex-col leading-tight">
+          <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference">
+            <div className="flex flex-col leading-tight pl-1">
               <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate">
                 {artist}
               </span>
