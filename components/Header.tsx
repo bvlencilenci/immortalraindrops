@@ -61,18 +61,18 @@ const Header = () => {
 
       {/* 2. Console (Right Group) */}
       <div className="flex items-center gap-6 z-20 pr-1 h-full">
-        {/* Playback Controls (Transparent Container, White Icons) */}
-        <div className="flex items-center gap-1 bg-transparent">
+        {/* Playback Controls (Transparent, White Icons) */}
+        <div className="flex items-center gap-1 bg-transparent border-none">
           <button
             onClick={(e) => { e.stopPropagation(); skipBack(); }}
-            className="w-8 h-8 flex items-center justify-center border-none hover:opacity-50 transition-opacity"
+            className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
             title="Previous / Restart"
           >
             <img src="/skip-back.svg" alt="Back" className="w-4 h-4 invert opacity-80" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-            className="w-10 h-10 flex items-center justify-center border-none hover:opacity-50 transition-opacity"
+            className="w-10 h-10 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
             title={isPlaying ? "Pause" : "Play"}
           >
             <img
@@ -83,64 +83,48 @@ const Header = () => {
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-            className="w-8 h-8 flex items-center justify-center border-none hover:opacity-50 transition-opacity"
+            className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
             title="Skip"
           >
             <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 invert opacity-80" />
           </button>
         </div>
 
-        {/* Dynamic Under-Icon Volume */}
-        <div className="relative group/vol-under flex flex-col items-center justify-center w-12 h-full">
-          <img src={getVolumeIcon()} alt="Vol" className="w-4 h-4 invert opacity-60 cursor-pointer" />
-          <div className="absolute top-[48px] w-0 group-hover/vol-under:w-16 overflow-hidden transition-all duration-300 ease-out flex items-center justify-center">
-            <div
-              className="h-[1px] w-14 bg-white/20 relative cursor-pointer"
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const percent = x / rect.width;
-                adjustVolume(percent);
-              }}
+        {/* Console Seeker Path (Fixed Height) */}
+        <div className="flex items-center group relative h-full">
+          {/* Volume Group (Under-Icon Fader) */}
+          <div className="relative flex items-center h-full group/volume ml-2">
+            <button
+              className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative z-10"
+              onClick={(e) => { e.stopPropagation(); toggleMute(); }}
             >
-              <div
-                className="absolute top-0 left-0 h-full bg-white"
-                style={{ width: `${volume * 100}%` }}
-              />
-              <div
-                className="absolute top-1/2 w-1.5 h-1.5 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                style={{ left: `${volume * 100}%` }}
-              />
-            </div>
+
+              {/* Precision Timer (Right Edge Gap 4px) */}
+              <div className="min-w-[100px] text-right flex items-center pr-1 h-full">
+                <span className="font-mono text-[10px] md:text-xs text-white/40 tabular-nums uppercase tracking-[0.2em] whitespace-nowrap">
+                  {formatTime(seek)} / {formatTime(duration)}
+                </span>
+              </div>
           </div>
-        </div>
 
-        {/* Precision Timer (Right Edge Gap 4px) */}
-        <div className="min-w-[100px] text-right flex items-center pr-1 h-full">
-          <span className="font-mono text-[10px] md:text-xs text-white/40 tabular-nums uppercase tracking-[0.2em] whitespace-nowrap">
-            {formatTime(seek)} / {formatTime(duration)}
-          </span>
-        </div>
-      </div>
-
-      {/* Persistence Layer: Bottom Seeker 1px */}
-      <div
-        className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-10"
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const percent = x / rect.width;
-          seekTo(percent * duration);
-        }}
-      >
-        <div className="absolute inset-0 bg-white/5" />
-        <div
-          className="h-full bg-white relative"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-    </header>
-  );
+          {/* Persistence Layer: Bottom Seeker 1px */}
+          <div
+            className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-10"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const percent = x / rect.width;
+              seekTo(percent * duration);
+            }}
+          >
+            <div className="absolute inset-0 bg-white/5" />
+            <div
+              className="h-full bg-white relative"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </header>
+        );
 };
 
-export default Header;
+        export default Header;
