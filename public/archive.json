@@ -1,0 +1,30 @@
+[
+  {
+    "id": "track1",
+    "title": "System Initialization",
+    "artist": "Unknown Entity",
+    "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
+    "duration": "0:12"
+  },
+  {
+    "id": "track2",
+    "title": "Digital Decay",
+    "artist": "Null Pointer",
+    "url": "https://archive.org/download/CanonInD_261/CanoninD.mp3",
+    "duration": "5:34"
+  },
+  {
+    "id": "track3",
+    "title": "Static Void",
+    "artist": "Memory Leak",
+    "url": "https://archive.org/download/mythium/JLS_ATI.mp3",
+    "duration": "4:20"
+  },
+  {
+    "id": "track4",
+    "title": "Buffer Overflow",
+    "artist": "Stack Trace",
+    "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
+    "duration": "0:12"
+  }
+]
