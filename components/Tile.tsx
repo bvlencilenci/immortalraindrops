@@ -226,7 +226,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                     className="w-7 h-7 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
                     title="Back"
                   >
-                    <img src="/skip-back.svg" alt="Back" className="w-4 h-4 opacity-90" />
+                    <img src="/skip-back.svg" alt="Back" className="w-4 h-4 invert opacity-80" />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); togglePlay(); }}
@@ -236,7 +236,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                     <img
                       src={isPlaying ? "/pause.svg" : "/play.svg"}
                       alt={isPlaying ? "Pause" : "Play"}
-                      className="w-5 h-5 opacity-90"
+                      className="w-5 h-5 invert opacity-80"
                     />
                   </button>
                   <button
@@ -244,7 +244,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                     className="w-7 h-7 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
                     title="Forward"
                   >
-                    <img src="/skip-forward.svg" alt="Forward" className="w-4 h-4 opacity-90" />
+                    <img src="/skip-forward.svg" alt="Forward" className="w-4 h-4 invert opacity-80" />
                   </button>
                 </div>
               </div>

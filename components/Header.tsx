@@ -38,10 +38,10 @@ const Header = () => {
     <header className="fixed top-0 left-0 w-full h-[64px] z-[100] border-b border-[#222] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 relative overflow-hidden">
       {/* 1. Identity & Metadata (Left Group with 4px Padding) */}
       <div className="flex items-center z-20 overflow-hidden pl-1 h-full">
-        <h1 className="font-mono text-xs text-white uppercase tracking-[0.3em] whitespace-nowrap mr-8">
+        <h1 className="font-mono text-xs text-white uppercase tracking-[0.3em] whitespace-nowrap mr-32">
           Immortal Raindrops
         </h1>
-        <div className="flex flex-col min-w-0 border-l border-white/10 pl-6 py-1 overflow-hidden max-w-[400px]">
+        <div className="flex flex-col min-w-0 pl-0 py-1 overflow-hidden max-w-[400px]">
           {trackTitle ? (
             <div className="flex flex-col justify-center h-full">
               <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none truncate">
@@ -61,14 +61,14 @@ const Header = () => {
 
       {/* 2. Console (Right Group) */}
       <div className="flex items-center gap-6 z-20 pr-1 h-full">
-        {/* Playback Controls (Transparent Container, Black Icons) */}
+        {/* Playback Controls (Transparent Container, White Icons) */}
         <div className="flex items-center gap-1 bg-transparent">
           <button
             onClick={(e) => { e.stopPropagation(); skipBack(); }}
             className="w-8 h-8 flex items-center justify-center border-none hover:opacity-50 transition-opacity"
             title="Previous / Restart"
           >
-            <img src="/skip-back.svg" alt="Back" className="w-4 h-4 opacity-90" />
+            <img src="/skip-back.svg" alt="Back" className="w-4 h-4 invert opacity-80" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); togglePlay(); }}
@@ -78,7 +78,7 @@ const Header = () => {
             <img
               src={isPlaying ? "/pause.svg" : "/play.svg"}
               alt={isPlaying ? "Pause" : "Play"}
-              className="w-5 h-5 opacity-90"
+              className="w-5 h-5 invert opacity-80"
             />
           </button>
           <button
@@ -86,7 +86,7 @@ const Header = () => {
             className="w-8 h-8 flex items-center justify-center border-none hover:opacity-50 transition-opacity"
             title="Skip"
           >
-            <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 opacity-90" />
+            <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 invert opacity-80" />
           </button>
         </div>
 
