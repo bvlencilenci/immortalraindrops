@@ -183,15 +183,15 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             </div>
           </div>
 
-          {/* In-Tile HUD (z-20) - Strategic per-tile interface */}
+          {/* In-Tile HUD (z-20) - Restricted to top ~20% */}
           <div className={`
-                absolute bottom-0 left-0 w-full h-[35%] min-h-[110px] z-20
+                absolute top-0 left-0 w-full h-[22%] min-h-[64px] z-20
                 bg-[#050505cc] backdrop-blur-md
-                border-t border-white/10
+                border-b border-white/10
                 flex flex-col
                 transition-opacity duration-300
                 opacity-0 ${isPlaying ? 'group-hover:opacity-100' : ''}
-                hud-wrapper px-4 pb-2 relative
+                hud-wrapper px-4 relative
             `}>
             {/* 1. Tactical Seeker: 2px solid white bar at top-0 */}
             <div
@@ -204,68 +204,80 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               />
             </div>
 
-            {/* 2. Tactical Core: Centered Controls */}
-            <div className="flex-1 flex flex-col justify-center gap-2 mt-2">
-              <div className="flex items-center justify-center gap-4">
+            {/* 2. Unified Row: Metadata + All Controls */}
+            <div className="flex-1 flex items-center justify-between mt-2 overflow-hidden gap-4">
+
+              {/* Metadata Cluster: Prominent TITLE / artist */}
+              <div className="flex flex-col flex-1 min-w-0 leading-tight pl-1">
+                <span className="font-mono text-[12px] md:text-sm font-bold text-white uppercase tracking-widest truncate">
+                  {title}
+                </span>
+                <span className="font-mono text-[10px] md:text-xs text-neutral-400 lowercase truncate">
+                  {artist}
+                </span>
+              </div>
+
+              {/* Control Cluster: One continuous line */}
+              <div className="flex items-center gap-2 md:gap-4">
                 <button
                   onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                  className="mechanical-btn w-10 h-10 flex items-center justify-center"
+                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
                   title="Previous / Restart"
                 >
-                  <img src="/skip-back.svg" alt="Back" className="w-5 h-5 invert opacity-80" />
+                  <img src="/skip-back.svg" alt="Back" className="w-4 h-4 invert opacity-80" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className="mechanical-btn w-12 h-12 flex items-center justify-center"
+                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
                   title={isPlaying ? "Pause" : "Play"}
                 >
                   <img
                     src={isPlaying ? "/pause.svg" : "/play.svg"}
                     alt={isPlaying ? "Pause" : "Play"}
-                    className={`w-6 h-6 invert opacity-80 ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
+                    className={`w-4 h-4 invert opacity-80 ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
                   />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="mechanical-btn w-10 h-10 flex items-center justify-center"
+                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
                   title="Skip"
                 >
-                  <img src="/skip-forward.svg" alt="Skip" className="w-5 h-5 invert opacity-80" />
+                  <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 invert opacity-80" />
                 </button>
-              </div>
 
-              {/* Horizontal Volume Bar centered below controls */}
-              <div className="flex items-center justify-center gap-3">
-                <img
-                  src={getVolumeIcon()}
-                  alt="Vol"
-                  className="w-3 h-3 invert opacity-60"
-                />
-                <div
-                  className="h-1 w-24 bg-white/10 relative cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const percent = x / rect.width;
-                    adjustVolume(percent);
-                  }}
-                >
-                  <div
-                    className="absolute top-0 left-0 h-full bg-white"
-                    style={{ width: `${volume * 100}%` }}
+                {/* Horizontal Volume Control */}
+                <div className="flex items-center gap-2 ml-2">
+                  <img
+                    src={getVolumeIcon()}
+                    alt="Vol"
+                    className="w-3 h-3 invert opacity-60"
                   />
                   <div
-                    className="absolute top-1/2 w-1.5 h-1.5 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                    style={{ left: `${volume * 100}%` }}
-                  />
+                    className="h-1 w-12 md:w-16 bg-white/10 relative cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const x = e.clientX - rect.left;
+                      const percent = x / rect.width;
+                      adjustVolume(percent);
+                    }}
+                  >
+                    <div
+                      className="absolute top-0 left-0 h-full bg-white"
+                      style={{ width: `${volume * 100}%` }}
+                    />
+                    <div
+                      className="absolute top-1/2 w-1 h-1 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
+                      style={{ left: `${volume * 100}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* 3. Timer readout: Lower precision display */}
-            <div className="w-full flex justify-center pb-1">
-              <span className="font-mono text-[10px] text-white/40 tabular-nums tracking-widest uppercase">
+            {/* 3. Timer readout: Positioned for visibility */}
+            <div className="absolute bottom-1 right-4">
+              <span className="font-mono text-[8px] md:text-[9px] text-white/30 tabular-nums uppercase">
                 {formatTime(seek)} / {formatTime(duration)}
               </span>
             </div>
