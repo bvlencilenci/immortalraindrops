@@ -45,54 +45,54 @@ const Header = () => {
 
       {/* 2. Absolute Centered Controls */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-6 z-20">
-        <button
-          onClick={(e) => { e.stopPropagation(); skipBack(); }}
-          className="mechanical-btn w-10 h-10 flex items-center justify-center"
-          title="Previous / Restart"
-        >
-          <img src="/skip-back.svg" alt="Back" className="w-5 h-5 invert opacity-80" />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-          className="mechanical-btn w-12 h-12 flex items-center justify-center"
-          title={isPlaying ? "Pause" : "Play"}
-        >
-          <img
-            src={isPlaying ? "/pause.svg" : "/play.svg"}
-            alt={isPlaying ? "Pause" : "Play"}
-            className="w-6 h-6 invert opacity-80"
-          />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-          className="mechanical-btn w-10 h-10 flex items-center justify-center"
-          title="Skip"
-        >
-          <img src="/skip-forward.svg" alt="Skip" className="w-5 h-5 invert opacity-80" />
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={(e) => { e.stopPropagation(); skipBack(); }}
+            className="mechanical-btn w-10 h-10 flex items-center justify-center"
+            title="Previous / Restart"
+          >
+            <img src="/skip-back.svg" alt="Back" className="w-5 h-5 invert opacity-80" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+            className="mechanical-btn w-12 h-12 flex items-center justify-center"
+            title={isPlaying ? "Pause" : "Play"}
+          >
+            <img
+              src={isPlaying ? "/pause.svg" : "/play.svg"}
+              alt={isPlaying ? "Pause" : "Play"}
+              className="w-6 h-6 invert opacity-80"
+            />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+            className="mechanical-btn w-10 h-10 flex items-center justify-center"
+            title="Skip"
+          >
+            <img src="/skip-forward.svg" alt="Skip" className="w-5 h-5 invert opacity-80" />
+          </button>
+        </div>
 
-        {/* Dynamic Expanding Volume: Grows from the icon */}
-        <div className="flex items-center group/vol-expand ml-2">
-          <img src={getVolumeIcon()} alt="Vol" className="w-4 h-4 invert opacity-60 cursor-pointer" />
-          <div className="w-0 group-hover/vol-expand:w-24 overflow-hidden transition-all duration-300 ease-out flex items-center">
+        {/* Static Volume: Icon + Fader on the right */}
+        <div className="flex items-center gap-3 ml-2 pr-4 border-r border-white/10">
+          <img src={getVolumeIcon()} alt="Vol" className="w-4 h-4 invert opacity-60" />
+          <div
+            className="h-[2px] w-24 bg-white/20 relative cursor-pointer"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const percent = x / rect.width;
+              adjustVolume(percent);
+            }}
+          >
             <div
-              className="ml-3 h-[2px] w-20 bg-white/20 relative cursor-pointer"
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const percent = x / rect.width;
-                adjustVolume(percent);
-              }}
-            >
-              <div
-                className="absolute top-0 left-0 h-full bg-white"
-                style={{ width: `${volume * 100}%` }}
-              />
-              <div
-                className="absolute top-1/2 w-1 h-1 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                style={{ left: `${volume * 100}%` }}
-              />
-            </div>
+              className="absolute top-0 left-0 h-full bg-white"
+              style={{ width: `${volume * 100}%` }}
+            />
+            <div
+              className="absolute top-1/2 w-1.5 h-1.5 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
+              style={{ left: `${volume * 100}%` }}
+            />
           </div>
         </div>
       </div>
