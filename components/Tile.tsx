@@ -135,6 +135,21 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
   const progressPercent = (duration > 0 && isActive) ? (seek / duration) * 100 : 0;
 
+  const formatTime = (time: number) => {
+    if (isNaN(time) || time === 0) return "--:--";
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getVolumeIcon = () => {
+    const v = isActive ? volume : 1.0;
+    if (v === 0) return "/speaker-simple-slash.svg";
+    if (v < 0.3) return "/speaker-simple-low.svg";
+    if (v < 0.7) return "/speaker-simple-none.svg";
+    return "/speaker-simple-high.svg";
+  };
+
   return (
     <div
       onClick={handleInteraction}
@@ -168,69 +183,93 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             </div>
           </div>
 
-          {/* In-Tile HUD (z-20) - 12% height, tactical interface */}
-          {/* HUD only visible on hover IF track is playing */}
+          {/* In-Tile HUD (z-20) - Strategic per-tile interface */}
           <div className={`
-                absolute bottom-0 left-0 w-full h-[12%] min-h-[48px] z-20
+                absolute bottom-0 left-0 w-full h-[30%] min-h-[96px] z-20
                 bg-[#050505cc] backdrop-blur-md
                 border-t border-white/10
                 flex flex-col
                 transition-opacity duration-300
                 opacity-0 ${isPlaying ? 'group-hover:opacity-100' : ''}
-                hud-wrapper
+                hud-wrapper px-4 pb-2
             `}>
-            {/* 1. Tactical Seeker: 2px solid white bar at top */}
+            {/* 1. Tactical Seeker: 2px solid white bar at top-0 */}
             <div
-              className="relative w-full h-[2px] bg-white/5 cursor-pointer group/seek"
+              className="absolute top-0 left-0 w-full h-[2px] bg-white/5 cursor-pointer group/seek"
               onClick={handleSeek}
             >
-              <div className="absolute top-[-4px] bottom-[-4px] w-full bg-transparent z-30" />
               <div
                 className="absolute top-0 left-0 h-full bg-white pointer-events-auto"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
 
-            {/* 2. Main Row */}
-            <div className="flex items-center justify-between flex-1 px-4">
-              {/* Metadata flip: TITLE top, artist bottom */}
-              <div className="flex flex-col flex-1 min-w-0 pr-4 leading-tight self-center">
-                <span className="font-mono text-[12px] md:text-lg text-white font-bold uppercase tracking-widest truncate">
-                  {title}
-                </span>
-                <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase truncate mt-0.5">
-                  {artist}
-                </span>
+            {/* 2. Tactical Core: Layout with left volume and central controls */}
+            <div className="flex-1 flex items-center justify-between mt-4">
+
+              {/* Left Wing: Vertical Volume + Icon */}
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  className="h-10 w-[20px] flex items-center justify-center cursor-pointer group/volume relative"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const y = e.clientY - rect.top;
+                    const percent = 1 - (y / rect.height);
+                    adjustVolume(percent);
+                  }}
+                >
+                  <div className="absolute h-full w-[1px] bg-white/30" />
+                  <div
+                    className="absolute w-1 h-1 bg-white shadow-[0_0_4px_rgba(255,255,255,0.5)] pointer-events-none"
+                    style={{ bottom: `${volume * 100}%`, transform: 'translateY(50%)' }}
+                  />
+                </div>
+                <img
+                  src={getVolumeIcon()}
+                  alt="Vol"
+                  className="w-3 h-3 invert opacity-60"
+                />
               </div>
 
-              {/* Controls: Mechanical Symbols replaced with SVGs */}
-              <div className="flex items-center gap-1 md:gap-2">
+              {/* Center Wing: Primary Playback Controls */}
+              <div className="flex items-center gap-4">
                 <button
                   onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
+                  className="mechanical-btn w-10 h-10 flex items-center justify-center"
                   title="Previous / Restart"
                 >
-                  <img src="/skip-back.svg" alt="Restart" className="w-4 h-4 invert opacity-80" />
+                  <img src="/skip-back.svg" alt="Back" className="w-5 h-5 invert opacity-80" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className={`mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center ${isBuffering ? 'animate-pulse' : ''}`}
+                  className={`mechanical-btn w-12 h-12 flex items-center justify-center ${isBuffering ? 'animate-pulse' : ''}`}
                   title={isPlaying ? "Pause" : "Play"}
                 >
                   <img
                     src={isPlaying ? "/pause.svg" : "/play.svg"}
                     alt={isPlaying ? "Pause" : "Play"}
-                    className={`w-4 h-4 invert opacity-80 ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
+                    className={`w-6 h-6 invert opacity-80 ${isBuffering ? 'animate-pulse text-green-500' : ''}`}
                   />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="mechanical-btn w-10 h-10 md:w-8 md:h-8 flex items-center justify-center"
+                  className="mechanical-btn w-10 h-10 flex items-center justify-center"
                   title="Skip"
                 >
-                  <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 invert opacity-80" />
+                  <img src="/skip-forward.svg" alt="Skip" className="w-5 h-5 invert opacity-80" />
                 </button>
               </div>
+
+              {/* Right Wing: Spacer for balance */}
+              <div className="w-8" />
+            </div>
+
+            {/* 3. Timer readout: Lower precision display */}
+            <div className="w-full flex justify-center pb-1">
+              <span className="font-mono text-[10px] text-white/40 tabular-nums tracking-widest">
+                {formatTime(seek)} / {formatTime(duration)}
+              </span>
             </div>
           </div>
         </>
