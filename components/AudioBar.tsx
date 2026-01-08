@@ -27,7 +27,7 @@ const AudioBar = () => {
       {/* LEFT: Metadata (Migrated from Tile) */}
       <div className="flex items-center gap-4 w-1/3 overflow-hidden">
         <div className="flex flex-col leading-tight">
-          <span className="text-white font-bold uppercase truncate">
+          <span className="text-white font-bold uppercase tracking-tighter truncate">
             {trackTitle}
           </span>
           <span className="text-neutral-500 uppercase truncate">
@@ -40,37 +40,38 @@ const AudioBar = () => {
       <div className="flex items-center justify-center w-1/3 gap-4">
         <button
           onClick={restartTrack}
-          className="hover:text-white text-neutral-500 transition-colors uppercase"
+          className="hud-btn px-2 py-1 uppercase"
         >
-          [RESTART]
+          RESTART
         </button>
         <button
           onClick={togglePlay}
-          className="hover:text-green-500 text-white font-bold transition-colors uppercase min-w-[60px] text-center"
+          className="hud-btn px-4 py-1 uppercase font-bold"
         >
-          [{isPlaying ? 'PAUSE' : 'PLAY'}]
+          {isPlaying ? 'PAUSE' : 'PLAY'}
         </button>
         <button
           onClick={skipTrack}
-          className="hover:text-white text-neutral-500 transition-colors uppercase"
+          className="hud-btn px-2 py-1 uppercase"
         >
-          [SKIP]
+          SKIP
         </button>
       </div>
 
       {/* RIGHT: Volume & Progress */}
       <div className="flex items-center justify-end w-1/3 gap-6">
         {/* Volume Controls */}
-        <div className="flex items-center gap-2">
-          <button onClick={() => adjustVolume(volume - 0.1)} className="hover:text-white text-neutral-500">
-            [-]
-          </button>
-          <span className="text-neutral-300 w-[40px] text-center">
-            VOL {Math.round(volPercent)}%
-          </span>
-          <button onClick={() => adjustVolume(volume + 0.1)} className="hover:text-white text-neutral-500">
-            [+]
-          </button>
+        <div className="flex items-center gap-2 w-[100px]">
+          <span className="text-neutral-500 text-[10px]">VOL</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={(e) => adjustVolume(parseFloat(e.target.value))}
+            className="retro-range"
+          />
         </div>
 
         {/* Progress Bar (Visual only) */}

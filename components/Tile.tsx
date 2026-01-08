@@ -149,37 +149,37 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
           {/* In-Tile HUD (z-10) */}
           <div className={`
-                absolute bottom-0 left-0 w-full h-[15%] min-h-[48px] z-10
+                absolute bottom-0 left-0 w-full h-[10%] min-h-[32px] z-10
                 bg-black/60 backdrop-blur-md
-                flex items-center justify-between px-3
-                border-t border-white/40
+                flex items-center justify-between px-2
+                border-t border-[#222]
                 ${isPlaying ? 'animate-pulse-border' : ''}
             `}>
             {/* Metadata */}
-            <div className="flex flex-col w-2/3 overflow-hidden">
+            <div className="flex flex-col w-2/3 overflow-hidden leading-none justify-center">
               <span className="font-mono text-[10px] text-green-400 uppercase truncate">
                 {artist}
               </span>
-              <span className="font-mono text-xs text-white font-bold uppercase truncate">
+              <span className="font-mono text-xs text-white font-bold uppercase tracking-tighter truncate">
                 {title}
               </span>
             </div>
 
             {/* Micro Controls */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
                 onClick={(e) => { e.stopPropagation(); restartTrack(); }}
-                className="text-neutral-400 hover:text-white text-[10px]"
+                className="hud-btn w-6 h-6 text-[10px]"
                 title="Restart"
               >
-                [R]
+                R
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                className="text-white hover:text-green-500 font-bold"
+                className="hud-btn w-6 h-6 font-bold text-[10px]"
                 title={isPlaying ? "Pause" : "Play"}
               >
-                {isPlaying ? '[ || ]' : '[ > ]'}
+                {isPlaying ? '||' : '>'}
               </button>
             </div>
           </div>
@@ -205,7 +205,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               <p className="font-mono text-xs text-neutral-400 uppercase tracking-widest group-hover:text-white transition-colors">
                 {artist}
               </p>
-              <p className="font-mono text-sm font-bold text-neutral-300 group-hover:text-green-500 transition-colors line-clamp-2">
+              <p className="font-mono text-sm font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors line-clamp-2">
                 {title}
               </p>
             </div>
