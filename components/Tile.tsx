@@ -183,15 +183,15 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             </div>
           </div>
 
-          {/* In-Tile HUD (z-20) - Restricted to top ~12% */}
+          {/* In-Tile HUD (z-20) - Restricted to top ~12% Hardware HUD */}
           <div className={`
-                absolute top-0 left-0 w-full h-[12%] min-h-[54px] z-20
+                absolute top-0 left-0 w-full h-[15%] min-h-[58px] z-20
                 bg-[#050505cc] backdrop-blur-md
                 border-b border-white/10
-                flex items-center justify-between px-4
+                flex items-center justify-between px-1 relative
                 transition-opacity duration-300
                 opacity-0 ${isPlaying ? 'group-hover:opacity-100' : ''}
-                hud-wrapper relative
+                hud-wrapper
             `}>
             {/* 1. Tactical Seeker: 2px solid white bar at top-0 */}
             <div
@@ -202,76 +202,82 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 className="absolute top-0 left-0 h-full bg-white pointer-events-auto"
                 style={{ width: `${progressPercent}%` }}
               />
-            </div>
-
-            {/* Metadata Cluster (Left) */}
-            <div className="flex flex-col min-w-0 leading-tight pl-1 flex-1">
-              <span className="font-mono text-[11px] font-bold text-white uppercase tracking-widest truncate">
-                {title}
-              </span>
-              <span className="font-mono text-[9px] text-neutral-400 lowercase truncate">
-                {artist}
-              </span>
-            </div>
-
-            {/* Playback Console (Center): White Pill */}
-            <div className="flex items-center bg-white rounded-full px-4 py-1 gap-4 mx-2">
-              <button
-                onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                className="hover:opacity-60 transition-opacity"
-                title="Previous / Restart"
-              >
-                <img src="/skip-back.svg" alt="Back" className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                className="hover:opacity-60 transition-opacity"
-                title={isPlaying ? "Pause" : "Play"}
-              >
-                <img
-                  src={isPlaying ? "/pause.svg" : "/play.svg"}
-                  alt={isPlaying ? "Pause" : "Play"}
-                  className={`w-4 h-4 ${isBuffering ? 'animate-pulse' : ''}`}
-                />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                className="hover:opacity-60 transition-opacity"
-                title="Skip"
-              >
-                <img src="/skip-forward.svg" alt="/skip-forward.svg" className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Volume Cluster (Right) */}
-            <div className="flex items-center gap-2 flex-1 justify-end">
-              <img src={getVolumeIcon()} alt="Vol" className="w-3 h-3 invert opacity-60" />
-              <div
-                className="h-1 w-12 bg-white/10 relative cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = e.clientX - rect.left;
-                  const percent = x / rect.width;
-                  adjustVolume(percent);
-                }}
-              >
-                <div
-                  className="absolute top-0 left-0 h-full bg-white"
-                  style={{ width: `${volume * 100}%` }}
-                />
-                <div
-                  className="absolute top-1/2 w-1 h-1 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                  style={{ left: `${volume * 100}%` }}
-                />
+              {/* Timer Indented 4px from Right, on seeker path */}
+              <div className="absolute top-[4px] right-1">
+                <span className="font-mono text-[8px] text-white/40 tabular-nums uppercase pr-0.5">
+                  {formatTime(seek)} / {formatTime(duration)}
+                </span>
               </div>
             </div>
 
-            {/* Timer readout (Hidden on mobile maybe, or very small) */}
-            <div className="absolute top-[35px] right-4">
-              <span className="font-mono text-[7px] text-white/20 tabular-nums">
-                {formatTime(seek)} / {formatTime(duration)}
-              </span>
+            {/* Content Row: Metadata (Left) | Controls (Center) | Volume (Right Expanding) */}
+            <div className="w-full flex items-center justify-between px-3 mt-2">
+              {/* Left: Metadata with 4px indent */}
+              <div className="flex flex-col min-w-0 leading-tight flex-1">
+                <span className="font-mono text-[10px] md:text-xs font-bold text-white uppercase tracking-widest truncate">
+                  {title}
+                </span>
+                <span className="font-mono text-[8px] md:text-[10px] text-neutral-400 lowercase truncate">
+                  {artist}
+                </span>
+              </div>
+
+              {/* Center: Playback Group */}
+              <div className="flex items-center gap-4 justify-center flex-1">
+                <button
+                  onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                  className="mechanical-btn w-8 h-8 flex items-center justify-center"
+                  title="Back"
+                >
+                  <img src="/skip-back.svg" alt="Back" className="w-3.5 h-3.5 invert opacity-70" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                  className="mechanical-btn w-9 h-9 flex items-center justify-center"
+                  title={isPlaying ? "Pause" : "Play"}
+                >
+                  <img
+                    src={isPlaying ? "/pause.svg" : "/play.svg"}
+                    alt={isPlaying ? "Pause" : "Play"}
+                    className="w-4 h-4 invert opacity-80"
+                  />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                  className="mechanical-btn w-8 h-8 flex items-center justify-center"
+                  title="Forward"
+                >
+                  <img src="/skip-forward.svg" alt="Forward" className="w-3.5 h-3.5 invert opacity-70" />
+                </button>
+              </div>
+
+              {/* Right: Volume Expanding Cluster */}
+              <div className="flex items-center flex-1 justify-end group/tile-vol">
+                <div className="flex items-center gap-2">
+                  <img src={getVolumeIcon()} alt="Vol" className="w-3 h-3 invert opacity-60" />
+                  <div className="w-0 group-hover/tile-vol:w-16 overflow-hidden transition-all duration-300 ease-out">
+                    <div
+                      className="ml-2 h-[2px] w-12 bg-white/10 relative cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const percent = x / rect.width;
+                        adjustVolume(percent);
+                      }}
+                    >
+                      <div
+                        className="absolute top-0 left-0 h-full bg-white"
+                        style={{ width: `${volume * 100}%` }}
+                      />
+                      <div
+                        className="absolute top-1/2 w-1 h-1 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
+                        style={{ left: `${volume * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </>
