@@ -14,11 +14,13 @@ const Header = () => {
     duration,
     volume,
     adjustVolume,
+    currentlyPlayingId,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     seekTo
   } = useAudioStore();
 
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
+  const isPlayerActive = !!currentlyPlayingId;
 
   const formatTime = (time: number) => {
     if (isNaN(time) || time === 0) return "--:--";
@@ -37,13 +39,13 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 w-full h-[64px] z-[100] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 relative overflow-hidden border-none text-white">
       {/* 1. Identity & Metadata Group */}
-      <div className="flex items-center gap-12 z-20 overflow-hidden pl-1 h-full">
-        <h1 className="font-mono text-xs uppercase tracking-[0.3em] whitespace-nowrap">
+      <div className="flex items-center z-20 overflow-hidden pl-1 h-full">
+        <h1 className="font-mono text-xs uppercase tracking-[0.3em] whitespace-nowrap pl-1">
           Immortal Raindrops
         </h1>
 
         {isPlayerActive && (
-          <div className="flex flex-col py-1 overflow-hidden max-w-[400px]">
+          <div className="flex flex-col py-1 overflow-hidden max-w-[400px] ml-12">
             <div className="flex flex-col justify-center h-full">
               <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none truncate pl-1">
                 {trackArtist}
@@ -142,7 +144,7 @@ const Header = () => {
       >
         <div className="absolute inset-0 bg-white/10" />
         <div
-          className="h-full bg-white relative translate-y-0"
+          className="h-full bg-white relative"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
