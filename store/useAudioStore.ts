@@ -56,6 +56,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       howl.unload();
     }
 
+    // Explicitly resume Context if suspended (Autoplay policy)
+    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+      Howler.ctx.resume();
+    }
+
     // Setup Analyser if not exists
     let analyser = get().analyser;
     if (!analyser && typeof window !== 'undefined') {
@@ -70,27 +75,25 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       src: [url],
       html5: true,
       format: ['mp3'],
+      xhr: {
+        withCredentials: false // Crucial for Archive.org CORS
+      },
       volume: volume,
       onplay: () => {
         set({ isPlaying: true, duration: newHowl.duration() });
         requestAnimationFrame(get().updateSeek);
 
+        // Visualizer Connection
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (newHowl as any)._sounds[0];
         if (sound && sound._node && Howler.ctx) {
           const audioNode = sound._node;
           audioNode.crossOrigin = "anonymous";
-          if (analyser) {
-            // Try to connect if not already connected?
-            // With html5: true, we can't easily connect to the global analyser 
-            // without createMediaElementSource, which we handle in the Tile or 
-            // accept the limitation. The store exposes `analyser` for the Tile to usage.
-          }
         }
       },
       onend: () => {
         set({ isPlaying: false, seek: 0 });
-        get().skipTrack(); // Auto-play next
+        get().skipTrack();
       },
       onpause: () => {
         set({ isPlaying: false });
@@ -100,6 +103,17 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       },
       onload: () => {
         set({ duration: newHowl.duration() });
+      },
+      onloaderror: (id, err) => {
+        console.error("Howl Load Error", id, err);
+        // Optional: Notify user or try next track
+      },
+      onplayerror: (id, err) => {
+        console.error("Howl Play Error", id, err);
+        // Unlock audio context again just in case
+        if (Howler.ctx && Howler.ctx.state === 'suspended') {
+          Howler.ctx.resume();
+        }
       }
     });
 
