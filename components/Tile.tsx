@@ -191,13 +191,13 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
             {/* 2. Main Controls Row */}
             <div className="flex items-center justify-between h-full px-2 pt-1 pb-1">
-              {/* Metadata: Title (Top) -> Artist (Bottom) */}
+              {/* Metadata: Artist (Top) -> Title (Bottom) */}
               <div className="flex flex-col w-2/5 overflow-hidden leading-none justify-center pl-4">
-                <span className="font-mono text-xs text-white font-bold uppercase tracking-widest truncate">
-                  {title}
-                </span>
                 <span className="font-mono text-[10px] text-[#888] lowercase truncate">
                   {artist}
+                </span>
+                <span className="font-mono text-xs text-white font-bold uppercase tracking-widest truncate">
+                  {title}
                 </span>
               </div>
 
