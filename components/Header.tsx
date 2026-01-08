@@ -35,7 +35,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full h-[64px] z-[100] border-b border-[#222] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 relative overflow-hidden">
+    <header className="fixed top-0 left-0 w-full h-[64px] z-[100] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 relative overflow-hidden border-none">
       {/* 1. Identity & Metadata (Left Group with 4px Padding) */}
       <div className="flex items-center z-20 overflow-hidden pl-1 h-full">
         <h1 className="font-mono text-xs text-white uppercase tracking-[0.3em] whitespace-nowrap mr-32">
@@ -90,41 +90,68 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Console Seeker Path (Fixed Height) */}
-        <div className="flex items-center group relative h-full">
+        {/* Volume & Timer Group */}
+        <div className="flex items-center gap-4 h-full">
           {/* Volume Group (Under-Icon Fader) */}
-          <div className="relative flex items-center h-full group/volume ml-2">
+          <div className="relative flex items-center h-full group/volume">
             <button
               className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative z-10"
-              onClick={(e) => { e.stopPropagation(); toggleMute(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                adjustVolume(volume > 0 ? 0 : 0.5);
+              }}
             >
+              <img
+                src={getVolumeIcon()}
+                alt="Volume"
+                className="w-4 h-4 invert opacity-80"
+              />
+            </button>
 
-              {/* Precision Timer (Right Edge Gap 4px) */}
-              <div className="min-w-[100px] text-right flex items-center pr-1 h-full">
-                <span className="font-mono text-[10px] md:text-xs text-white/40 tabular-nums uppercase tracking-[0.2em] whitespace-nowrap">
-                  {formatTime(seek)} / {formatTime(duration)}
-                </span>
-              </div>
+            {/* The "Hardware HUD" fader (appears under icon on hover) */}
+            <div className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-32 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center pl-1">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  adjustVolume(parseFloat(e.target.value));
+                }}
+                className="w-full h-full bg-transparent appearance-none cursor-pointer fader-thumb pointer-events-auto"
+              />
+            </div>
           </div>
 
-          {/* Persistence Layer: Bottom Seeker 1px */}
-          <div
-            className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-10"
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const percent = x / rect.width;
-              seekTo(percent * duration);
-            }}
-          >
-            <div className="absolute inset-0 bg-white/5" />
-            <div
-              className="h-full bg-white relative"
-              style={{ width: `${progressPercent}%` }}
-            />
+          {/* Precision Timer (Right Edge Gap 4px) */}
+          <div className="min-w-[100px] text-right flex items-center pr-1 h-full">
+            <span className="font-mono text-[10px] md:text-xs text-white/40 tabular-nums uppercase tracking-[0.2em] whitespace-nowrap">
+              {formatTime(seek)} / {formatTime(duration)}
+            </span>
           </div>
-        </header>
-        );
+        </div>
+      </div>
+
+      {/* Persistence Layer: Bottom Seeker 1px */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-10"
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const percent = x / rect.width;
+          useAudioStore.getState().seekTo(percent * duration);
+        }}
+      >
+        <div className="absolute inset-0 bg-white/5" />
+        <div
+          className="h-full bg-white relative"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+    </header>
+  );
 };
 
-        export default Header;
+export default Header;

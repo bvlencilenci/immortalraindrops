@@ -249,30 +249,34 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 </div>
               </div>
 
-              {/* Right: Under-Icon Volume Fader */}
-              <div className="flex items-center flex-1 justify-end">
-                <div className="relative group/vol-tile w-10 h-full flex flex-col items-center justify-center">
-                  <img src={getVolumeIcon()} alt="Vol" className="w-3 h-3 invert opacity-60 cursor-pointer" />
-                  <div className="absolute top-[40px] w-0 group-hover/vol-tile:w-16 overflow-hidden transition-all duration-300 ease-out flex items-center justify-center">
-                    <div
-                      className="h-[1px] w-12 bg-white/20 relative cursor-pointer"
-                      onClick={(e) => {
+              {/* Right: Under-Icon Volume Fader (Timer Removed) */}
+              <div className="flex items-center group/volume relative h-full pr-1">
+                <div className="relative flex items-center h-full">
+                  <button
+                    className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative z-10"
+                    onClick={(e) => { e.stopPropagation(); adjustVolume(volume > 0 ? 0 : 0.5); }}
+                  >
+                    <img
+                      src={getVolumeIcon()}
+                      alt="Volume"
+                      className="w-4 h-4 invert opacity-80"
+                    />
+                  </button>
+
+                  {/* The "Hardware HUD" fader (appears under icon on hover) */}
+                  <div className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-32 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center pl-1">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={volume}
+                      onChange={(e) => {
                         e.stopPropagation();
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const percent = x / rect.width;
-                        adjustVolume(percent);
+                        adjustVolume(parseFloat(e.target.value));
                       }}
-                    >
-                      <div
-                        className="absolute top-0 left-0 h-full bg-white"
-                        style={{ width: `${volume * 100}%` }}
-                      />
-                      <div
-                        className="absolute top-1/2 w-1 h-1 bg-white -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                        style={{ left: `${volume * 100}%` }}
-                      />
-                    </div>
+                      className="w-full h-full bg-transparent appearance-none cursor-pointer fader-thumb pointer-events-auto"
+                    />
                   </div>
                 </div>
               </div>
