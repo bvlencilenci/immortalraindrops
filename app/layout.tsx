@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import WebampPlayer from '../components/WebampPlayer';
+import AudioBar from '../components/AudioBar';
 
 export const metadata: Metadata = {
   title: 'Immortal Raindrops',
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased min-h-screen">
         {children}
-        <WebampPlayer />
+        <AudioBar />
       </body>
     </html>
   );
