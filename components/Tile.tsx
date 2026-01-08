@@ -158,10 +158,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           {/* Metadata Overlay (Artist Top, Title Bottom when NOT Hovering) */}
           <div className={`absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6 transition-opacity duration-300 ${isPlaying ? 'group-hover:opacity-0' : ''}`}>
             <div className="flex flex-col leading-tight">
-              <span className="font-mono text-[10px] md:text-xs lg:text-sm text-neutral-400 lowercase tracking-widest truncate">
+              <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase tracking-widest truncate">
                 {artist}
               </span>
-              <span className="font-mono text-[12px] md:text-sm lg:text-base font-bold text-neutral-300 uppercase tracking-tighter truncate">
+              <span className="font-mono text-[12px] md:text-lg font-bold text-neutral-300 uppercase tracking-tighter truncate">
                 {title}
               </span>
             </div>
@@ -194,10 +194,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             <div className="flex items-center justify-between flex-1 px-4">
               {/* Metadata flip: TITLE top, artist bottom */}
               <div className="flex flex-col flex-1 min-w-0 pr-4 leading-tight self-center">
-                <span className="font-mono text-[12px] md:text-sm lg:text-base text-white font-bold uppercase tracking-widest truncate">
+                <span className="font-mono text-[12px] md:text-lg text-white font-bold uppercase tracking-widest truncate">
                   {title}
                 </span>
-                <span className="font-mono text-[10px] md:text-xs lg:text-sm text-neutral-400 lowercase truncate mt-0.5">
+                <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase truncate mt-0.5">
                   {artist}
                 </span>
               </div>
@@ -248,10 +248,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           {/* Metadata Overlay (Artist Top, Title Bottom) */}
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference pl-6">
             <div className="flex flex-col leading-tight">
-              <span className="font-mono text-[10px] md:text-xs lg:text-sm text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate">
+              <span className="font-mono text-[10px] md:text-sm text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate">
                 {artist}
               </span>
-              <span className="font-mono text-[12px] md:text-sm lg:text-base font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors truncate">
+              <span className="font-mono text-[12px] md:text-lg font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors truncate">
                 {title}
               </span>
             </div>
