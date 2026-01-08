@@ -15,12 +15,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen w-full flex flex-col items-center justify-start p-0">
       <div className="w-full max-w-[1920px]">
-        {/* Optional Header / Title could go here */}
-        <header className="p-4 border-b border-[#222]">
-          <h1 className="text-xl font-bold uppercase tracking-widest text-[#444]">
-            Immortal Raindrops
-          </h1>
-        </header>
+
 
         <ArchiveGrid tracks={tracks} />
       </div>
