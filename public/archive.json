@@ -1,11 +1,11 @@
 [
   {
     "id": "track1",
-    "title": "System Initialization",
-    "artist": "Unknown Entity",
-    "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
+    "title": "may 8 mix",
+    "artist": "p/rpose",
+    "url": "https://archive.org/download/may-8-calm-mix/may%208%20calm%20mix.mp3",
     "coverImage": "/tiles/track1.jpg",
-    "duration": "0:12"
+    "duration": "0:00"
   },
   {
     "id": "track2",

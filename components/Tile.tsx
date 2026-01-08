@@ -146,10 +146,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pointer-events-none mix-blend-difference">
             <div className="space-y-1">
               <p className="font-mono text-xs text-neutral-400 uppercase tracking-widest group-hover:text-white transition-colors">
-                - {artist}
+                {artist}
               </p>
               <p className="font-mono text-sm font-bold text-neutral-300 group-hover:text-green-500 transition-colors line-clamp-2">
-                - {title}
+                {title}
               </p>
             </div>
           </div>
