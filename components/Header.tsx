@@ -47,10 +47,10 @@ const Header = () => {
         {isPlayerActive && (
           <div className="flex flex-col py-1 overflow-hidden max-w-[400px] ml-12">
             <div className="flex flex-col justify-center h-full">
-              <span className="font-mono text-[9px] md:text-[10px] text-neutral-400 lowercase leading-none truncate pl-1">
+              <span className="font-mono text-[9px] md:text-xs text-neutral-400 lowercase leading-none truncate pl-1">
                 {trackArtist}
               </span>
-              <span className="font-mono text-xs md:text-sm font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
+              <span className="font-mono text-xs md:text-xl font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
                 {trackTitle}
               </span>
             </div>
@@ -132,7 +132,7 @@ const Header = () => {
         </div>
       )}
 
-      {/* 1px Master Seeker Line at Bottom */}
+      {/* 1px Master Seeker Line at Bottom (Full Width) */}
       <div
         className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-30"
         onClick={(e) => {

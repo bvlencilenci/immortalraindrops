@@ -209,10 +209,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
               {/* Left: Metadata with 4px indent */}
               <div className="flex flex-col min-w-0 leading-tight flex-1">
                 <div className="flex flex-col pl-1">
-                  <span className="font-mono text-lg md:text-2xl font-bold text-white uppercase tracking-widest truncate">
+                  <span className="font-mono text-xl md:text-4xl font-bold text-white uppercase tracking-widest truncate pl-1">
                     {title}
                   </span>
-                  <span className="font-mono text-sm md:text-lg text-neutral-400 lowercase truncate">
+                  <span className="font-mono text-sm md:text-xl text-neutral-400 lowercase truncate pl-1">
                     {artist}
                   </span>
                 </div>
@@ -300,10 +300,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           {/* Metadata Overlay (Artist Top, Title Bottom) - TOP-LEFT CORNER SLOT */}
           <div className="absolute top-0 left-0 right-0 z-10 h-[30%] flex flex-col justify-start p-6 pointer-events-none mix-blend-difference">
             <div className="flex flex-col leading-tight pl-1">
-              <span className="font-mono text-xl md:text-2xl text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate">
+              <span className="font-mono text-xl md:text-2xl text-neutral-400 lowercase tracking-widest group-hover:text-white transition-colors truncate pl-1">
                 {artist}
               </span>
-              <span className="font-mono text-3xl md:text-5xl font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors truncate">
+              <span className="font-mono text-3xl md:text-5xl font-bold text-neutral-300 uppercase tracking-tighter group-hover:text-green-500 transition-colors truncate pl-1">
                 {title}
               </span>
             </div>
