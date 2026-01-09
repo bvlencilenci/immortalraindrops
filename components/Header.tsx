@@ -37,9 +37,9 @@ const Header = () => {
   };
 
   return (
-    <header className="relative w-full h-20 z-50 bg-black/80 backdrop-blur-md grid grid-cols-[1fr_auto_1fr] items-center px-[20px] border-b border-white/10 text-white overflow-hidden flex-shrink-0">
+    <header className="relative w-full h-20 z-50 bg-black/80 backdrop-blur-md flex items-center px-4 md:px-6 border-b border-white/10 text-white overflow-hidden flex-shrink-0">
       {/* Zone 1: Left - Identity & Meta */}
-      <div className="flex flex-col justify-center min-w-0">
+      <div className="flex flex-col justify-center min-w-0 z-10">
         <h1 className="font-mono text-[16px] font-bold uppercase tracking-[0.2em] leading-none truncate">
           Immortal Raindrops
         </h1>
@@ -56,8 +56,8 @@ const Header = () => {
         )}
       </div>
 
-      {/* Zone 2: Center - True Viewport Player */}
-      <div className="flex flex-col items-center justify-center pointer-events-auto">
+      {/* Zone 2: True Viewport Center (The Player) */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-auto">
         {isPlayerActive && (
           <div className="flex items-center gap-6">
             <button
@@ -90,16 +90,16 @@ const Header = () => {
       </div>
 
       {/* Zone 3: Right - Volume & Future Nav */}
-      <div className="flex justify-end items-center gap-8">
+      <div className="flex-1 flex justify-end items-center gap-8 z-10">
         {isPlayerActive && (
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 h-full">
             {/* Timer */}
             <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-widest leading-none tabular-nums whitespace-nowrap">
               {formatTime(seek)} / {formatTime(duration)}
             </span>
 
-            {/* Volume Control */}
-            <div className="relative flex items-center group/volume h-20">
+            {/* Volume Control Wrapper */}
+            <div className="relative group py-2">
               <button
                 className="flex items-center justify-center transition-all duration-200 relative z-10"
                 onClick={(e) => {
@@ -110,32 +110,35 @@ const Header = () => {
                 <img
                   src={getVolumeIcon()}
                   alt="Volume"
-                  className="w-5 h-5 invert opacity-60 group-hover/volume:opacity-100 transition-opacity"
+                  className="w-5 h-5 invert opacity-60 group-hover:opacity-100 transition-opacity"
                 />
               </button>
 
-              {/* Slider - Appearing on hover without shifting layout */}
-              <div className="absolute right-full mr-4 opacity-0 scale-x-0 group-hover/volume:opacity-100 group-hover/volume:scale-x-100 transition-all duration-300 origin-right flex items-center bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={volume}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    adjustVolume(parseFloat(e.target.value));
-                  }}
-                  className="w-24 h-1 bg-white/20 appearance-none cursor-pointer fader-thumb accent-white hover:accent-neutral-200"
-                />
+              {/* Thought-Bubble Volume Slider */}
+              <div className="absolute top-full right-0 mt-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 z-50">
+                <div className="bg-white p-3 rounded-xl shadow-xl flex items-center justify-center min-w-[120px] relative">
+                  {/* Triangle Pointer */}
+                  <div className="absolute -top-1 right-3 w-3 h-3 bg-white rotate-45" />
+
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      adjustVolume(parseFloat(e.target.value));
+                    }}
+                    className="w-24 h-1 bg-black/20 appearance-none cursor-pointer fader-thumb accent-black"
+                  />
+                </div>
               </div>
             </div>
           </div>
         )}
         {/* Reserved area for future nav */}
-        <div className="w-10 h-10 flex items-center justify-center opacity-0 pointer-events-none">
-          {/* Placeholder for future buttons */}
-        </div>
+        <div className="w-6 h-6 flex items-center justify-center opacity-0 pointer-events-none" />
       </div>
 
       {/* 1px Master Seeker Line at Bottom (Full Width) */}
