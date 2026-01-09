@@ -38,7 +38,7 @@ const Header = () => {
   };
 
   return (
-    <header className="relative w-full h-20 z-50 bg-[#0a0a0a] border-b border-white/20 backdrop-blur-md flex items-center px-4 md:px-8 text-white overflow-hidden flex-shrink-0">
+    <header className="relative w-full h-20 z-50 bg-black backdrop-blur-md flex items-center px-4 md:px-8 text-white overflow-hidden flex-shrink-0">
       {/* Zone 1: Left - Identity & Meta */}
       <div className="flex items-baseline gap-3 z-10 shrink-0 ml-8">
         {/* Column 1: Station Identity */}
@@ -136,7 +136,7 @@ const Header = () => {
       {/* Bottom Zone: Expanding Progress Bar Console */}
       <div className="absolute bottom-0 left-0 w-full h-[16px] group/scrubber cursor-pointer z-50">
         {/* Background Track (Expands on Hover) */}
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/30 group-hover/scrubber:h-[8px] transition-all duration-200 ease-in-out z-10" />
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover/scrubber:h-[8px] transition-all duration-200 ease-in-out z-10" />
 
         {/* Progress Fill (Expands on Hover) */}
         <div
