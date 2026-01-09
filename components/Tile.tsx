@@ -195,14 +195,14 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       </div>
 
       {/* 2. Text Protection & Hover Layer */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
       {/* 3. Metadata & Safe-Area Offset */}
       <div className="absolute top-[12px] left-[12px] md:top-[20px] md:left-[20px] flex flex-col z-20 pointer-events-none">
         <span className="text-[15px] font-mono text-neutral-300 lowercase leading-none tracking-normal">
           {artist}
         </span>
-        <span className="text-[24px] md:text-[32px] font-bold uppercase leading-[0.9] tracking-tighter mt-2 text-white">
+        <span className="text-[24px] md:text-[32px] font-bold uppercase leading-none tracking-tighter mt-2 text-white">
           {title}
         </span>
       </div>
