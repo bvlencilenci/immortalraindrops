@@ -12,7 +12,7 @@
     "title": "test2",
     "artist": "Null Pointer",
     "url": "https://archive.org/download/CanonInD_261/CanoninD.mp3",
-    "coverImage": "/images/test2.jpg",
+    "coverImage": "/images/test2_pic.jpg",
     "duration": "5:34"
   },
   {
@@ -20,7 +20,7 @@
     "title": "test3",
     "artist": "Memory Leak",
     "url": "https://archive.org/download/mythium/JLS_ATI.mp3",
-    "coverImage": "/images/test3.jpg",
+    "coverImage": "/images/test3_pic.jpg",
     "duration": "4:20"
   },
   {
@@ -28,7 +28,7 @@
     "title": "test4",
     "artist": "Stack Trace",
     "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
-    "coverImage": "/images/test4.jpg",
+    "coverImage": "/images/test4_pic.jpg",
     "duration": "0:12"
   },
   {
@@ -36,7 +36,7 @@
     "title": "test5",
     "artist": "Void Walker",
     "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
-    "coverImage": "/images/test5.jpg",
+    "coverImage": "/images/test5_pic.jpg",
     "duration": "0:15"
   },
   {
@@ -44,7 +44,7 @@
     "title": "test6",
     "artist": "Kernel Panic",
     "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
-    "coverImage": "/images/test6.jpg",
+    "coverImage": "/images/test6_pic.jpg",
     "duration": "0:18"
   }
 ]
