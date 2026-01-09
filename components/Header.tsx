@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 
 const Header = () => {
@@ -18,6 +19,26 @@ const Header = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     seekTo
   } = useAudioStore();
+
+  const [isVolumeOpen, setIsVolumeOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleVolumeEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsVolumeOpen(true);
+  };
+
+  const handleVolumeLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsVolumeOpen(false);
+    }, 200);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
   const isPlayerActive = !!currentlyPlayingId;
@@ -97,23 +118,32 @@ const Header = () => {
         {isPlayerActive && (
           <div className="flex items-center gap-6 h-full">
             {/* Volume Control Wrapper */}
-            <div className="relative group py-2">
+            <div
+              className="relative py-2"
+              onMouseEnter={handleVolumeEnter}
+              onMouseLeave={handleVolumeLeave}
+            >
               <button
                 className="flex items-center justify-center transition-all duration-200 relative z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   adjustVolume(volume > 0 ? 0 : 0.5);
                 }}
+                onFocus={handleVolumeEnter}
+                onBlur={handleVolumeLeave}
               >
                 <img
                   src={getVolumeIcon()}
                   alt="Volume"
-                  className="w-5 h-5 invert opacity-60 group-hover:opacity-100 transition-opacity"
+                  className={`w-5 h-5 invert transition-opacity ${isVolumeOpen ? 'opacity-100' : 'opacity-60'}`}
                 />
               </button>
 
               {/* Slider - Floating Bubble */}
-              <div className="absolute top-full right-0 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-[100] bg-white p-4 rounded-xl shadow-2xl min-w-[140px] flex items-center">
+              <div
+                className={`absolute top-full right-0 mt-1 p-4 bg-white rounded-xl shadow-2xl transition-all duration-200 z-[100] flex items-center ${isVolumeOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+                  }`}
+              >
                 {/* Pointer */}
                 <div className="absolute -top-1 right-3 w-3 h-3 bg-white rotate-45" />
 
@@ -127,6 +157,8 @@ const Header = () => {
                     e.stopPropagation();
                     adjustVolume(parseFloat(e.target.value));
                   }}
+                  onFocus={handleVolumeEnter}
+                  onBlur={handleVolumeLeave}
                   className="w-24 h-1 bg-black/20 appearance-none cursor-pointer fader-thumb accent-black"
                 />
               </div>
