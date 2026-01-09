@@ -13,8 +13,10 @@ export default async function Home() {
   const tracks = await getData();
 
   return (
-    <main className="flex-1 w-full flex flex-col items-center justify-start p-0 bg-black">
-      <ArchiveGrid tracks={tracks} />
+    <main className="h-full w-full flex flex-col items-center justify-start p-0 bg-black">
+      <div className="h-full w-full">
+        <ArchiveGrid tracks={tracks} />
+      </div>
     </main>
   );
 }
