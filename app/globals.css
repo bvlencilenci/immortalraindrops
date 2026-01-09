@@ -122,20 +122,9 @@ body::after {
   /* Length of the fader */
 }
 
-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 64px;
-  z-index: 100 !important;
-  background: rgba(5, 5, 5, 0.8);
-  backdrop-filter: blur(10px);
-  border: none;
-}
 
-main {
-  margin-top: 64px;
-}
+
+
 
 /* Grain / Noise Texture */
 body::before {
