@@ -135,7 +135,7 @@ const Header = () => {
           <div className="flex items-center gap-6 h-full">
             {/* Volume Control Wrapper */}
             <div
-              className="relative py-2 flex items-center"
+              className="relative py-2 flex items-center group"
               onMouseEnter={handleVolumeEnter}
               onMouseLeave={handleVolumeLeave}
             >
@@ -151,17 +151,17 @@ const Header = () => {
                 <img
                   src={getVolumeIcon()}
                   alt="Volume"
-                  className={`w-5 h-5 invert transition-opacity ${isVolumeOpen ? 'opacity-100' : 'opacity-60'}`}
+                  className={`w-5 h-5 invert transition-all duration-200 ${isVolumeOpen ? 'opacity-100 scale-110' : 'opacity-60'}`}
                 />
               </button>
 
-              {/* Slider - Floating Bubble */}
+              {/* Slider - Floating Thought Bubble */}
               <div
-                className={`absolute top-full right-0 mt-1 p-4 bg-white rounded-xl shadow-2xl transition-all duration-200 z-[100] flex items-center ${isVolumeOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+                className={`absolute top-full right-0 mt-3 bg-white p-4 rounded-xl shadow-2xl z-50 flex items-center min-w-[140px] transition-all duration-200 ${isVolumeOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
                   }`}
               >
                 {/* Pointer */}
-                <div className="absolute -top-1 right-3 w-3 h-3 bg-white rotate-45" />
+                <div className="absolute -top-1 right-4 w-3 h-3 bg-white rotate-45" />
 
                 <input
                   type="range"
@@ -175,7 +175,7 @@ const Header = () => {
                   }}
                   onFocus={handleVolumeEnter}
                   onBlur={handleVolumeLeave}
-                  className="w-24 h-1 bg-black/10 appearance-none cursor-pointer accent-black"
+                  className="w-full h-1 bg-black/10 appearance-none cursor-pointer accent-black [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black"
                 />
               </div>
             </div>
