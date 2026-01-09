@@ -178,7 +178,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       className="relative w-full aspect-square overflow-hidden group border-t border-white/5 border-r last:border-r-0 cursor-pointer bg-black"
     >
       {/* 1. Visual Base (Milkdrop or Cover) */}
-      <div className="absolute inset-0 z-0 grayscale brightness-50 group-hover:brightness-75 transition-all duration-500 w-full h-full">
+      <div className="absolute inset-0 z-0 transition-all duration-500 w-full h-full">
         {isActive && isPlaying ? (
           <canvas
             ref={canvasRef}
@@ -187,19 +187,19 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         ) : (
           <img
             src={imagePath}
-            className="absolute inset-0 w-full h-full object-cover grayscale opacity-50 z-0"
+            className="absolute inset-0 w-full h-full object-cover z-0"
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
       </div>
 
-      {/* 2. Hover Dimmer Layer */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 z-10 pointer-events-none" />
+      {/* 2. Text Protection & Hover Layer */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
       {/* 3. Metadata & Safe-Area Offset */}
       <div className="absolute top-[12px] left-[12px] md:top-[20px] md:left-[20px] flex flex-col z-20 pointer-events-none">
-        <span className="text-[15px] font-mono text-neutral-400 lowercase leading-none tracking-normal">
+        <span className="text-[15px] font-mono text-neutral-300 lowercase leading-none tracking-normal">
           {artist}
         </span>
         <span className="text-[24px] md:text-[32px] font-bold uppercase leading-[0.9] tracking-tighter mt-2 text-white">

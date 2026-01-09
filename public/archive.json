@@ -30,5 +30,21 @@
     "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
     "coverImage": "/tiles/track4.jpg",
     "duration": "0:12"
+  },
+  {
+    "id": "track5",
+    "title": "Null State",
+    "artist": "Void Walker",
+    "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
+    "coverImage": "/tiles/track5.jpg",
+    "duration": "0:15"
+  },
+  {
+    "id": "track6",
+    "title": "Cache Miss",
+    "artist": "Kernel Panic",
+    "url": "https://archive.org/download/testmp3testfile/mp3test.mp3",
+    "coverImage": "/tiles/track6.jpg",
+    "duration": "0:18"
   }
 ]
