@@ -30,7 +30,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     isBuffering
   } = useAudioStore();
 
-  const fileName = title.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_') + '_pic.jpg';
+  const fileName = title.toLowerCase().replace(/[^a-z0-9]/g, '') + '_pic.jpg';
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
