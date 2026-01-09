@@ -16,9 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased min-h-screen flex flex-col bg-black selection:bg-[#ECEEDF] selection:text-black">
         <div className="flex-1 w-full flex flex-col bg-black relative">
-          <div className="relative z-50 w-full h-20 bg-[#0F0E0E]">
-            <Header />
-          </div>
+          <Header />
           <div className="flex-1 w-full">
             {children}
           </div>

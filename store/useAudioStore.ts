@@ -82,23 +82,28 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const newHowl = new Howl({
       src: [url],
       html5: true,
-      preload: 'metadata', // Optimize for large files
+      preload: 'metadata', // Required for R2 byte-range requests to support seeking without downloading the whole file
       pool: 1, // Minimize resource usage
       format: ['mp3'],
       xhr: {
-        withCredentials: false // Crucial for Archive.org CORS
+        withCredentials: false // Crucial for Archive.org / R2 CORS
       },
       volume: volume,
       onplay: () => {
         set({ isPlaying: true, isBuffering: false, duration: newHowl.duration() });
         requestAnimationFrame(get().updateSeek);
 
-        // Visualizer Connection
+        // Visualizer Connection & Partial Content Support
+        // We set crossOrigin to "anonymous" to allow the AnalyserNode to access audio data 
+        // from Cloudflare R2 / remote sources without tainting the canvas.
+        // This is critical for the "Liquid Glass" visualizer effects.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (newHowl as any)._sounds[0];
-        if (sound && sound._node && Howler.ctx) {
+        if (sound && sound._node) {
           const audioNode = sound._node;
-          audioNode.crossOrigin = "anonymous";
+          if (!audioNode.crossOrigin) {
+            audioNode.crossOrigin = "anonymous";
+          }
         }
       },
       onend: () => {
