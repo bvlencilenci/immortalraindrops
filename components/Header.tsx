@@ -52,9 +52,9 @@ const Header = () => {
 
   const getVolumeIcon = () => {
     if (volume === 0) return "/speaker-simple-slash.svg"; // Mute (0%)
-    if (volume <= 0.25) return "/speaker-simple-none.svg"; // Icon only (1-25%)
-    if (volume <= 0.75) return "/speaker-simple-low.svg"; // One wave (26-75%)
-    return "/speaker-simple-high.svg"; // Full waves (76-100%)
+    if (volume <= 0.33) return "/speaker-simple-none.svg"; // Low/No wave (1-33%)
+    if (volume <= 0.66) return "/speaker-simple-low.svg"; // Medium waves (34-66%)
+    return "/speaker-simple-high.svg"; // High/Full waves (67-100%)
   };
 
   return (
@@ -186,7 +186,7 @@ const Header = () => {
             e.stopPropagation();
             useAudioStore.getState().seekTo(parseFloat(e.target.value));
           }}
-          className="absolute bottom-0 left-0 w-full h-[2px] bg-white/10 accent-white appearance-none cursor-pointer z-50 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+          className="absolute bottom-0 left-0 w-full h-[2px] bg-white/20 appearance-none cursor-pointer z-[60] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
         />
       )}
     </header>
