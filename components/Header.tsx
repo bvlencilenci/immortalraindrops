@@ -139,16 +139,9 @@ const Header = () => {
 
 
 
-      {/* Zone 4: Bottom Scrubber (The "Hard Edge") */}
+      {/* Zone 4: Full-Width Scrubber (Styled like Volume Bar, No Needle) */}
       {isPlayerActive && (
-        <div className="absolute bottom-[-1px] left-0 right-0 w-full h-[2px] bg-transparent group/progress overflow-visible z-[60]">
-          {/* Progress Fill */}
-          <div
-            className="absolute bottom-0 left-0 h-full bg-white transition-all duration-100 ease-out"
-            style={{ width: `${progressPercent}%` }}
-          />
-
-          {/* Scrubbing Input Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 w-full h-[4px] bg-transparent z-[60]">
           <input
             type="range"
             min="0"
@@ -159,7 +152,10 @@ const Header = () => {
               e.stopPropagation();
               seekTo(parseFloat(e.target.value));
             }}
-            className="absolute inset-0 w-full h-4 -top-1 opacity-0 cursor-pointer z-30"
+            className="absolute inset-0 w-full h-full appearance-none bg-transparent cursor-pointer outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-0 [&::-webkit-slider-thumb]:h-0"
+            style={{
+              background: `linear-gradient(to right, white ${progressPercent}%, rgba(255,255,255,0.1) ${progressPercent}%)`
+            }}
           />
         </div>
       )}
