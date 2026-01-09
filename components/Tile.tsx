@@ -31,12 +31,13 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
   } = useAudioStore();
 
   // Function logic for image path generation
-  const getImagePath = (trackTitle: string) => {
+  const getImagePath = (trackTitle: string, cover?: string) => {
+    if (cover) return cover;
     const sanitized = trackTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
     return `/images/${sanitized}_pic.jpg`;
   };
 
-  const imagePath = getImagePath(title);
+  const imagePath = getImagePath(title, coverImage);
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any

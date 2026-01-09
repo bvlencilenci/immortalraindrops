@@ -121,10 +121,10 @@ const Header = () => {
                     e.stopPropagation();
                     adjustVolume(parseFloat(e.target.value));
                   }}
+                  className="w-[110px] h-[3px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-white outline-none"
                   style={{
-                    background: `linear-gradient(to right, white ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%)`
+                    background: `linear-gradient(to right, white ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%)`
                   }}
-                  className="w-[110px] h-[3px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-white"
                 />
               </div>
 
@@ -144,7 +144,7 @@ const Header = () => {
       {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
       <div className="absolute bottom-0 left-0 right-0 w-full h-[16px] group cursor-pointer z-50">
         {/* Dual-Layer Progress Scrubber */}
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/20 group-hover:h-[8px] transition-all duration-200 z-10" />
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:h-[8px] transition-all duration-200 z-10" />
         <div
           className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
           style={{ width: `${progressPercent}%` }}
