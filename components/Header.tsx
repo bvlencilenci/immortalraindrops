@@ -48,14 +48,16 @@ const Header = () => {
         </div>
 
         {/* Column 2: Metadata Block */}
-        <div className="flex flex-col justify-center border-l border-white/20 pl-6 max-w-[150px] md:max-w-[250px]">
-          <span className="font-mono text-[16px] text-neutral-500 lowercase leading-tight truncate">
-            {isPlayerActive ? trackArtist : "broadcast"}
-          </span>
-          <span className="font-mono text-[16px] text-white uppercase font-bold leading-tight truncate">
-            {isPlayerActive ? trackTitle : "standby"}
-          </span>
-        </div>
+        {isPlayerActive && (
+          <div className="flex flex-col justify-center border-l border-white/20 pl-6 max-w-[150px] md:max-w-[250px]">
+            <span className="font-mono text-[16px] text-neutral-500 lowercase leading-tight truncate">
+              {trackArtist}
+            </span>
+            <span className="font-mono text-[16px] text-white uppercase font-bold leading-tight truncate">
+              {trackTitle}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Zone 2: True Viewport Center (The Player) */}
@@ -93,80 +95,73 @@ const Header = () => {
 
       {/* Zone 3: Right - Utility Stack (Volume & Time) */}
       <div className="flex-1 flex justify-end items-center z-10 shrink-0">
-        <div className="flex flex-col items-end gap-1">
-          {isPlayerActive ? (
-            <>
-              {/* Row 1: Volume Utility (Solid Fill) */}
-              <div className="flex items-center gap-3">
-                <button
-                  className="flex items-center justify-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    adjustVolume(volume > 0 ? 0 : 0.5);
-                  }}
-                >
-                  <img
-                    src={getVolumeIcon()}
-                    alt="Volume"
-                    className="w-4 h-4 invert opacity-70"
-                  />
-                </button>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={volume}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    adjustVolume(parseFloat(e.target.value));
-                  }}
-                  className="w-[110px] h-[3px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-white outline-none"
-                  style={{
-                    background: `linear-gradient(to right, white ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%)`
-                  }}
+        {isPlayerActive && (
+          <div className="flex flex-col items-end gap-1">
+            {/* Row 1: Volume Utility (Solid Fill) */}
+            <div className="flex items-center gap-3">
+              <button
+                className="flex items-center justify-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  adjustVolume(volume > 0 ? 0 : 0.5);
+                }}
+              >
+                <img
+                  src={getVolumeIcon()}
+                  alt="Volume"
+                  className="w-4 h-4 invert opacity-70"
                 />
-              </div>
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  adjustVolume(parseFloat(e.target.value));
+                }}
+                className="w-[110px] h-[3px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-white outline-none"
+                style={{
+                  background: `linear-gradient(to right, white ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%)`
+                }}
+              />
+            </div>
 
-              {/* Row 2: Metadata Timestamp */}
-              <span className="font-mono text-[12px] text-white/70 tracking-widest leading-none tabular-nums">
-                {formatTime(seek)} / {formatTime(duration)}
-              </span>
-            </>
-          ) : (
-            <span className="font-mono text-[12px] text-white/30 tracking-widest leading-none tabular-nums">
-              --:-- / --:--
+            {/* Row 2: Metadata Timestamp */}
+            <span className="font-mono text-[12px] text-white/70 tracking-widest leading-none tabular-nums">
+              {formatTime(seek)} / {formatTime(duration)}
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
-      <div className="absolute bottom-0 left-0 right-0 w-full h-[16px] group cursor-pointer z-50">
-        {/* Dual-Layer Progress Scrubber */}
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:h-[8px] transition-all duration-200 z-10" />
-        <div
-          className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
-          style={{ width: `${progressPercent}%` }}
-        />
+      {isPlayerActive && (
+        <div className="absolute bottom-0 left-0 right-0 w-full h-[16px] group cursor-pointer z-50">
+          {/* Dual-Layer Progress Scrubber */}
+          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:h-[8px] transition-all duration-200 z-10" />
+          <div
+            className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
+            style={{ width: `${progressPercent}%` }}
+          />
 
-        {/* Note: Hover ball logic removed as per request for clean fill aesthetic */}
-
-        {/* Full-width functional scrubber hitbox */}
-        <input
-          type="range"
-          min="0"
-          max={duration || 100}
-          step="0.1"
-          value={seek}
-          disabled={!isPlayerActive}
-          onChange={(e) => {
-            e.stopPropagation();
-            useAudioStore.getState().seekTo(parseFloat(e.target.value));
-          }}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[60]"
-        />
-      </div>
+          {/* Full-width functional scrubber hitbox */}
+          <input
+            type="range"
+            min="0"
+            max={duration || 100}
+            step="0.1"
+            value={seek}
+            onChange={(e) => {
+              e.stopPropagation();
+              useAudioStore.getState().seekTo(parseFloat(e.target.value));
+            }}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[60]"
+          />
+        </div>
+      )}
     </header>
   );
 };
