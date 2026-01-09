@@ -168,15 +168,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
   return (
     <div
       onClick={handleInteraction}
-      className={`
-        group relative w-full h-full
-        bg-black
-        cursor-pointer overflow-hidden
-        ${isActive ? 'z-20' : 'z-0'}
-      `}
+      className="relative w-full h-full overflow-hidden group border-r border-white/5 last:border-r-0 aspect-square max-h-full cursor-pointer bg-black"
     >
-      {/* 1. Visual Base (Milkdrop or Cover) - Edge-to-Edge */}
-      <div className="absolute inset-0 z-0 grayscale brightness-50 group-hover:brightness-75 transition-all duration-500">
+      {/* 1. Visual Base (Milkdrop or Cover) */}
+      <div className="absolute inset-0 z-0 grayscale brightness-50 group-hover:brightness-75 transition-all duration-500 w-full h-full">
         {isActive ? (
           <canvas
             ref={canvasRef}
@@ -197,34 +192,20 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         )}
       </div>
 
-      {/* 2. Metadata HUD (Synced with Header Player) */}
-      <div className="absolute top-0 left-0 w-full z-10 pointer-events-none flex flex-col items-start overflow-hidden pt-1">
-        {/* Dimming overlay on hover */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      {/* 2. Dimmer Layer */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 z-10 pointer-events-none" />
 
-        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay">
-          <span className="text-xs text-neutral-400 font-mono lowercase leading-none pl-1">
-            {artist}
-          </span>
-          <span className="text-sm font-bold text-white font-mono uppercase mt-1 leading-none pl-1">
-            {title}
-          </span>
-        </div>
-
-        {/* Hardware Indent Safety Marker */}
-        <div className="absolute top-0 left-0 w-[1cqw] h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+      {/* 3. Metadata & Offset */}
+      <div className="absolute top-0 left-0 flex flex-col pt-[5px] pl-[5px] z-20 pointer-events-none">
+        <span className="text-xs font-mono text-neutral-400 lowercase leading-none">
+          {artist}
+        </span>
+        <span className="text-sm font-bold font-mono uppercase text-white mt-1 leading-none">
+          {title}
+        </span>
       </div>
 
-      {/* 4. Playback Indicator */}
-      {isActive && isPlaying && (
-        <div className="absolute bottom-[4cqw] right-[4cqw] z-20 pointer-events-none opacity-60">
-          <div className="flex gap-1 items-end h-[4cqw]">
-            <div className="w-[1cqw] bg-white animate-[music-bar_0.8s_ease-in-out_infinite]" />
-            <div className="w-[1cqw] bg-white animate-[music-bar_0.6s_ease-in-out_infinite_0.1s]" />
-            <div className="w-[1cqw] bg-white animate-[music-bar_1.1s_ease-in-out_infinite_0.2s]" />
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
