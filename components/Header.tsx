@@ -59,9 +59,9 @@ const Header = () => {
       </div>
 
       {/* Zone 2: True Viewport Center (The Player) */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-auto w-full max-w-[200px] md:max-w-[300px]">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
         {isPlayerActive && (
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8">
             <button
               onClick={(e) => { e.stopPropagation(); skipBack(); }}
               className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110"
