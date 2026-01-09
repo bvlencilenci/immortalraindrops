@@ -133,27 +133,38 @@ const Header = () => {
         <div className="w-6 h-6 flex items-center justify-center opacity-0 pointer-events-none" />
       </div>
 
-      {/* Bottom Zone: Dual-Layer Progress Bar (No visible thumb) */}
-      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/30 z-10" />
-      <div
-        className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 z-20 pointer-events-none"
-        style={{ width: `${progressPercent}%` }}
-      />
+      {/* Bottom Zone: Expanding Progress Bar Console */}
+      <div className="absolute bottom-0 left-0 w-full h-[16px] group/scrubber cursor-pointer z-50">
+        {/* Background Track (Expands on Hover) */}
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/30 group-hover/scrubber:h-[8px] transition-all duration-200 ease-in-out z-10" />
 
-      {/* Invisible Interactive Scrubber */}
-      <input
-        type="range"
-        min="0"
-        max={duration || 100}
-        step="0.1"
-        value={seek}
-        disabled={!isPlayerActive}
-        onChange={(e) => {
-          e.stopPropagation();
-          useAudioStore.getState().seekTo(parseFloat(e.target.value));
-        }}
-        className="absolute bottom-0 left-0 w-full h-[10px] opacity-0 z-30 cursor-pointer"
-      />
+        {/* Progress Fill (Expands on Hover) */}
+        <div
+          className="absolute bottom-0 left-0 h-[2px] bg-white group-hover/scrubber:h-[8px] transition-all duration-200 ease-in-out z-20 pointer-events-none"
+          style={{ width: `${progressPercent}%` }}
+        />
+
+        {/* Hover-Only Thumb (The Ball) */}
+        <div
+          className="absolute bottom-[4px] -translate-x-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover/scrubber:opacity-100 transition-opacity duration-200 z-30 pointer-events-none"
+          style={{ left: `${progressPercent}%` }}
+        />
+
+        {/* Functional Invisible Input */}
+        <input
+          type="range"
+          min="0"
+          max={duration || 100}
+          step="0.1"
+          value={seek}
+          disabled={!isPlayerActive}
+          onChange={(e) => {
+            e.stopPropagation();
+            useAudioStore.getState().seekTo(parseFloat(e.target.value));
+          }}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-40"
+        />
+      </div>
     </header>
   );
 };
