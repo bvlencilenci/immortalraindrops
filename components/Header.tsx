@@ -38,11 +38,11 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 w-full flex items-center justify-between px-[4%] bg-black z-50">
+    <header className="sticky top-0 w-full h-20 flex items-center justify-between px-8 bg-white/5 backdrop-blur-xl border-b border-white/10 z-50 bg-gradient-to-b from-white/10 to-transparent">
       {/* Zone 1: Left - Identity & Meta */}
       <div className="flex items-baseline gap-3 z-10 shrink-0">
         {/* Column 1: Station Identity */}
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-center text-white">
           <span className="font-mono text-[18px] font-bold tracking-widest leading-none">IMMORTAL</span>
           <span className="font-mono text-[18px] font-bold tracking-widest leading-none">RAINDROPS</span>
         </div>
@@ -50,7 +50,7 @@ const Header = () => {
         {/* Column 2: Metadata Block */}
         {isPlayerActive && (
           <div className="flex flex-col justify-center border-l border-white/20 pl-6 max-w-[150px] md:max-w-[250px]">
-            <span className="font-mono text-[16px] text-neutral-500 lowercase leading-tight truncate">
+            <span className="font-mono text-[16px] text-white lowercase leading-tight truncate">
               {trackArtist}
             </span>
             <span className="font-mono text-[16px] text-white uppercase font-bold leading-tight truncate">
@@ -109,7 +109,7 @@ const Header = () => {
                 <img
                   src={getVolumeIcon()}
                   alt="Volume"
-                  className="w-4 h-4 invert opacity-70"
+                  className="w-4 h-4 invert"
                 />
               </button>
               <input
@@ -130,7 +130,7 @@ const Header = () => {
             </div>
 
             {/* Row 2: Metadata Timestamp */}
-            <span className="font-mono text-[12px] text-white/70 tracking-widest leading-none tabular-nums">
+            <span className="font-mono text-[12px] text-white tracking-widest leading-none tabular-nums">
               {formatTime(seek)} / {formatTime(duration)}
             </span>
           </div>
@@ -138,6 +138,31 @@ const Header = () => {
       </div>
 
 
+
+      {/* Zone 4: Bottom Scrubber (The "Hard Edge") */}
+      {isPlayerActive && (
+        <div className="absolute bottom-[-1px] left-0 right-0 w-full h-[2px] bg-transparent group/progress overflow-visible z-[60]">
+          {/* Progress Fill */}
+          <div
+            className="absolute bottom-0 left-0 h-full bg-white transition-all duration-100 ease-out"
+            style={{ width: `${progressPercent}%` }}
+          />
+
+          {/* Scrubbing Input Overlay */}
+          <input
+            type="range"
+            min="0"
+            max={duration || 100}
+            step="0.1"
+            value={seek}
+            onChange={(e) => {
+              e.stopPropagation();
+              seekTo(parseFloat(e.target.value));
+            }}
+            className="absolute inset-0 w-full h-4 -top-1 opacity-0 cursor-pointer z-30"
+          />
+        </div>
+      )}
     </header>
   );
 };
