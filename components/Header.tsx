@@ -93,14 +93,9 @@ const Header = () => {
       </div>
 
       {/* Zone 3: Right - Volume & Future Nav */}
-      <div className="flex-1 flex justify-end items-center gap-8 z-10">
+      <div className="flex-1 flex justify-end items-center gap-6 z-10">
         {isPlayerActive && (
           <div className="flex items-center gap-6 h-full">
-            {/* Timer */}
-            <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-widest leading-none tabular-nums whitespace-nowrap">
-              {formatTime(seek)} / {formatTime(duration)}
-            </span>
-
             {/* Volume Control Wrapper */}
             <div className="relative group py-2">
               <button
@@ -136,6 +131,11 @@ const Header = () => {
                 />
               </div>
             </div>
+
+            {/* Timer */}
+            <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-widest leading-none tabular-nums whitespace-nowrap">
+              {formatTime(seek)} / {formatTime(duration)}
+            </span>
           </div>
         )}
         {/* Reserved area for future nav */}
