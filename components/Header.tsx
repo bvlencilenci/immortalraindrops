@@ -71,13 +71,13 @@ const Header = () => {
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-              className="flex items-center justify-center bg-white/5 w-9 h-9 rounded-full transition-all duration-200 border border-white/10 hover:bg-white/10 hover:scale-110"
+              className="flex items-center justify-center bg-white/5 w-11 h-11 rounded-full transition-all duration-200 border border-white/10 hover:bg-white/10 hover:scale-110"
               title={isPlaying ? "Pause" : "Play"}
             >
               <img
                 src={isPlaying ? "/pause.svg" : "/play.svg"}
                 alt={isPlaying ? "Pause" : "Play"}
-                className="w-5 h-5 invert"
+                className="w-8 h-8 invert translate-x-[1px]"
               />
             </button>
             <button
@@ -143,12 +143,11 @@ const Header = () => {
 
       {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
       <div className="absolute bottom-0 left-0 right-0 w-full h-[16px] group cursor-pointer z-50">
-        {/* Unified Progress Track (Solid Fill logic) */}
+        {/* Dual-Layer Progress Scrubber */}
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/20 group-hover:h-[8px] transition-all duration-200 z-10" />
         <div
-          className="absolute bottom-0 left-0 w-full h-[2px] transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
-          style={{
-            background: `linear-gradient(to right, white ${progressPercent}%, rgba(255,255,255,0.2) ${progressPercent}%)`
-          }}
+          className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
+          style={{ width: `${progressPercent}%` }}
         />
 
         {/* Note: Hover ball logic removed as per request for clean fill aesthetic */}
