@@ -20,6 +20,16 @@ const Header = () => {
     seekTo
   } = useAudioStore();
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const isPlayerActive = !!currentlyPlayingId;
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
 
@@ -38,7 +48,10 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 w-full h-20 flex items-center justify-between px-8 bg-white/5 backdrop-blur-xl border-b border-white/10 z-50 bg-gradient-to-b from-white/10 to-transparent">
+    <header className={`sticky top-0 w-full h-20 flex items-center justify-between px-8 z-50 transition-all duration-300 ease-in-out ${isScrolled
+        ? "bg-white/5 backdrop-blur-xl border-b border-white/10 bg-gradient-to-b from-white/10 to-transparent"
+        : "bg-black"
+      }`}>
       {/* Zone 1: Left - Identity & Meta */}
       <div className="flex items-baseline gap-3 z-10 shrink-0">
         {/* Column 1: Station Identity */}
