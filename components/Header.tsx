@@ -83,49 +83,33 @@ const Header = () => {
       {/* Zone 2: True Viewport Center (The Player) */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-auto w-full max-w-[300px]">
         {isPlayerActive && (
-          <>
-            <div className="flex items-center gap-6">
-              <button
-                onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                className="group flex items-center justify-center transition-all duration-200"
-                title="Previous / Restart"
-              >
-                <img src="/skip-back.svg" alt="Back" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                className="group flex items-center justify-center bg-white/5 hover:bg-white/10 w-12 h-12 rounded-full transition-all duration-200 border border-white/10"
-                title={isPlaying ? "Pause" : "Play"}
-              >
-                <img
-                  src={isPlaying ? "/pause.svg" : "/play.svg"}
-                  alt={isPlaying ? "Pause" : "Play"}
-                  className="w-5 h-5 invert opacity-80 group-hover:opacity-100"
-                />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                className="group flex items-center justify-center transition-all duration-200"
-                title="Skip"
-              >
-                <img src="/skip-forward.svg" alt="Skip" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
-              </button>
-            </div>
-
-            {/* Main Seeker */}
-            <input
-              type="range"
-              min="0"
-              max={duration || 100}
-              step="0.1"
-              value={seek}
-              onChange={(e) => {
-                e.stopPropagation();
-                useAudioStore.getState().seekTo(parseFloat(e.target.value));
-              }}
-              className="w-full h-1 bg-neutral-800 accent-white appearance-none cursor-pointer mt-3"
-            />
-          </>
+          <div className="flex items-center gap-6">
+            <button
+              onClick={(e) => { e.stopPropagation(); skipBack(); }}
+              className="group flex items-center justify-center transition-all duration-200"
+              title="Previous / Restart"
+            >
+              <img src="/skip-back.svg" alt="Back" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+              className="group flex items-center justify-center bg-white/5 hover:bg-white/10 w-12 h-12 rounded-full transition-all duration-200 border border-white/10"
+              title={isPlaying ? "Pause" : "Play"}
+            >
+              <img
+                src={isPlaying ? "/pause.svg" : "/play.svg"}
+                alt={isPlaying ? "Pause" : "Play"}
+                className="w-5 h-5 invert opacity-80 group-hover:opacity-100"
+              />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+              className="group flex items-center justify-center transition-all duration-200"
+              title="Skip"
+            >
+              <img src="/skip-forward.svg" alt="Skip" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
+            </button>
+          </div>
         )}
       </div>
 
@@ -175,7 +159,7 @@ const Header = () => {
                   }}
                   onFocus={handleVolumeEnter}
                   onBlur={handleVolumeLeave}
-                  className="w-full h-1 bg-black/10 appearance-none cursor-pointer accent-black [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black"
+                  className="w-full h-1 bg-neutral-200 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black cursor-pointer"
                 />
               </div>
             </div>
@@ -190,6 +174,21 @@ const Header = () => {
         <div className="w-6 h-6 flex items-center justify-center opacity-0 pointer-events-none" />
       </div>
 
+      {/* Bottom Seeker - Global Header Divider */}
+      {isPlayerActive && (
+        <input
+          type="range"
+          min="0"
+          max={duration || 100}
+          step="0.1"
+          value={seek}
+          onChange={(e) => {
+            e.stopPropagation();
+            useAudioStore.getState().seekTo(parseFloat(e.target.value));
+          }}
+          className="absolute bottom-0 left-0 w-full h-[2px] bg-white/10 accent-white appearance-none cursor-pointer z-50 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+        />
+      )}
     </header>
   );
 };
