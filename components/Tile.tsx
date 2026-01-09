@@ -184,10 +184,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       </div>
 
       {/* 2. Dim Overlay & Reactive Metadata (CQW Constraints + Digital Decay) - Locked to 25% Height */}
-      <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden h-full w-full">
-        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute top-0 left-0 w-full h-[25%] z-10 pointer-events-none p-1">
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-        <div className="absolute top-0 left-0 w-full h-[25%] flex flex-col justify-end pl-1">
+        <div className="relative w-full h-full flex flex-col justify-end">
           <div className="flex flex-col w-full h-full justify-end opacity-100 transition-opacity duration-300">
             <div className="whitespace-nowrap overflow-hidden group-hover:animate-digital-decay">
               <div className="inline-block animate-marquee-hardware leading-[0.9] tracking-tighter">
