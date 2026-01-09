@@ -30,7 +30,13 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     isBuffering
   } = useAudioStore();
 
-  const fileName = title.toLowerCase().replace(/[^a-z0-9]/g, '') + '_pic.jpg';
+  // Function logic for image path generation
+  const getImagePath = (trackTitle: string) => {
+    const sanitized = trackTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return `/images/${sanitized}_pic.jpg`;
+  };
+
+  const imagePath = getImagePath(title);
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -180,7 +186,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           />
         ) : (
           <img
-            src={'/images/' + fileName}
+            src={imagePath}
             className="absolute inset-0 w-full h-full object-cover grayscale opacity-50 z-0"
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
