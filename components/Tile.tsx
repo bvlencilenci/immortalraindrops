@@ -208,14 +208,14 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
                 <span className="font-mono text-[clamp(10px,2vw,14px)] text-neutral-400 lowercase mr-[4cqw]">
                   {artist}
                 </span>
-                <span className="font-mono text-[clamp(14px,3vw,24px)] font-bold text-white uppercase mr-[4cqw]">
+                <span className="font-mono text-[4vw] font-bold text-white uppercase mr-[4cqw]">
                   {title}
                 </span>
                 {/* Duplication for marquee */}
                 <span className="font-mono text-[clamp(10px,2vw,14px)] text-neutral-400 lowercase mr-[4cqw]">
                   {artist}
                 </span>
-                <span className="font-mono text-[clamp(14px,3vw,24px)] font-bold text-white uppercase mr-[4cqw]">
+                <span className="font-mono text-[4vw] font-bold text-white uppercase mr-[4cqw]">
                   {title}
                 </span>
               </div>
