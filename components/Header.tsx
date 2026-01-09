@@ -24,7 +24,7 @@ const Header = () => {
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
 
   const formatTime = (time: number) => {
-    if (isNaN(time) || time === 0) return "00:00";
+    if (isNaN(time) || time === 0) return "--:--";
     const mins = Math.floor(time / 60);
     const secs = Math.floor(time % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -40,7 +40,7 @@ const Header = () => {
   return (
     <header className="relative w-full h-20 z-50 bg-[#0a0a0a] border-b border-white/20 backdrop-blur-md flex items-center px-4 md:px-8 text-white overflow-hidden flex-shrink-0">
       {/* Zone 1: Left - Identity & Meta */}
-      <div className="flex items-center gap-8 z-10 shrink-0 ml-8">
+      <div className="flex items-baseline gap-3 z-10 shrink-0 ml-8">
         {/* Column 1: Station Identity */}
         <div className="flex flex-col justify-center">
           <span className="font-mono text-[18px] font-bold tracking-widest leading-none">IMMORTAL</span>
@@ -96,11 +96,23 @@ const Header = () => {
         <div className="flex items-center gap-6">
           {/* Timestamp */}
           <span className="font-mono text-[14px] text-white tracking-widest leading-none tabular-nums">
-            {isPlayerActive ? `${formatTime(seek)} / ${formatTime(duration)}` : "00:00 / 00:00"}
+            {isPlayerActive ? `${formatTime(seek)} / ${formatTime(duration)}` : "--:-- / --:--"}
           </span>
 
           {isPlayerActive && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  adjustVolume(parseFloat(e.target.value));
+                }}
+                className="w-[110px] h-[3px] bg-white/30 rounded-full appearance-none accent-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
+              />
               <button
                 className="flex items-center justify-center"
                 onClick={(e) => {
@@ -114,20 +126,6 @@ const Header = () => {
                   className="w-5 h-5 invert opacity-100"
                 />
               </button>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  adjustVolume(parseFloat(e.target.value));
-                }}
-                className="w-[120px] h-[4px] bg-white/20 accent-white appearance-none cursor-pointer 
-                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer
-                [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-              />
             </div>
           )}
         </div>
@@ -135,10 +133,10 @@ const Header = () => {
         <div className="w-6 h-6 flex items-center justify-center opacity-0 pointer-events-none" />
       </div>
 
-      {/* Bottom Zone: Dual-Layer Progress Bar */}
-      <div className="absolute bottom-0 left-0 w-full h-[3px] bg-white/20 z-40" />
+      {/* Bottom Zone: Dual-Layer Progress Bar (No visible thumb) */}
+      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/30 z-10" />
       <div
-        className="absolute bottom-0 left-0 h-[3px] bg-white transition-all duration-300 z-50 pointer-events-none"
+        className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 z-20 pointer-events-none"
         style={{ width: `${progressPercent}%` }}
       />
 
@@ -154,7 +152,7 @@ const Header = () => {
           e.stopPropagation();
           useAudioStore.getState().seekTo(parseFloat(e.target.value));
         }}
-        className="absolute bottom-0 left-0 w-full h-[6px] opacity-0 z-[60] cursor-pointer"
+        className="absolute bottom-0 left-0 w-full h-[10px] opacity-0 z-30 cursor-pointer"
       />
     </header>
   );
