@@ -50,7 +50,7 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 w-full h-20 z-50 bg-black flex items-center justify-between transition-all duration-300 ease-in-out">
       {/* Zone 1: Left - Identity & Meta */}
-      <div className="flex items-baseline gap-3 z-10 shrink-0 pl-8">
+      <div className="flex items-baseline gap-3 z-10 shrink-0 ml-8">
         {/* Column 1: Station Identity */}
         <div className="flex flex-col justify-center text-white">
           <span className="font-mono text-[18px] font-bold tracking-widest leading-none">IMMORTAL</span>
@@ -104,7 +104,7 @@ const Header = () => {
       </div>
 
       {/* Zone 3: Right - Utility Stack (Volume & Time) */}
-      <div className="flex-1 flex justify-end items-center z-10 shrink-0 pr-8">
+      <div className="flex-1 flex justify-end items-center z-10 shrink-0 mr-8">
         {isPlayerActive && (
           <div className="flex flex-col items-end gap-1">
             {/* Row 1: Volume Utility (Solid Fill) */}
