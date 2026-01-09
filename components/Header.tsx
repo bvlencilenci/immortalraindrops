@@ -46,10 +46,10 @@ const Header = () => {
 
         {isPlayerActive && (
           <div className="flex flex-col py-1 overflow-hidden max-w-[450px] h-full justify-center">
-            <span className="font-mono text-[9px] md:text-xs text-neutral-400 lowercase leading-none truncate pl-1">
+            <span className="font-mono text-xs text-neutral-400 lowercase leading-none truncate pl-1">
               {trackArtist}
             </span>
-            <span className="font-mono text-xs md:text-xl font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
+            <span className="font-mono text-sm font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
               {trackTitle}
             </span>
           </div>
