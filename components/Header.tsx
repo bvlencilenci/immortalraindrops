@@ -37,15 +37,14 @@ const Header = () => {
   };
 
   return (
-    <header className="relative w-full h-20 z-50 bg-black/80 backdrop-blur-md flex items-center justify-between px-[12px] md:px-[20px] border-b border-white/10 text-white overflow-hidden flex-shrink-0">
-      {/* 1. Identity & Metadata Group */}
-      <div className="flex items-center z-20 overflow-hidden h-full gap-8">
+    <header className="relative w-full h-20 z-50 bg-black/80 backdrop-blur-md flex items-center px-[20px] border-b border-white/10 text-white overflow-hidden flex-shrink-0">
+      {/* Zone 1: Left-Anchored Identity */}
+      <div className="flex flex-col z-10">
         <h1 className="font-mono text-[16px] font-bold uppercase tracking-[0.2em] leading-none">
           Immortal Raindrops
         </h1>
-
         {isPlayerActive && (
-          <div className="flex flex-col py-1 overflow-hidden max-w-[450px] h-full justify-center">
+          <div className="flex flex-col mt-2">
             <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-widest leading-none truncate">
               {trackArtist}
             </span>
@@ -56,43 +55,43 @@ const Header = () => {
         )}
       </div>
 
-      {/* 2. Hardware Console Group (Conditional Visibility) */}
+      {/* Zone 2: True Viewport Center (The Player) */}
       {isPlayerActive && (
-        <div className="flex items-center gap-4 z-20 h-full">
-          {/* Playback Controls */}
-          <div className="flex items-center gap-1 bg-transparent border-none h-full">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20">
+          {/* Transport Controls */}
+          <div className="flex items-center gap-1">
             <button
               onClick={(e) => { e.stopPropagation(); skipBack(); }}
-              className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity p-2"
               title="Previous / Restart"
             >
-              <img src="/skip-back.svg" alt="Back" className="h-[2rem] invert opacity-80" />
+              <img src="/skip-back.svg" alt="Back" className="w-[1.4em] h-[1.4em] invert opacity-80" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-              className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity p-2"
               title={isPlaying ? "Pause" : "Play"}
             >
               <img
                 src={isPlaying ? "/pause.svg" : "/play.svg"}
                 alt={isPlaying ? "Pause" : "Play"}
-                className="h-[2rem] invert opacity-80"
+                className="w-[1.4em] h-[1.4em] invert opacity-80"
               />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-              className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity p-2"
               title="Skip"
             >
-              <img src="/skip-forward.svg" alt="Skip" className="h-[2rem] invert opacity-80" />
+              <img src="/skip-forward.svg" alt="Skip" className="w-[1.4em] h-[1.4em] invert opacity-80" />
             </button>
           </div>
 
-          {/* Volume & Timer */}
-          <div className="flex items-center gap-3 h-full">
-            <div className="relative flex items-center h-full group/volume">
+          {/* Player Seeker/Metadata Line */}
+          <div className="flex items-center gap-3 mt-1">
+            <div className="flex items-center gap-2">
               <button
-                className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative z-10"
+                className="flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative p-1"
                 onClick={(e) => {
                   e.stopPropagation();
                   adjustVolume(volume > 0 ? 0 : 0.5);
@@ -101,27 +100,9 @@ const Header = () => {
                 <img
                   src={getVolumeIcon()}
                   alt="Volume"
-                  className="h-[2rem] invert opacity-80"
+                  className="w-[1.4em] h-[1.4em] invert opacity-80"
                 />
               </button>
-
-              <div className="absolute top-[calc(50%+14px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-24 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center">
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={volume}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    adjustVolume(parseFloat(e.target.value));
-                  }}
-                  className="w-full h-full bg-transparent appearance-none cursor-pointer fader-thumb pointer-events-auto"
-                />
-              </div>
-            </div>
-
-            <div className="min-w-[80px] text-right flex items-center h-full">
               <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-widest leading-none tabular-nums whitespace-nowrap">
                 {formatTime(seek)} / {formatTime(duration)}
               </span>
@@ -129,6 +110,9 @@ const Header = () => {
           </div>
         </div>
       )}
+
+      {/* Zone 3: Right Navigation Space */}
+      <div className="flex-1" />
 
       {/* 1px Master Seeker Line at Bottom (Full Width) */}
       <div
