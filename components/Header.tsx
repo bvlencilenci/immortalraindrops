@@ -38,9 +38,9 @@ const Header = () => {
   };
 
   return (
-    <header className="relative w-full h-20 z-50 bg-black backdrop-blur-md flex items-center px-4 md:px-8 text-white overflow-hidden flex-shrink-0">
+    <header className="relative h-20 w-full flex items-center justify-between px-8 bg-black z-50">
       {/* Zone 1: Left - Identity & Meta */}
-      <div className="flex items-baseline gap-3 z-10 shrink-0 ml-8">
+      <div className="flex items-baseline gap-3 z-10 shrink-0">
         {/* Column 1: Station Identity */}
         <div className="flex flex-col justify-center">
           <span className="font-mono text-[18px] font-bold tracking-widest leading-none">IMMORTAL</span>
@@ -93,7 +93,7 @@ const Header = () => {
 
       {/* Zone 3: Right - Utility Stack (Volume & Time) */}
       <div className="flex-1 flex justify-end items-center z-10 shrink-0">
-        <div className="flex flex-col items-end gap-1 mr-8">
+        <div className="flex flex-col items-end gap-1">
           {isPlayerActive ? (
             <>
               {/* Row 1: Volume Utility (Solid Fill) */}
@@ -124,8 +124,7 @@ const Header = () => {
                   style={{
                     background: `linear-gradient(to right, white ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%)`
                   }}
-                  className="w-[110px] h-[3px] rounded-full appearance-none cursor-pointer accent-transparent 
-                  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-0 [&::-webkit-slider-thumb]:h-0"
+                  className="w-[110px] h-[3px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-white"
                 />
               </div>
 
@@ -144,20 +143,15 @@ const Header = () => {
 
       {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
       <div className="absolute bottom-0 left-0 right-0 w-full h-[16px] group cursor-pointer z-50">
-        {/* Transparent Background Track */}
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:h-[8px] transition-all duration-200 z-10" />
-
-        {/* The active fill line (single source of truth for progress) */}
+        {/* Unified Progress Track (Solid Fill logic) */}
         <div
-          className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
-          style={{ width: `${progressPercent}%` }}
+          className="absolute bottom-0 left-0 w-full h-[2px] transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
+          style={{
+            background: `linear-gradient(to right, white ${progressPercent}%, rgba(255,255,255,0.2) ${progressPercent}%)`
+          }}
         />
 
-        {/* Hover-only tracking ball */}
-        <div
-          className="absolute bottom-[4px] -translate-x-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 pointer-events-none"
-          style={{ left: `${progressPercent}%` }}
-        />
+        {/* Note: Hover ball logic removed as per request for clean fill aesthetic */}
 
         {/* Full-width functional scrubber hitbox */}
         <input
