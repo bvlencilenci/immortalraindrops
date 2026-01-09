@@ -30,7 +30,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     isBuffering
   } = useAudioStore();
 
-  const fileName = title.toLowerCase().trim().replace(/\s+/g, '_') + '_pic.jpg';
+  const fileName = title.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_') + '_pic.jpg';
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -183,6 +183,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
             src={'/images/' + fileName}
             className="absolute inset-0 w-full h-full object-cover grayscale opacity-50 z-0"
             alt=""
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
       </div>
@@ -192,7 +193,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
       {/* 3. Metadata & Safe-Area Offset */}
       <div className="absolute top-[12px] left-[12px] md:top-[20px] md:left-[20px] flex flex-col z-20 pointer-events-none">
-        <span className="text-[13px] font-mono text-neutral-400 lowercase leading-none">
+        <span className="text-[15px] font-mono text-neutral-400 lowercase leading-none tracking-normal">
           {artist}
         </span>
         <span className="text-[24px] md:text-[32px] font-bold uppercase leading-[0.9] tracking-tighter mt-2 text-white">

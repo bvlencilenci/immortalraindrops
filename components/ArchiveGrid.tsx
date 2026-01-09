@@ -16,7 +16,7 @@ const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
   }, [tracks, setPlaylist]);
 
   return (
-    <div className="grid grid-cols-2 w-full pt-20 gap-0">
+    <div className="flex-1 w-full grid grid-cols-2 overflow-y-auto gap-0 pt-0">
       {tracks.map((track) => (
         <Tile
           key={track.id}
