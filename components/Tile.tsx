@@ -197,16 +197,16 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         )}
       </div>
 
-      {/* 2. Metadata HUD (Hardware Label Stack) */}
-      <div className="absolute top-0 left-0 w-full h-[30%] z-10 pointer-events-none p-1 pl-1 flex flex-col justify-start">
-        {/* Hover Dimming Overlay background */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      {/* 2. Metadata HUD (Synced with Header Player) */}
+      <div className="absolute top-0 left-0 w-full h-[30%] z-10 pointer-events-none p-1 flex flex-col items-start overflow-hidden">
+        {/* Dimming overlay on hover */}
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay">
-          <span className="font-mono text-[clamp(12px,2.5vw,18px)] font-medium uppercase tracking-wider text-neutral-400 leading-none">
+        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay pl-1">
+          <span className="font-mono text-xs text-neutral-400 lowercase leading-none">
             {artist}
           </span>
-          <span className="font-mono text-[clamp(14px,3.5vw,24px)] font-bold uppercase leading-[0.9] text-white mt-1">
+          <span className="font-mono text-sm md:text-base font-bold text-white uppercase mt-1 leading-none tracking-tighter">
             {title}
           </span>
         </div>
