@@ -232,11 +232,27 @@ body {
   /* Mechanical Switch feel */
 }
 
+/* Universal Range Slider Styling */
+input[type='range'] {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: currentColor;
+  cursor: pointer;
+  border: none;
+}
+
 /* Custom Volume Slider (Thin Line) */
 input[type=range].retro-range {
-  -webkit-appearance: none;
   width: 100%;
-  background: transparent;
 }
 
 input[type=range].retro-range:focus {
@@ -244,14 +260,12 @@ input[type=range].retro-range:focus {
 }
 
 input[type=range].retro-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
   height: 12px;
   width: 6px;
   border: 1px solid white;
   background: black;
-  cursor: pointer;
+  border-radius: 0;
   margin-top: -6px;
-  /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 }
 
 input[type=range].retro-range::-webkit-slider-runnable-track {
@@ -264,20 +278,14 @@ input[type=range].retro-range::-webkit-slider-runnable-track {
 
 /* Header Needle Range */
 input[type=range].header-needle-range {
-  -webkit-appearance: none;
   width: 100%;
-  background: transparent;
 }
 
 input[type=range].header-needle-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
   height: 4px;
-  /* Exact 4px square specified */
   width: 4px;
   border-radius: 0;
-  /* Square needle handle */
   background: white;
-  cursor: pointer;
   margin-top: -1.5px;
   box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
 }
@@ -307,7 +315,6 @@ input[type=range].header-needle-range::-webkit-slider-runnable-track {
 
 .mechanical-btn:active {
   transform: translate(1px, 1px);
-  /* Mechanical Switch feedback */
 }
 
 /* Marquee Animation */

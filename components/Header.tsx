@@ -157,7 +157,7 @@ const Header = () => {
 
               {/* Slider - Floating Bubble */}
               <div
-                className={`absolute top-full right-0 mt-1 p-4 bg-white rounded-xl shadow-2xl transition-all duration-200 z-[100] flex items-center ${isVolumeOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+                className={`absolute top-[calc(100%+10px)] right-0 bg-white p-3 rounded-xl shadow-2xl z-[100] flex items-center min-w-[140px] transition-all duration-200 ${isVolumeOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
                   }`}
               >
                 {/* Pointer */}
@@ -175,7 +175,7 @@ const Header = () => {
                   }}
                   onFocus={handleVolumeEnter}
                   onBlur={handleVolumeLeave}
-                  className="w-24 h-1 bg-black/10 appearance-none cursor-pointer accent-black"
+                  className="w-full h-1 bg-black/10 appearance-none cursor-pointer accent-black"
                 />
               </div>
             </div>
