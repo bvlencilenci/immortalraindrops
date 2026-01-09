@@ -14,12 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased h-screen w-screen flex flex-col overflow-hidden bg-black selection:bg-white selection:text-black">
-        <div className="h-full w-full flex flex-col overflow-hidden bg-black relative">
+      <body className="antialiased min-h-screen flex flex-col bg-black selection:bg-white selection:text-black">
+        <div className="flex-1 w-full flex flex-col bg-black relative">
           <div className="scanline pointer-events-none" />
           <div className="grain pointer-events-none" />
           <Header />
-          <div className="flex-1 w-full overflow-hidden min-h-0">
+          <div className="flex-1 w-full">
             {children}
           </div>
         </div>

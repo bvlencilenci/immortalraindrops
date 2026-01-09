@@ -117,10 +117,10 @@ const Header = () => {
                 />
               </button>
 
-              {/* Thought-Bubble Volume Slider */}
-              <div className="absolute top-[calc(100%+10px)] right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white p-3 rounded-lg shadow-2xl z-50 flex items-center pointer-events-none group-hover:pointer-events-auto">
+              {/* Slider - Floating Bubble */}
+              <div className="absolute top-full right-0 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-[100] bg-white p-4 rounded-xl shadow-2xl min-w-[140px] flex items-center">
                 {/* Pointer */}
-                <div className="absolute -top-1 right-3 w-2 h-2 bg-white rotate-45" />
+                <div className="absolute -top-1 right-3 w-3 h-3 bg-white rotate-45" />
 
                 <input
                   type="range"
