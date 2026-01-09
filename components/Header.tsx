@@ -48,9 +48,9 @@ const Header = () => {
   };
 
   return (
-    <header className={`sticky top-0 w-full h-20 flex items-center justify-between px-8 z-50 transition-all duration-300 ease-in-out ${isScrolled
-        ? "bg-white/5 backdrop-blur-xl border-b border-white/10 bg-gradient-to-b from-white/10 to-transparent"
-        : "bg-black"
+    <header className={`sticky top-0 mx-[10px] w-[calc(100%-20px)] h-20 flex items-center justify-between px-8 z-50 transition-all duration-300 ease-in-out ${isScrolled
+      ? "bg-white/5 backdrop-blur-xl border-b border-white/10 bg-gradient-to-b from-white/10 to-transparent"
+      : "bg-black"
       }`}>
       {/* Zone 1: Left - Identity & Meta */}
       <div className="flex items-baseline gap-3 z-10 shrink-0">
