@@ -169,14 +169,14 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     <div
       onClick={handleInteraction}
       className={`
-        group relative aspect-square w-full
+        group relative w-full h-full
         bg-black
         cursor-pointer overflow-hidden
         ${isActive ? 'z-20' : 'z-0'}
       `}
     >
       {/* 1. Visual Base (Milkdrop or Cover) - Edge-to-Edge */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 grayscale brightness-50 group-hover:brightness-75 transition-all duration-500">
         {isActive ? (
           <canvas
             ref={canvasRef}
@@ -184,7 +184,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           />
         ) : (
           coverImage && (
-            <div className="relative w-full h-full opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-500">
+            <div className="absolute inset-0 w-full h-full opacity-60 transition-all duration-500">
               <Image
                 src={coverImage}
                 alt={title}
@@ -198,15 +198,15 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       </div>
 
       {/* 2. Metadata HUD (Synced with Header Player) */}
-      <div className="absolute top-0 left-0 w-full h-[30%] z-10 pointer-events-none p-1 flex flex-col items-start overflow-hidden">
+      <div className="absolute top-0 left-0 w-full z-10 pointer-events-none flex flex-col items-start overflow-hidden pt-1">
         {/* Dimming overlay on hover */}
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay pl-1">
-          <span className="font-mono text-xs text-neutral-400 lowercase leading-none">
+        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay">
+          <span className="text-xs text-neutral-400 font-mono lowercase leading-none pl-1">
             {artist}
           </span>
-          <span className="font-mono text-sm md:text-base font-bold text-white uppercase mt-1 leading-none tracking-tighter">
+          <span className="text-sm font-bold text-white font-mono uppercase mt-1 leading-none pl-1">
             {title}
           </span>
         </div>

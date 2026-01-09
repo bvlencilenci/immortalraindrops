@@ -75,9 +75,8 @@
   }
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
 
 :root {
   --background: #050505;
@@ -93,9 +92,7 @@ body {
 }
 
 /* Scanline Overlay */
-body::after {
-  content: " ";
-  display: block;
+.scanline {
   position: fixed;
   top: 0;
   left: 0;
@@ -110,25 +107,8 @@ body::after {
   animation: scanline 10s linear infinite;
 }
 
-/* Header Volume Placement */
-.header-volume-container {
-  position: absolute;
-  right: 6%;
-  /* Targeted 5-7% range */
-  top: 50%;
-  transform: translateY(-50%) rotate(-90deg);
-  /* Makes horizontal slider vertical */
-  width: 60px;
-  /* Length of the fader */
-}
-
-
-
-
-
 /* Grain / Noise Texture */
-body::before {
-  content: "";
+.grain {
   position: fixed;
   top: -50%;
   left: -50%;
@@ -145,6 +125,7 @@ body::before {
   pointer-events: none;
   z-index: 9998;
 }
+
 
 @keyframes scanline {
   0% {
@@ -223,6 +204,7 @@ body::before {
 /* Tactile HUD Button */
 .hud-btn {
   appearance: none;
+  -webkit-appearance: none;
   background: transparent;
   border: 1px solid #333;
   color: #888;

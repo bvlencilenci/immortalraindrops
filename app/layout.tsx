@@ -14,9 +14,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen">
-        <Header />
-        {children}
+      <body className="antialiased h-screen w-screen bg-black overflow-hidden">
+        <div className="flex flex-col h-full w-full overflow-hidden relative">
+          <div className="scanline pointer-events-none" />
+          <div className="grain pointer-events-none" />
+          <Header />
+          <div className="flex-1 w-full overflow-hidden">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
