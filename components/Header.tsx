@@ -37,7 +37,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full h-[64px] z-[100] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 border-none text-white">
+    <header className="fixed top-0 left-0 w-full h-12 z-[100] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 border-none text-white overflow-hidden">
       {/* 1. Identity & Metadata Group */}
       <div className="flex items-center z-20 overflow-hidden pl-1 h-full gap-[5vw]">
         <h1 className="font-mono text-xs uppercase tracking-[0.3em] whitespace-nowrap pl-1">

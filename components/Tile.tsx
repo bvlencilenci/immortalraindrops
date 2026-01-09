@@ -186,26 +186,26 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       {/* 2. Dim Overlay (Hover Only) */}
       <div className="absolute inset-0 z-10 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-      {/* 3. Reactive Metadata (CQW Units + Digital Decay) */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-start p-0 pointer-events-none overflow-hidden">
+      {/* 3. Reactive Metadata (CQW Constraints + Digital Decay) - Locked to 25% Height */}
+      <div className="absolute inset-0 z-20 flex flex-col justify-start p-0 pointer-events-none overflow-hidden h-[25%] w-full">
         <div className={`
-          flex flex-col h-[30%] w-full justify-center 
+          flex flex-col w-full justify-end h-full pl-1
           transition-opacity duration-300
           ${(isActive || isBuffering) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
         `}>
-          <div className="whitespace-nowrap overflow-hidden pl-[2cqw] group-hover:animate-digital-decay">
-            <div className="inline-block animate-marquee-hardware leading-[0.8] tracking-tighter">
-              <span className="font-mono text-[4cqw] text-neutral-400 lowercase mr-[4cqw]">
+          <div className="whitespace-nowrap overflow-hidden group-hover:animate-digital-decay">
+            <div className="inline-block animate-marquee-hardware leading-[0.9] tracking-tighter">
+              <span className="font-mono text-[clamp(12px,3cqw,16px)] text-neutral-400 lowercase mr-[4cqw]">
                 {artist}
               </span>
-              <span className="font-mono text-[12cqw] font-bold text-white uppercase mr-[4cqw]">
+              <span className="font-mono text-[clamp(18px,6cqw,32px)] font-bold text-white uppercase mr-[4cqw]">
                 {title}
               </span>
               {/* Duplication for marquee */}
-              <span className="font-mono text-[4cqw] text-neutral-400 lowercase mr-[4cqw]">
+              <span className="font-mono text-[clamp(12px,3cqw,16px)] text-neutral-400 lowercase mr-[4cqw]">
                 {artist}
               </span>
-              <span className="font-mono text-[12cqw] font-bold text-white uppercase mr-[4cqw]">
+              <span className="font-mono text-[clamp(18px,6cqw,32px)] font-bold text-white uppercase mr-[4cqw]">
                 {title}
               </span>
             </div>
