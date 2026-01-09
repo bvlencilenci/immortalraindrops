@@ -202,11 +202,11 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         {/* Dimming overlay on hover */}
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay pl-1">
-          <span className="font-mono text-xs text-neutral-400 lowercase leading-none">
+        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay pl-1 w-full pr-4">
+          <span className="font-mono text-xs text-neutral-400 lowercase leading-none truncate w-full">
             {artist}
           </span>
-          <span className="font-mono text-sm md:text-base font-bold text-white uppercase mt-1 leading-none tracking-tighter">
+          <span className="font-mono text-sm font-bold text-white uppercase mt-1 leading-none tracking-widest truncate w-full">
             {title}
           </span>
         </div>
