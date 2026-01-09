@@ -30,6 +30,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     isBuffering
   } = useAudioStore();
 
+  const fileName = title.toLowerCase().trim().replace(/\s+/g, '_') + '_pic.jpg';
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -172,40 +173,32 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     >
       {/* 1. Visual Base (Milkdrop or Cover) */}
       <div className="absolute inset-0 z-0 grayscale brightness-50 group-hover:brightness-75 transition-all duration-500 w-full h-full">
-        {isActive ? (
+        {isActive && isPlaying ? (
           <canvas
             ref={canvasRef}
             className="absolute inset-0 w-full h-full block object-cover z-0"
           />
         ) : (
-          coverImage && (
-            <div className="absolute inset-0 w-full h-full opacity-60 transition-all duration-500">
-              <Image
-                src={coverImage}
-                alt={title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-          )
+          <img
+            src={'/images/' + fileName}
+            className="absolute inset-0 w-full h-full object-cover grayscale opacity-50 z-0"
+            alt=""
+          />
         )}
       </div>
 
-      {/* 2. Dimmer Layer */}
+      {/* 2. Hover Dimmer Layer */}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300 z-10 pointer-events-none" />
 
-      {/* 3. Metadata & Offset */}
-      <div className="absolute top-0 left-0 flex flex-col pt-[5px] pl-[5px] z-20 pointer-events-none">
-        <span className="text-[12px] font-mono text-neutral-400 lowercase leading-none">
+      {/* 3. Metadata & Safe-Area Offset */}
+      <div className="absolute top-[12px] left-[12px] md:top-[20px] md:left-[20px] flex flex-col z-20 pointer-events-none">
+        <span className="text-[13px] font-mono text-neutral-400 lowercase leading-none">
           {artist}
         </span>
-        <span className="text-[15px] font-mono font-bold uppercase text-white mt-[4px] leading-none">
+        <span className="text-[24px] md:text-[32px] font-bold uppercase leading-[0.9] tracking-tighter mt-2 text-white">
           {title}
         </span>
       </div>
-
-
     </div>
   );
 };

@@ -14,8 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen w-screen flex flex-col bg-black">
-        <div className="min-h-screen w-full flex flex-col bg-black relative">
+      <body className="antialiased min-h-screen flex flex-col bg-black selection:bg-white selection:text-black">
+        <div className="min-h-screen flex flex-col bg-black relative">
           <div className="scanline pointer-events-none" />
           <div className="grain pointer-events-none" />
           <Header />
