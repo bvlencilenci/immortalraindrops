@@ -13,7 +13,7 @@ export default async function Home() {
   const tracks = await getData();
 
   return (
-    <main className="min-h-screen w-full pt-20 bg-black">
+    <main className="min-h-screen w-full bg-black">
       <ArchiveGrid tracks={tracks} />
     </main>
   );
