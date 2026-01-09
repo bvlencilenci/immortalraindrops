@@ -71,7 +71,7 @@ const Header = () => {
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-              className="flex items-center justify-center bg-white/5 w-12 h-12 rounded-full transition-all duration-200 border border-white/10 hover:bg-white/10 hover:scale-105"
+              className="flex items-center justify-center bg-white/5 w-9 h-9 rounded-full transition-all duration-200 border border-white/10 hover:bg-white/10 hover:scale-110"
               title={isPlaying ? "Pause" : "Play"}
             >
               <img
@@ -91,47 +91,57 @@ const Header = () => {
         )}
       </div>
 
-      {/* Zone 3: Right - Volume & Time */}
-      <div className="flex-1 flex justify-end items-center gap-6 z-10 shrink-0">
-        <div className="flex items-center gap-6">
-          {/* Timestamp */}
-          <span className="font-mono text-[14px] text-white tracking-widest leading-none tabular-nums">
-            {isPlayerActive ? `${formatTime(seek)} / ${formatTime(duration)}` : "--:-- / --:--"}
-          </span>
-
+      {/* Zone 3: Right - Utility Stack (Volume & Time) */}
+      <div className="flex-1 flex justify-end items-center z-10 shrink-0">
+        <div className="flex flex-col items-end gap-1.5 mr-8">
           {isPlayerActive && (
-            <div className="flex items-center gap-4">
-              {/* Fixed Volume Slider - Nestled between Time and Icon */}
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  adjustVolume(parseFloat(e.target.value));
-                }}
-                className="w-[110px] h-[3px] bg-white/20 rounded-full appearance-none accent-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
-              />
-              <button
-                className="flex items-center justify-center translate-y-[1px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  adjustVolume(volume > 0 ? 0 : 0.5);
-                }}
-              >
-                <img
-                  src={getVolumeIcon()}
-                  alt="Volume"
-                  className="w-5 h-5 invert opacity-100"
+            <>
+              {/* Row 1: Volume Control */}
+              <div className="flex items-center gap-3">
+                <button
+                  className="flex items-center justify-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    adjustVolume(volume > 0 ? 0 : 0.5);
+                  }}
+                >
+                  <img
+                    src={getVolumeIcon()}
+                    alt="Volume"
+                    className="w-4 h-4 invert opacity-70"
+                  />
+                </button>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    adjustVolume(parseFloat(e.target.value));
+                  }}
+                  style={{
+                    background: `linear-gradient(to right, white ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%)`
+                  }}
+                  className="w-[110px] h-[3px] rounded-full appearance-none cursor-pointer accent-transparent 
+                  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-0 [&::-webkit-slider-thumb]:h-0"
                 />
-              </button>
-            </div>
+              </div>
+
+              {/* Row 2: Metadata Timestamp */}
+              <span className="font-mono text-[12px] text-white/70 tracking-widest leading-none tabular-nums">
+                {formatTime(seek)} / {formatTime(duration)}
+              </span>
+            </>
+          )}
+
+          {!isPlayerActive && (
+            <span className="font-mono text-[12px] text-white/30 tracking-widest leading-none tabular-nums">
+              --:-- / --:--
+            </span>
           )}
         </div>
-        {/* Reserved area for future nav */}
-        <div className="w-6 h-6 flex items-center justify-center opacity-0 pointer-events-none" />
       </div>
 
       {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
