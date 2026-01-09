@@ -191,17 +191,17 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
           <div className="flex flex-col w-full h-full justify-end opacity-100 transition-opacity duration-300">
             <div className="whitespace-nowrap overflow-hidden group-hover:animate-digital-decay">
               <div className="inline-block animate-marquee-hardware leading-[0.9] tracking-tighter">
-                <span className="font-mono text-[clamp(12px,2vw,16px)] text-neutral-400 lowercase mr-[4cqw]">
+                <span className="font-mono text-[clamp(10px,2vw,14px)] text-neutral-400 lowercase mr-[4cqw]">
                   {artist}
                 </span>
-                <span className="font-mono text-[clamp(16px,5vw,32px)] font-bold text-white uppercase mr-[4cqw]">
+                <span className="font-mono text-[clamp(14px,3vw,24px)] font-bold text-white uppercase mr-[4cqw]">
                   {title}
                 </span>
                 {/* Duplication for marquee */}
-                <span className="font-mono text-[clamp(12px,2vw,16px)] text-neutral-400 lowercase mr-[4cqw]">
+                <span className="font-mono text-[clamp(10px,2vw,14px)] text-neutral-400 lowercase mr-[4cqw]">
                   {artist}
                 </span>
-                <span className="font-mono text-[clamp(16px,5vw,32px)] font-bold text-white uppercase mr-[4cqw]">
+                <span className="font-mono text-[clamp(14px,3vw,24px)] font-bold text-white uppercase mr-[4cqw]">
                   {title}
                 </span>
               </div>
