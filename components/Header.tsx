@@ -93,10 +93,10 @@ const Header = () => {
 
       {/* Zone 3: Right - Utility Stack (Volume & Time) */}
       <div className="flex-1 flex justify-end items-center z-10 shrink-0">
-        <div className="flex flex-col items-end gap-1.5 mr-8">
-          {isPlayerActive && (
+        <div className="flex flex-col items-end gap-1 mr-8">
+          {isPlayerActive ? (
             <>
-              {/* Row 1: Volume Control */}
+              {/* Row 1: Volume Utility (Solid Fill) */}
               <div className="flex items-center gap-3">
                 <button
                   className="flex items-center justify-center"
@@ -134,9 +134,7 @@ const Header = () => {
                 {formatTime(seek)} / {formatTime(duration)}
               </span>
             </>
-          )}
-
-          {!isPlayerActive && (
+          ) : (
             <span className="font-mono text-[12px] text-white/30 tracking-widest leading-none tabular-nums">
               --:-- / --:--
             </span>
@@ -145,16 +143,19 @@ const Header = () => {
       </div>
 
       {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
-      <div className="absolute bottom-0 left-0 right-0 h-[16px] group/horizon cursor-pointer z-[60]">
+      <div className="absolute bottom-0 left-0 right-0 w-full h-[16px] group cursor-pointer z-50">
+        {/* Transparent Background Track */}
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:h-[8px] transition-all duration-200 z-10" />
+
         {/* The active fill line (single source of truth for progress) */}
         <div
-          className="absolute bottom-0 left-0 h-[2px] bg-white group-hover/horizon:h-[8px] transition-all duration-200 ease-in-out z-20 pointer-events-none"
+          className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
           style={{ width: `${progressPercent}%` }}
         />
 
         {/* Hover-only tracking ball */}
         <div
-          className="absolute bottom-[4px] -translate-x-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover/horizon:opacity-100 transition-opacity duration-200 z-30 pointer-events-none"
+          className="absolute bottom-[4px] -translate-x-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 pointer-events-none"
           style={{ left: `${progressPercent}%` }}
         />
 
@@ -170,7 +171,7 @@ const Header = () => {
             e.stopPropagation();
             useAudioStore.getState().seekTo(parseFloat(e.target.value));
           }}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-40"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[60]"
         />
       </div>
     </header>
