@@ -168,7 +168,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
   return (
     <div
       onClick={handleInteraction}
-      className="aspect-square w-full relative overflow-hidden group border-r border-b border-white/5 cursor-pointer bg-black"
+      className="w-full relative aspect-square overflow-hidden group border-r border-b border-white/5 cursor-pointer bg-black"
     >
       {/* 1. Visual Base (Milkdrop or Cover) */}
       <div className="absolute inset-0 z-0 grayscale brightness-50 group-hover:brightness-75 transition-all duration-500 w-full h-full">
