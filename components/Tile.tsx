@@ -155,7 +155,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       onClick={handleInteraction}
       className={`
         group relative aspect-square w-full
-        bg-black
+        bg-black container-size
         cursor-pointer overflow-hidden
         outline-none border-none shadow-none
         ${isActive ? 'z-20' : 'z-0'}
@@ -186,38 +186,42 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       {/* 2. Dim Overlay (Hover Only) */}
       <div className="absolute inset-0 z-10 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-      {/* 3. Hover-Only Metadata Animation (Architectural Scale) */}
+      {/* 3. Reactive Metadata (CQW Units + Digital Decay) */}
       <div className="absolute inset-0 z-20 flex flex-col justify-start p-0 pointer-events-none overflow-hidden">
-        <div className="flex flex-col h-[30%] w-full justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
-          <div className="whitespace-nowrap overflow-hidden pl-1">
+        <div className={`
+          flex flex-col h-[30%] w-full justify-center 
+          transition-opacity duration-300
+          ${(isActive || isBuffering) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+        `}>
+          <div className="whitespace-nowrap overflow-hidden pl-[2cqw] group-hover:animate-digital-decay">
             <div className="inline-block animate-marquee-hardware leading-[0.8] tracking-tighter">
-              <span className="font-mono text-[4vw] md:text-[2vw] text-neutral-400 lowercase mr-8">
+              <span className="font-mono text-[4cqw] text-neutral-400 lowercase mr-[4cqw]">
                 {artist}
               </span>
-              <span className="font-mono text-[8vw] md:text-[4vw] font-bold text-white uppercase mr-8">
+              <span className="font-mono text-[12cqw] font-bold text-white uppercase mr-[4cqw]">
                 {title}
               </span>
               {/* Duplication for marquee */}
-              <span className="font-mono text-[4vw] md:text-[2vw] text-neutral-400 lowercase mr-8">
+              <span className="font-mono text-[4cqw] text-neutral-400 lowercase mr-[4cqw]">
                 {artist}
               </span>
-              <span className="font-mono text-[8vw] md:text-[4vw] font-bold text-white uppercase mr-8">
+              <span className="font-mono text-[12cqw] font-bold text-white uppercase mr-[4cqw]">
                 {title}
               </span>
             </div>
           </div>
           {/* Hardware Indent Safety Marker */}
-          <div className="absolute top-0 left-0 w-1 h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-[1cqw] h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </div>
 
-      {/* 4. Subtle Playback Indicator */}
+      {/* 4. Playback Indicator */}
       {isActive && isPlaying && (
-        <div className="absolute bottom-4 right-4 z-20 pointer-events-none opacity-60">
-          <div className="flex gap-1 items-end h-4">
-            <div className="w-1 bg-white animate-[music-bar_0.8s_ease-in-out_infinite]" />
-            <div className="w-1 bg-white animate-[music-bar_0.6s_ease-in-out_infinite_0.1s]" />
-            <div className="w-1 bg-white animate-[music-bar_1.1s_ease-in-out_infinite_0.2s]" />
+        <div className="absolute bottom-[4cqw] right-[4cqw] z-20 pointer-events-none opacity-60">
+          <div className="flex gap-1 items-end h-[4cqw]">
+            <div className="w-[1cqw] bg-white animate-[music-bar_0.8s_ease-in-out_infinite]" />
+            <div className="w-[1cqw] bg-white animate-[music-bar_0.6s_ease-in-out_infinite_0.1s]" />
+            <div className="w-[1cqw] bg-white animate-[music-bar_1.1s_ease-in-out_infinite_0.2s]" />
           </div>
         </div>
       )}
