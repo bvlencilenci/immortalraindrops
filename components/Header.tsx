@@ -137,31 +137,7 @@ const Header = () => {
         )}
       </div>
 
-      {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
-      {isPlayerActive && (
-        <div className="absolute bottom-0 left-0 right-0 w-full h-[16px] group cursor-pointer z-50">
-          {/* Dual-Layer Progress Scrubber */}
-          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:h-[8px] transition-all duration-200 z-10" />
-          <div
-            className="absolute bottom-0 left-0 h-[2px] bg-white transition-all duration-200 ease-in-out group-hover:h-[8px] z-20"
-            style={{ width: `${progressPercent}%` }}
-          />
 
-          {/* Full-width functional scrubber hitbox */}
-          <input
-            type="range"
-            min="0"
-            max={duration || 100}
-            step="0.1"
-            value={seek}
-            onChange={(e) => {
-              e.stopPropagation();
-              useAudioStore.getState().seekTo(parseFloat(e.target.value));
-            }}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[60]"
-          />
-        </div>
-      )}
     </header>
   );
 };
