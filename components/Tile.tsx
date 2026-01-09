@@ -172,7 +172,6 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         group relative aspect-square w-full
         bg-black
         cursor-pointer overflow-hidden
-        outline-none border-none shadow-none
         ${isActive ? 'z-20' : 'z-0'}
       `}
     >
@@ -181,7 +180,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         {isActive ? (
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 w-full h-full block object-cover"
+            className="absolute inset-0 w-full h-full block object-cover z-0"
           />
         ) : (
           coverImage && (
@@ -198,12 +197,12 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         )}
       </div>
 
-      {/* 2. Dim Overlay & Reactive Metadata (CQW Constraints + Digital Decay) - Locked to 25% Height */}
-      <div className="absolute top-0 left-0 w-full z-10 pointer-events-none p-1">
+      {/* 2. Dim Overlay & Reactive Metadata (Persistent HUD) - Locked to 25% Height */}
+      <div className="absolute top-0 left-0 w-full h-[25%] z-10 pointer-events-none p-1">
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
         <div className="relative w-full h-full flex flex-col justify-end">
-          <div className="flex flex-col w-full h-full justify-end opacity-100 transition-opacity duration-300">
+          <div className="flex flex-col w-full h-full justify-end opacity-100">
             <div className="whitespace-nowrap overflow-hidden group-hover:animate-digital-decay">
               <div className="inline-block animate-marquee-hardware leading-[0.9] tracking-tighter">
                 <span className="font-mono text-[clamp(10px,2vw,14px)] text-neutral-400 lowercase mr-[4cqw]">
