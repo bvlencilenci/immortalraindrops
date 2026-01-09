@@ -150,12 +150,27 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     return "/speaker-simple-high.svg";
   };
 
+  // Handle window resize to sync visualizer dimensions
+  useEffect(() => {
+    const handleResize = () => {
+      if (visualizerRef.current && canvasRef.current) {
+        const { width, height } = canvasRef.current.parentElement?.getBoundingClientRect() || { width: 0, height: 0 };
+        if (width > 0 && height > 0) {
+          visualizerRef.current.setRendererSize(width, height);
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div
       onClick={handleInteraction}
       className={`
         group relative aspect-square w-full
-        bg-black container-size
+        bg-black
         cursor-pointer overflow-hidden
         outline-none border-none shadow-none
         ${isActive ? 'z-20' : 'z-0'}
@@ -166,7 +181,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         {isActive ? (
           <canvas
             ref={canvasRef}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full block object-cover"
           />
         ) : (
           coverImage && (
@@ -184,7 +199,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
       </div>
 
       {/* 2. Dim Overlay & Reactive Metadata (CQW Constraints + Digital Decay) - Locked to 25% Height */}
-      <div className="absolute top-0 left-0 w-full h-[25%] z-10 pointer-events-none p-1">
+      <div className="absolute top-0 left-0 w-full z-10 pointer-events-none p-1">
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
         <div className="relative w-full h-full flex flex-col justify-end">
