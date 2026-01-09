@@ -39,7 +39,7 @@ const Header = () => {
   return (
     <header className="relative w-full h-20 z-50 bg-black/80 backdrop-blur-md flex items-center px-4 md:px-6 border-b border-white/10 text-white overflow-hidden flex-shrink-0">
       {/* Zone 1: Left - Identity & Meta */}
-      <div className="flex items-center gap-8 z-10">
+      <div className="flex items-center gap-6 z-10">
         {/* Column 1: Station Identity */}
         <div className="flex flex-col justify-center">
           <span className="font-mono text-[14px] font-bold tracking-widest leading-none">IMMORTAL</span>
@@ -48,11 +48,11 @@ const Header = () => {
 
         {/* Column 2: Metadata Block */}
         {isPlayerActive && (
-          <div className="flex flex-col justify-center border-l border-white/10 pl-4">
-            <span className="font-mono text-[10px] uppercase text-neutral-500 leading-none h-[14px] flex items-end truncate">
+          <div className="flex flex-col justify-center border-l border-white/20 pl-4">
+            <span className="font-mono text-[12px] text-neutral-500 lowercase leading-none truncate">
               {trackArtist}
             </span>
-            <span className="font-mono text-[14px] font-bold uppercase text-white leading-none h-[14px] flex items-end truncate">
+            <span className="font-mono text-[14px] text-white uppercase font-bold leading-none mt-1 truncate">
               {trackTitle}
             </span>
           </div>
@@ -118,24 +118,22 @@ const Header = () => {
               </button>
 
               {/* Thought-Bubble Volume Slider */}
-              <div className="absolute top-full right-0 mt-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 z-50">
-                <div className="bg-white p-3 rounded-xl shadow-xl flex items-center justify-center min-w-[120px] relative">
-                  {/* Triangle Pointer */}
-                  <div className="absolute -top-1 right-3 w-3 h-3 bg-white rotate-45" />
+              <div className="absolute top-[calc(100%+10px)] right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white p-3 rounded-lg shadow-2xl z-50 flex items-center pointer-events-none group-hover:pointer-events-auto">
+                {/* Pointer */}
+                <div className="absolute -top-1 right-3 w-2 h-2 bg-white rotate-45" />
 
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      adjustVolume(parseFloat(e.target.value));
-                    }}
-                    className="w-24 h-1 bg-black/20 appearance-none cursor-pointer fader-thumb accent-black"
-                  />
-                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    adjustVolume(parseFloat(e.target.value));
+                  }}
+                  className="w-24 h-1 bg-black/20 appearance-none cursor-pointer fader-thumb accent-black"
+                />
               </div>
             </div>
           </div>
