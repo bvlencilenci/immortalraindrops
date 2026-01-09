@@ -19,7 +19,7 @@ export default function RootLayout({
           <div className="scanline pointer-events-none" />
           <div className="grain pointer-events-none" />
           <Header />
-          <div className="flex-1 w-full">
+          <div className="flex-1 w-full pt-20">
             {children}
           </div>
         </div>

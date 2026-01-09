@@ -38,7 +38,7 @@ const Header = () => {
   };
 
   return (
-    <header className="relative h-20 w-full flex items-center justify-between px-[4%] bg-black z-50">
+    <header className="fixed top-0 left-0 right-0 h-20 w-full flex items-center justify-between px-[4%] bg-black z-50">
       {/* Zone 1: Left - Identity & Meta */}
       <div className="flex items-baseline gap-3 z-10 shrink-0">
         {/* Column 1: Station Identity */}
