@@ -168,7 +168,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
   return (
     <div
       onClick={handleInteraction}
-      className="relative w-full h-full overflow-hidden group border-r border-white/5 last:border-r-0 aspect-square max-h-full cursor-pointer bg-black"
+      className="aspect-square w-full relative overflow-hidden group border-r border-b border-white/5 cursor-pointer bg-black"
     >
       {/* 1. Visual Base (Milkdrop or Cover) */}
       <div className="absolute inset-0 z-0 grayscale brightness-50 group-hover:brightness-75 transition-all duration-500 w-full h-full">
@@ -197,10 +197,10 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
       {/* 3. Metadata & Offset */}
       <div className="absolute top-0 left-0 flex flex-col pt-[5px] pl-[5px] z-20 pointer-events-none">
-        <span className="text-xs font-mono text-neutral-400 lowercase leading-none">
+        <span className="text-[10px] font-mono text-neutral-400 lowercase leading-none">
           {artist}
         </span>
-        <span className="text-sm font-bold font-mono uppercase text-white mt-1 leading-none">
+        <span className="text-[12px] font-bold font-mono uppercase text-white mt-1 leading-none">
           {title}
         </span>
       </div>

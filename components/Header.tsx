@@ -37,19 +37,19 @@ const Header = () => {
   };
 
   return (
-    <header className="h-full w-full border-b border-white/10 relative z-[100] bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 text-white overflow-hidden">
+    <header className="fixed top-0 left-0 w-full h-20 z-50 bg-[#050505cc] backdrop-blur-md flex items-center justify-between px-1 border-b border-white/10 text-white overflow-hidden">
       {/* 1. Identity & Metadata Group */}
-      <div className="flex items-center z-20 overflow-hidden pl-1 h-full gap-[5vw]">
-        <h1 className="font-mono text-xs uppercase tracking-[0.3em] whitespace-nowrap pl-1">
+      <div className="flex items-center z-20 overflow-hidden pl-1 h-full gap-8">
+        <h1 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] whitespace-nowrap pl-1">
           Immortal Raindrops
         </h1>
 
         {isPlayerActive && (
           <div className="flex flex-col py-1 overflow-hidden max-w-[450px] h-full justify-center">
-            <span className="font-mono text-xs text-neutral-400 lowercase leading-none truncate pl-1">
+            <span className="font-mono text-[10px] text-neutral-400 lowercase leading-none truncate pl-1">
               {trackArtist}
             </span>
-            <span className="font-mono text-sm font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest leading-none mt-1 truncate pl-1">
               {trackTitle}
             </span>
           </div>
@@ -58,41 +58,41 @@ const Header = () => {
 
       {/* 2. Hardware Console Group (Conditional Visibility) */}
       {isPlayerActive && (
-        <div className="flex items-center gap-6 z-20 pr-1 h-full">
+        <div className="flex items-center gap-4 z-20 pr-1 h-full">
           {/* Playback Controls */}
           <div className="flex items-center gap-1 bg-transparent border-none h-full">
             <button
               onClick={(e) => { e.stopPropagation(); skipBack(); }}
-              className="w-10 h-10 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
               title="Previous / Restart"
             >
-              <img src="/skip-back.svg" alt="Back" className="w-4 h-4 invert opacity-80" />
+              <img src="/skip-back.svg" alt="Back" className="w-3 h-3 invert opacity-80" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-              className="w-12 h-12 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="w-10 h-10 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
               title={isPlaying ? "Pause" : "Play"}
             >
               <img
                 src={isPlaying ? "/pause.svg" : "/play.svg"}
                 alt={isPlaying ? "Pause" : "Play"}
-                className="w-6 h-6 invert opacity-80"
+                className="w-5 h-5 invert opacity-80"
               />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-              className="w-10 h-10 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
+              className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity"
               title="Skip"
             >
-              <img src="/skip-forward.svg" alt="Skip" className="w-4 h-4 invert opacity-80" />
+              <img src="/skip-forward.svg" alt="Skip" className="w-3 h-3 invert opacity-80" />
             </button>
           </div>
 
           {/* Volume & Timer */}
-          <div className="flex items-center gap-4 h-full">
+          <div className="flex items-center gap-3 h-full">
             <div className="relative flex items-center h-full group/volume">
               <button
-                className="w-8 h-8 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative z-10"
+                className="w-6 h-6 flex items-center justify-center border-none bg-transparent hover:opacity-50 transition-opacity relative z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   adjustVolume(volume > 0 ? 0 : 0.5);
@@ -101,11 +101,11 @@ const Header = () => {
                 <img
                   src={getVolumeIcon()}
                   alt="Volume"
-                  className="w-4 h-4 invert opacity-80"
+                  className="w-3 h-3 invert opacity-80"
                 />
               </button>
 
-              <div className="absolute top-[calc(50%+14px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-32 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center">
+              <div className="absolute top-[calc(50%+14px)] left-1/2 -translate-x-1/2 w-0 group-hover/volume:w-24 h-[1px] bg-white transition-all duration-300 pointer-events-none opacity-0 group-hover/volume:opacity-100 overflow-hidden flex items-center">
                 <input
                   type="range"
                   min="0"
@@ -121,8 +121,8 @@ const Header = () => {
               </div>
             </div>
 
-            <div className="min-w-[100px] text-right flex items-center pr-1 h-full">
-              <span className="font-mono text-[10px] md:text-xs text-white/40 tabular-nums uppercase tracking-[0.2em] whitespace-nowrap">
+            <div className="min-w-[80px] text-right flex items-center pr-1 h-full">
+              <span className="font-mono text-[10px] text-white/40 tabular-nums uppercase tracking-[0.2em] whitespace-nowrap">
                 {formatTime(seek)} / {formatTime(duration)}
               </span>
             </div>
