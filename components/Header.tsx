@@ -101,6 +101,7 @@ const Header = () => {
 
           {isPlayerActive && (
             <div className="flex items-center gap-4">
+              {/* Fixed Volume Slider - Nestled between Time and Icon */}
               <input
                 type="range"
                 min="0"
@@ -111,10 +112,10 @@ const Header = () => {
                   e.stopPropagation();
                   adjustVolume(parseFloat(e.target.value));
                 }}
-                className="w-[110px] h-[3px] bg-white/30 rounded-full appearance-none accent-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
+                className="w-[110px] h-[3px] bg-white/20 rounded-full appearance-none accent-white [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
               />
               <button
-                className="flex items-center justify-center"
+                className="flex items-center justify-center translate-y-[1px]"
                 onClick={(e) => {
                   e.stopPropagation();
                   adjustVolume(volume > 0 ? 0 : 0.5);
@@ -133,24 +134,21 @@ const Header = () => {
         <div className="w-6 h-6 flex items-center justify-center opacity-0 pointer-events-none" />
       </div>
 
-      {/* Bottom Zone: Expanding Progress Bar Console */}
-      <div className="absolute bottom-0 left-0 w-full h-[16px] group/scrubber cursor-pointer z-50">
-        {/* Background Track (Expands on Hover) */}
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover/scrubber:h-[8px] transition-all duration-200 ease-in-out z-10" />
-
-        {/* Progress Fill (Expands on Hover) */}
+      {/* Bottom Zone: Single Dynamic Progress Bar Horizon */}
+      <div className="absolute bottom-0 left-0 right-0 h-[16px] group/horizon cursor-pointer z-[60]">
+        {/* The active fill line (single source of truth for progress) */}
         <div
-          className="absolute bottom-0 left-0 h-[2px] bg-white group-hover/scrubber:h-[8px] transition-all duration-200 ease-in-out z-20 pointer-events-none"
+          className="absolute bottom-0 left-0 h-[2px] bg-white group-hover/horizon:h-[8px] transition-all duration-200 ease-in-out z-20 pointer-events-none"
           style={{ width: `${progressPercent}%` }}
         />
 
-        {/* Hover-Only Thumb (The Ball) */}
+        {/* Hover-only tracking ball */}
         <div
-          className="absolute bottom-[4px] -translate-x-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover/scrubber:opacity-100 transition-opacity duration-200 z-30 pointer-events-none"
+          className="absolute bottom-[4px] -translate-x-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover/horizon:opacity-100 transition-opacity duration-200 z-30 pointer-events-none"
           style={{ left: `${progressPercent}%` }}
         />
 
-        {/* Functional Invisible Input */}
+        {/* Full-width functional scrubber hitbox */}
         <input
           type="range"
           min="0"
