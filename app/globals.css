@@ -1,3 +1,80 @@
+@layer utilities {
+  .container-size {
+    container-type: size;
+  }
+}
+
+@keyframes digital-decay {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  10% {
+    opacity: 0.8;
+    transform: translateX(-2px);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translateX(2px) scaleY(1.05);
+  }
+
+  30% {
+    opacity: 0.5;
+    transform: translateX(-1px);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: skewX(5deg);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-digital-decay {
+  animation: digital-decay 0.3s steps(2, end) infinite;
+}
+
+@keyframes marquee-hardware {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-hardware {
+  display: inline-block;
+  animation: marquee-hardware 15s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes music-bar {
+
+  0%,
+  100% {
+    height: 4px;
+  }
+
+  50% {
+    height: 16px;
+  }
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

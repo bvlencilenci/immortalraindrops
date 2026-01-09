@@ -183,31 +183,32 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         )}
       </div>
 
-      {/* 2. Dim Overlay (Hover Only) */}
-      <div className="absolute inset-0 z-10 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      {/* 2. Dim Overlay & Reactive Metadata (CQW Constraints + Digital Decay) - Locked to 25% Height */}
+      <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden h-full w-full">
+        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      {/* 3. Reactive Metadata (CQW Constraints + Digital Decay) - Locked to 25% Height */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-start p-0 pointer-events-none overflow-hidden h-[25%] w-full">
-        <div className={`
-          flex flex-col w-full justify-end h-full pl-1
-          transition-opacity duration-300
-          ${(isActive || isBuffering) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
-        `}>
-          <div className="whitespace-nowrap overflow-hidden group-hover:animate-digital-decay">
-            <div className="inline-block animate-marquee-hardware leading-[0.9] tracking-tighter">
-              <span className="font-mono text-[clamp(12px,2vw,16px)] text-neutral-400 lowercase mr-[4cqw]">
-                {artist}
-              </span>
-              <span className="font-mono text-[clamp(16px,5vw,32px)] font-bold text-white uppercase mr-[4cqw]">
-                {title}
-              </span>
-              {/* Duplication for marquee */}
-              <span className="font-mono text-[clamp(12px,2vw,16px)] text-neutral-400 lowercase mr-[4cqw]">
-                {artist}
-              </span>
-              <span className="font-mono text-[clamp(16px,5vw,32px)] font-bold text-white uppercase mr-[4cqw]">
-                {title}
-              </span>
+        <div className="absolute top-0 left-0 w-full h-[25%] flex flex-col justify-end pl-1">
+          <div className={`
+            flex flex-col w-full h-full justify-end
+            transition-opacity duration-300
+            ${(isActive || isBuffering) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+          `}>
+            <div className="whitespace-nowrap overflow-hidden group-hover:animate-digital-decay">
+              <div className="inline-block animate-marquee-hardware leading-[0.9] tracking-tighter">
+                <span className="font-mono text-[clamp(12px,2vw,16px)] text-neutral-400 lowercase mr-[4cqw]">
+                  {artist}
+                </span>
+                <span className="font-mono text-[clamp(16px,5vw,32px)] font-bold text-white uppercase mr-[4cqw]">
+                  {title}
+                </span>
+                {/* Duplication for marquee */}
+                <span className="font-mono text-[clamp(12px,2vw,16px)] text-neutral-400 lowercase mr-[4cqw]">
+                  {artist}
+                </span>
+                <span className="font-mono text-[clamp(16px,5vw,32px)] font-bold text-white uppercase mr-[4cqw]">
+                  {title}
+                </span>
+              </div>
             </div>
           </div>
           {/* Hardware Indent Safety Marker */}
