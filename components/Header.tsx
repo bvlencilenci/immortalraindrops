@@ -39,17 +39,20 @@ const Header = () => {
   return (
     <header className="relative w-full h-20 z-50 bg-black/80 backdrop-blur-md flex items-center px-4 md:px-6 border-b border-white/10 text-white overflow-hidden flex-shrink-0">
       {/* Zone 1: Left - Identity & Meta */}
-      <div className="flex flex-col justify-center min-w-0 z-10">
-        <h1 className="font-mono text-[16px] font-bold uppercase tracking-[0.2em] leading-none truncate">
-          Immortal Raindrops
-        </h1>
+      <div className="flex items-center gap-8 z-10">
+        {/* Column 1: Station Identity */}
+        <div className="flex flex-col justify-center">
+          <span className="font-mono text-[14px] font-bold tracking-widest leading-none">IMMORTAL</span>
+          <span className="font-mono text-[14px] font-bold tracking-widest leading-none">RAINDROPS</span>
+        </div>
+
+        {/* Column 2: Metadata Block */}
         {isPlayerActive && (
-          <div className="flex items-center gap-2 mt-2 overflow-hidden">
-            <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-widest leading-none truncate shrink-0">
+          <div className="flex flex-col justify-center border-l border-white/10 pl-4">
+            <span className="font-mono text-[10px] uppercase text-neutral-500 leading-none h-[14px] flex items-end truncate">
               {trackArtist}
             </span>
-            <span className="w-1 h-1 bg-neutral-700 rounded-full shrink-0" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest leading-none truncate">
+            <span className="font-mono text-[14px] font-bold uppercase text-white leading-none h-[14px] flex items-end truncate">
               {trackTitle}
             </span>
           </div>
