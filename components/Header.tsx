@@ -51,10 +51,10 @@ const Header = () => {
   };
 
   const getVolumeIcon = () => {
-    if (volume === 0) return "/speaker-simple-slash.svg";
-    if (volume <= 0.3) return "/speaker-simple-low.svg";
-    if (volume <= 0.7) return "/speaker-simple-none.svg";
-    return "/speaker-simple-high.svg";
+    if (volume === 0) return "/speaker-simple-slash.svg"; // Mute (0%)
+    if (volume <= 0.25) return "/speaker-simple-none.svg"; // Icon only (1-25%)
+    if (volume <= 0.75) return "/speaker-simple-low.svg"; // One wave (26-75%)
+    return "/speaker-simple-high.svg"; // Full waves (76-100%)
   };
 
   return (
@@ -81,35 +81,51 @@ const Header = () => {
       </div>
 
       {/* Zone 2: True Viewport Center (The Player) */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-auto">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-auto w-full max-w-[300px]">
         {isPlayerActive && (
-          <div className="flex items-center gap-6">
-            <button
-              onClick={(e) => { e.stopPropagation(); skipBack(); }}
-              className="group flex items-center justify-center transition-all duration-200"
-              title="Previous / Restart"
-            >
-              <img src="/skip-back.svg" alt="Back" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-              className="group flex items-center justify-center bg-white/5 hover:bg-white/10 w-12 h-12 rounded-full transition-all duration-200 border border-white/10"
-              title={isPlaying ? "Pause" : "Play"}
-            >
-              <img
-                src={isPlaying ? "/pause.svg" : "/play.svg"}
-                alt={isPlaying ? "Pause" : "Play"}
-                className="w-5 h-5 invert opacity-80 group-hover:opacity-100"
-              />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-              className="group flex items-center justify-center transition-all duration-200"
-              title="Skip"
-            >
-              <img src="/skip-forward.svg" alt="Skip" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
-            </button>
-          </div>
+          <>
+            <div className="flex items-center gap-6">
+              <button
+                onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                className="group flex items-center justify-center transition-all duration-200"
+                title="Previous / Restart"
+              >
+                <img src="/skip-back.svg" alt="Back" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                className="group flex items-center justify-center bg-white/5 hover:bg-white/10 w-12 h-12 rounded-full transition-all duration-200 border border-white/10"
+                title={isPlaying ? "Pause" : "Play"}
+              >
+                <img
+                  src={isPlaying ? "/pause.svg" : "/play.svg"}
+                  alt={isPlaying ? "Pause" : "Play"}
+                  className="w-5 h-5 invert opacity-80 group-hover:opacity-100"
+                />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                className="group flex items-center justify-center transition-all duration-200"
+                title="Skip"
+              >
+                <img src="/skip-forward.svg" alt="Skip" className="w-6 h-6 invert opacity-60 group-hover:opacity-100 transition-opacity" />
+              </button>
+            </div>
+
+            {/* Main Seeker */}
+            <input
+              type="range"
+              min="0"
+              max={duration || 100}
+              step="0.1"
+              value={seek}
+              onChange={(e) => {
+                e.stopPropagation();
+                useAudioStore.getState().seekTo(parseFloat(e.target.value));
+              }}
+              className="w-full h-1 bg-neutral-800 accent-white appearance-none cursor-pointer mt-3"
+            />
+          </>
         )}
       </div>
 
@@ -119,7 +135,7 @@ const Header = () => {
           <div className="flex items-center gap-6 h-full">
             {/* Volume Control Wrapper */}
             <div
-              className="relative py-2"
+              className="relative py-2 flex items-center"
               onMouseEnter={handleVolumeEnter}
               onMouseLeave={handleVolumeLeave}
             >
@@ -153,13 +169,13 @@ const Header = () => {
                   max="1"
                   step="0.01"
                   value={volume}
-                  onChange={(e) => {
+                  onInput={(e) => {
                     e.stopPropagation();
-                    adjustVolume(parseFloat(e.target.value));
+                    adjustVolume(parseFloat((e.target as HTMLInputElement).value));
                   }}
                   onFocus={handleVolumeEnter}
                   onBlur={handleVolumeLeave}
-                  className="w-24 h-1 bg-black/20 appearance-none cursor-pointer fader-thumb accent-black"
+                  className="w-24 h-1 bg-black/10 appearance-none cursor-pointer accent-black"
                 />
               </div>
             </div>
@@ -174,25 +190,6 @@ const Header = () => {
         <div className="w-6 h-6 flex items-center justify-center opacity-0 pointer-events-none" />
       </div>
 
-      {/* 1px Master Seeker Line at Bottom (Full Width) */}
-      <div
-        className="absolute bottom-0 left-0 w-full h-[1px] cursor-pointer group/seeker z-[60]"
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const percent = x / rect.width;
-          useAudioStore.getState().seekTo(percent * duration);
-        }}
-      >
-        <div className="absolute inset-0 bg-white/5" />
-        <div
-          className="h-full bg-white transition-[width] duration-300 ease-out relative"
-          style={{ width: `${progressPercent}%` }}
-        >
-          {/* Seeker Handle (Only visible on hover) */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[2px] h-[10px] bg-white opacity-0 group-hover/seeker:opacity-100 transition-opacity shadow-[0_0_10px_white]" />
-        </div>
-      </div>
     </header>
   );
 };
