@@ -197,33 +197,22 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         )}
       </div>
 
-      {/* 2. Dim Overlay & Reactive Metadata (Persistent HUD) - Locked to 25% Height */}
-      <div className="absolute top-0 left-0 w-full h-[25%] z-10 pointer-events-none p-1">
+      {/* 2. Metadata HUD (Hardware Label Stack) */}
+      <div className="absolute top-0 left-0 w-full h-[30%] z-10 pointer-events-none p-1 pl-1 flex flex-col justify-start">
+        {/* Hover Dimming Overlay background */}
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-        <div className="relative w-full h-full flex flex-col justify-end">
-          <div className="flex flex-col w-full h-full justify-end opacity-100">
-            <div className="whitespace-nowrap overflow-hidden group-hover:animate-digital-decay">
-              <div className="inline-block animate-marquee-hardware leading-[0.9] tracking-tighter">
-                <span className="font-mono text-[clamp(10px,2vw,14px)] text-neutral-400 lowercase mr-[4cqw]">
-                  {artist}
-                </span>
-                <span className="font-mono text-[4vw] font-bold text-white uppercase mr-[4cqw]">
-                  {title}
-                </span>
-                {/* Duplication for marquee */}
-                <span className="font-mono text-[clamp(10px,2vw,14px)] text-neutral-400 lowercase mr-[4cqw]">
-                  {artist}
-                </span>
-                <span className="font-mono text-[4vw] font-bold text-white uppercase mr-[4cqw]">
-                  {title}
-                </span>
-              </div>
-            </div>
-          </div>
-          {/* Hardware Indent Safety Marker */}
-          <div className="absolute top-0 left-0 w-[1cqw] h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="relative flex flex-col items-start opacity-100 group-hover:animate-digital-decay">
+          <span className="font-mono text-[clamp(12px,2.5vw,18px)] font-medium uppercase tracking-wider text-neutral-400 leading-none">
+            {artist}
+          </span>
+          <span className="font-mono text-[clamp(14px,3.5vw,24px)] font-bold uppercase leading-[0.9] text-white mt-1">
+            {title}
+          </span>
         </div>
+
+        {/* Hardware Indent Safety Marker */}
+        <div className="absolute top-0 left-0 w-[1cqw] h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
 
       {/* 4. Playback Indicator */}
