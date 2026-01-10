@@ -1,6 +1,5 @@
 'use server';
 
-import { tracks } from '../data/tracks';
 import { Track } from '../types';
 import { supabase } from '../lib/supabase';
 
@@ -14,12 +13,11 @@ export async function getTracks(): Promise<Track[]> {
 
     if (error) {
       console.error('Supabase fetch error:', error);
-      return tracks; // Fallback to static data on error
+      return []; // Return empty array on error
     }
 
     if (!data || data.length === 0) {
-      console.warn('Supabase returned no content. Using static fallback.');
-      return tracks;
+      return [];
     }
 
     // Map strict schema
@@ -40,6 +38,6 @@ export async function getTracks(): Promise<Track[]> {
     }));
   } catch (error) {
     console.error('Unexpected error fetching tracks:', error);
-    return tracks;
+    return [];
   }
 }
