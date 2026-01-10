@@ -15,7 +15,7 @@ export async function getTracks(): Promise<Track[]> {
   try {
     // 2. Select strictly and order by tile_index
     const { results } = await DB.prepare(
-      `SELECT * FROM tracks ORDER BY tile_index ASC`
+      `SELECT id, created_at, title, artist, genre, media_type, tile_id, audio_ext, image_ext, tile_index, release_date, duration FROM tracks ORDER BY tile_index ASC`
     ).all();
 
     if (!results || results.length === 0) {

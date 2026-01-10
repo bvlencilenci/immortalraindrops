@@ -19,7 +19,7 @@ interface AudioStore {
   analyser: AnalyserNode | null;
 
   setPlaylist: (tracks: Track[]) => void;
-  playTrack: (id: string, url: string, title: string, artist: string) => void;
+  playTrack: (id: string, url: string, title: string, artist: string) => Promise<void>;
   togglePlay: () => void;
   restartTrack: () => void;
   skipTrack: () => void;
@@ -45,7 +45,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
   setPlaylist: (tracks) => set({ playlist: tracks }),
 
-  playTrack: (id, url, title, artist) => {
+  playTrack: async (id, url, title, artist) => {
     const { howl, volume } = get();
 
     // Stop and unload previous
@@ -55,8 +55,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     }
 
     // Explicitly resume Context if suspended (Autoplay policy)
+    // Using await to ensure context is ready before creating new Howl instance
     if (Howler.ctx && Howler.ctx.state === 'suspended') {
-      Howler.ctx.resume();
+      await Howler.ctx.resume();
     }
 
     // Determine format from URL to prevent guessing behavior
