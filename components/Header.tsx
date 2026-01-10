@@ -192,16 +192,10 @@ const Header = () => {
               onMouseLeave={() => setIsHovered(false)}
             >
               <div className="flex flex-col text-[#ECEEDF]">
-                <span
-                  className="font-mono tracking-tighter leading-none whitespace-nowrap"
-                  style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
-                >
+                <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
                   IMMORTAL
                 </span>
-                <span
-                  className="font-mono tracking-tighter leading-none whitespace-nowrap"
-                  style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
-                >
+                <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
                   RAINDROPS
                 </span>
               </div>
