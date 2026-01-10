@@ -187,7 +187,7 @@ const Header = () => {
           {/* BLOCK 1: Left - Station Identity & Meta */}
           <div className="justify-self-start flex items-center z-10 shrink-0">
             <div
-              className={`flex items-center gap-4 relative cursor-pointer group pr-6`}
+              className={`flex items-center gap-8 relative cursor-pointer group pr-6`}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
