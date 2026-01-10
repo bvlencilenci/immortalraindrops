@@ -214,7 +214,7 @@ const Tile = (props: TileProps) => {
         <span className="text-[15px] font-mono text-[#ECEEDF] lowercase leading-none tracking-normal">
           {artist || '—'}
         </span>
-        <span className="text-[24px] md:text-[32px] uppercase leading-none tracking-tighter mt-1 text-[#ECEEDF]">
+        <span className="text-[20px] md:text-[28px] uppercase leading-none tracking-tighter mt-1 text-[#ECEEDF]">
           {title || '—'}
         </span>
       </div>
