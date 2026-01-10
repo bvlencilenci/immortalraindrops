@@ -331,24 +331,43 @@ const Header = () => {
       </div>
 
       {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
+      {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
       {isPlayerActive && (
-        <div className="hidden md:block absolute bottom-0 left-0 right-0 w-full h-[3px] bg-transparent z-[60] group/scrubber">
-          {/* Hit area larger than visible line */}
-          <input
-            type="range"
-            min="0"
-            max={duration || 100}
-            step="0.1"
-            value={seek}
-            onChange={(e) => {
-              e.stopPropagation();
-              seekTo(parseFloat(e.target.value));
-            }}
-            className="absolute inset-0 w-full h-full appearance-none bg-transparent cursor-pointer outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-0 [&::-webkit-slider-thumb]:h-0"
-            style={{
-              background: `linear-gradient(to right, #ECEEDF ${progressPercent}%, rgba(236,238,223,0.1) ${progressPercent}%)`
-            }}
-          />
+        <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">
+
+          {/* Interaction Layer (Invisible Input - Massive Hitbox) */}
+          {/* absolute -bottom-6 means it extends 24px below the header, and top-0 extends full height of container */}
+          {/* We actually want the hitbox to be roughly 48px centered on the line. 
+               The container is positioned at bottom-0. 
+               Let's make the container itself the hit area trigger, but the input needs to capture events. */}
+          <div className="absolute bottom-[-18px] left-0 w-full h-[48px] z-50">
+            <input
+              type="range"
+              min="0"
+              max={duration || 100}
+              step="0.1"
+              value={seek}
+              onChange={(e) => {
+                e.stopPropagation();
+                seekTo(parseFloat(e.target.value));
+              }}
+              className="w-full h-full opacity-0 cursor-pointer focus-visible:outline-none"
+              aria-label="Playback position"
+            />
+          </div>
+
+          {/* Visual Track Layer (Pointer Events None) */}
+          {/* Positioned at bottom of header */}
+          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#ECEEDF]/20 group-hover/scrubber:h-[6px] transition-all duration-200 ease-out pointer-events-none">
+            {/* Progress Fill */}
+            <div
+              className="h-full bg-[#ECEEDF] relative transition-all duration-200 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            >
+              {/* Thumb (Right Edge of Progress) */}
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 group-hover/scrubber:w-4 group-hover/scrubber:h-4 bg-[#ECEEDF] rounded-full shadow-[0_0_10px_rgba(236,238,223,0.5)] transition-all duration-200 ease-out translate-x-1/2" />
+            </div>
+          </div>
         </div>
       )}
     </header>
