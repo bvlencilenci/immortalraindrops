@@ -187,18 +187,18 @@ const Header = () => {
           {/* BLOCK 1: Left - Station Identity & Meta (Z-20) */}
           <div className="justify-self-start flex items-center z-20 shrink-0">
             <div
-              className="flex items-center gap-8 relative cursor-pointer group shrink-0"
+              className="flex items-center gap-8 relative group shrink-0"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <div className="flex flex-col text-[#ECEEDF]">
+              <Link href="/" className="flex flex-col text-[#ECEEDF] transition-opacity hover:opacity-80 cursor-pointer">
                 <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
                   IMMORTAL
                 </span>
                 <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
                   RAINDROPS
                 </span>
-              </div>
+              </Link>
 
               <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
                 <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
@@ -216,7 +216,6 @@ const Header = () => {
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                     className="flex items-center gap-x-6 lg:gap-x-12 overflow-hidden whitespace-nowrap pl-6"
                   >
-                    <Link href="/" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">HOME</Link>
                     <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
                     <Link href="/live" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
                   </motion.div>
