@@ -182,10 +182,10 @@ const Header = () => {
         }`}>
 
         {/* Constraints Wrapper (Max Width: 1400px) */}
-        <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-3 items-center relative">
+        <div className="w-full h-full max-w-[1400px] mx-auto px-8 flex justify-between items-center relative">
 
-          {/* BLOCK 1: Left - Station Identity & Meta */}
-          <div className="justify-self-start flex items-center z-10 shrink-0">
+          {/* Left: Station Identity & Meta (Z-20 to slide under occluder) */}
+          <div className="flex items-center z-20 shrink-0">
             <div
               className="flex items-center gap-8 relative cursor-pointer group"
               onMouseEnter={() => setIsHovered(true)}
@@ -254,9 +254,13 @@ const Header = () => {
             )}
           </div>
 
-          {/* BLOCK 2: Center - Playback Controls */}
-          <div className="col-span-1 justify-self-center z-20 pointer-events-auto w-auto flex flex-col items-center justify-center">
-            {isPlayerActive && (
+          {/* Right: Occluder Wall (Controls + Volume) (Z-30) */}
+          {isPlayerActive && (
+            <div
+              className="flex items-center gap-6 z-30 h-full pl-12"
+              style={{ background: 'linear-gradient(to right, transparent, #000000 20%)' }}
+            >
+              {/* Playback Controls */}
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-[2vw]">
                   <button
@@ -286,12 +290,8 @@ const Header = () => {
                   </button>
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* BLOCK 3: Right - Utility Stack (Desktop Only) */}
-          <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
-            {isPlayerActive && (
+              {/* Volume & Timestamp */}
               <div className="flex flex-col items-end gap-1 translate-y-[2px]">
                 <div className="flex items-center gap-4">
                   <button
@@ -327,8 +327,8 @@ const Header = () => {
                   {formatTime(seek)} / {formatTime(duration)}
                 </span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
