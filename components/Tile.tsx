@@ -8,13 +8,16 @@ interface TileProps {
   id: string;
   title: string;
   artist: string;
-  url: string; // Absolute R2 audio URL
-  coverImage?: string; // Absolute R2 image URL
+  media_type: string;
+  tile_index: number;
+  release_date?: string;
+  audio_key?: string;
+  image_key?: string;
+  r2_key?: string;
   genre?: string;
-  media_type?: string;
 }
 
-const Tile = ({ id, title, artist, url, coverImage, genre, media_type }: TileProps) => {
+const Tile = ({ id, title, artist, audio_key, image_key, genre, media_type, r2_key }: TileProps) => {
   const {
     playTrack,
     currentlyPlayingId,
@@ -25,6 +28,13 @@ const Tile = ({ id, title, artist, url, coverImage, genre, media_type }: TilePro
     seek,
     volume,
   } = useAudioStore();
+
+  // Construct absolute URLs from keys
+  const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
+  // If r2_key or url was passed previously, we now rely on audio_key/image_key from the new schema.
+  // We handle potential missing keys gracefully or fallback.
+  const audioUrl = audio_key ? `${r2BaseUrl}/${audio_key}` : '';
+  const imageUrl = image_key ? `${r2BaseUrl}/${image_key}` : '/images/placeholder.jpg';
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,7 +57,7 @@ const Tile = ({ id, title, artist, url, coverImage, genre, media_type }: TilePro
         else videoRef.current.play();
       }
     } else {
-      playTrack(id, url, title, artist);
+      playTrack(id, audioUrl, title, artist);
       // Video autoplay handled by side effect of isActive
     }
   };
@@ -177,10 +187,7 @@ const Tile = ({ id, title, artist, url, coverImage, genre, media_type }: TilePro
               // Video Layer: Muted because Main Audio is provided by Howler/AudioStore
               <video
                 ref={videoRef}
-                src={coverImage} // R2 Video URL passes as coverImage or we should use url? Actually, for video, usually 'url' is the video file. 
-                // If the user setup means 'audio_key' maps to 'url', and 'image_key' maps to 'coverImage'
-                // Then for a 'video' type, we probably want to play the video FILE. 
-                // Assuming 'url' (from audio_key) is the media source.
+                src={imageUrl}
                 className="absolute inset-0 w-full h-full object-cover z-0"
                 loop
                 muted // Important: Audio handled by global player for consistency/visualization
@@ -202,7 +209,7 @@ const Tile = ({ id, title, artist, url, coverImage, genre, media_type }: TilePro
           </>
         ) : (
           <img
-            src={coverImage}
+            src={imageUrl}
             className="absolute inset-0 w-full h-full object-cover z-0"
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

@@ -12,6 +12,7 @@ export interface Track {
   media_type?: string;
   audio_key?: string;
   image_key?: string;
+  tileIndex?: number;
 }
 
 interface AudioStore {
