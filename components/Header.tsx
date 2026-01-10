@@ -298,7 +298,7 @@ const Header = () => {
           {/* BLOCK 3: Right - Utility Stack (Desktop Only) */}
           <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
             {isPlayerActive && (
-              <div className="flex flex-col items-end gap-[0.5vh]">
+              <div className="flex flex-col items-center gap-[0.5vh]">
                 <div className="flex items-center gap-4">
                   <button
                     className="flex items-center justify-center"
