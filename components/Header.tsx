@@ -29,31 +29,65 @@ const Header = () => {
   const prevVolumeRef = useRef(1.0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
+    // 1. Initial Fetch of Live State
+    const fetchSettings = async () => {
+      const { supabase } = await import('../lib/supabase'); // Dynamic import to avoid SSR issues if used there
+      const { data } = await supabase
+        .from('site_settings')
+        .select('is_live, stream_title')
+        .eq('id', 1)
+        .single();
+
+      if (data) {
+        useAudioStore.getState().setLiveState(data.is_live, data.stream_title);
+      }
     };
 
+    fetchSettings();
+
+    // 2. Realtime Listener
+    const setupListener = async () => {
+      const { supabase } = await import('../lib/supabase');
+      const channel = supabase
+        .channel('site_settings_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'site_settings',
+            filter: 'id=eq.1'
+          },
+          (payload) => {
+            const newData = payload.new as { is_live: boolean; stream_title: string };
+            useAudioStore.getState().setLiveState(newData.is_live, newData.stream_title);
+
+            // Optional: If going live, pause any archive playback so user can switch? 
+            // Or let them stay on archive until they click LIVE. 
+            // User requested: "Store Sync: When is_live becomes true, trigger a 'pause' on the useAudioStore"
+            if (newData.is_live) {
+              useAudioStore.getState().howl?.pause();
+              // Note: We don't force them to /live, but we pause archive so they notice.
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    const cleanupPromise = setupListener();
+
+    // 3. Keep existing scroll/key handlers
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Safety: Ignore if typing in an input
+      /* existing handler logic */
       const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
-        return;
-      }
-
-      // Spacebar: Play/Pause
-      if (e.code === 'Space') {
-        e.preventDefault(); // Prevent page scroll
-        togglePlay();
-      }
-
-      // M Key: Mute toggle
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+      if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
       if (e.key === 'm' || e.key === 'M') {
-        // We use the store's current state directly via the hook's values
-        // Note: adjustVolume update will trigger re-render
         if (useAudioStore.getState().volume > 0) {
           prevVolumeRef.current = useAudioStore.getState().volume;
           adjustVolume(0);
@@ -69,6 +103,7 @@ const Header = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeyDown);
+      cleanupPromise.then(cleanup => cleanup());
     };
   }, [togglePlay, adjustVolume]);
 

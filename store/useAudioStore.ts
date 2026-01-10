@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Howl, Howler } from 'howler';
+import Hls from 'hls.js';
 import { Track } from '../types';
 
 interface AudioStore {
@@ -18,6 +19,7 @@ interface AudioStore {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   howl: Howl | null;
+  hls: Hls | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   analyser: AnalyserNode | null;
 
@@ -33,6 +35,7 @@ interface AudioStore {
   playLiveStream: (url: string) => Promise<void>;
   updateSeek: () => void;
   seekTo: (time: number) => void;
+  setLiveState: (isLive: boolean, title?: string) => void;
 }
 
 export const useAudioStore = create<AudioStore>((set, get) => ({
@@ -47,6 +50,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   volume: 1.0,
   playlist: [],
   howl: null,
+  hls: null,
   analyser: null,
 
   hasEntered: false,
@@ -171,64 +175,150 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       await Howler.ctx.resume();
     }
 
-    const { howl, volume } = get();
+    const { howl, hls, volume } = get();
+
+    // Cleanup previous
     if (howl) {
       howl.stop();
       howl.unload();
     }
+    if (hls) {
+      hls.destroy();
+    }
 
-    const newHowl = new Howl({
-      src: [url],
-      html5: true,
-      format: ['m3u8'],
-      volume: volume,
-      onplay: () => {
+    // --- HLS.JS SUPPORT (Chrome, Firefox, etc.) ---
+    if (Hls.isSupported()) {
+      const hlsInstance = new Hls({
+        debug: true, // Enable debugging to see HLS logs in console
+        xhrSetup: (xhr, url) => {
+          xhr.setRequestHeader('ngrok-skip-browser-warning', 'true');
+        }
+      });
+
+      // Create a hidden audio element
+      const audio = document.createElement('audio');
+      audio.id = 'hls-audio-stream';
+      audio.crossOrigin = 'anonymous'; // Essential for Visualizer & CORS
+      // audio.style.display = 'none'; // Optional, elements created this way are hidden by default unless appended
+
+      hlsInstance.loadSource(url);
+      hlsInstance.attachMedia(audio);
+
+      hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+        audio.volume = volume;
+        audio.play().catch(e => console.error("HLS Play Error:", e));
+
         set({ isPlaying: true, isBuffering: false });
 
-        // Visualizer Connection Logic (Same as normal track)
+        // Visualizer Wiring
         const ctx = Howler.ctx;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const sound = (newHowl as any)._sounds[0];
-        if (sound && sound._node) {
-          const audioNode = sound._node;
-          audioNode.crossOrigin = "anonymous";
+        if (ctx) {
+          // Avoid double connection if node already exists? 
+          // Ideally we need to manage the node. For now, try/catch.
+          try {
+            const source = ctx.createMediaElementSource(audio);
 
-          let analyser = get().analyser;
-          if (!analyser && ctx) {
-            analyser = ctx.createAnalyser();
-            analyser.fftSize = 256;
-            set({ analyser });
-          }
+            let analyser = get().analyser;
+            if (!analyser) {
+              analyser = ctx.createAnalyser();
+              analyser.fftSize = 256;
+              set({ analyser });
+            }
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if (analyser && !(sound as any)._visualizerConnected) {
-            try {
-              const source = ctx.createMediaElementSource(audioNode);
-              source.connect(analyser);
-              analyser.connect(ctx.destination);
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (sound as any)._visualizerConnected = true;
-            } catch (e) { console.warn(e); }
+            // Connect
+            source.connect(analyser);
+            analyser.connect(ctx.destination);
+          } catch (e) {
+            console.warn("Visualizer HLS connect warn:", e);
           }
         }
-      },
-      onend: () => set({ isPlaying: false }),
-      onpause: () => set({ isPlaying: false }),
-      onstop: () => set({ isPlaying: false }),
-      onloaderror: (id, err) => console.error("Live Stream Load Error", err),
-      onplayerror: (id, err) => console.error("Live Stream Play Error", err)
-    });
+      });
 
-    set({
-      currentlyPlayingId: 'live-stream',
-      trackTitle: 'LIVE DJ SET',
-      trackArtist: 'IMMORTAL RAINDROPS',
-      howl: newHowl,
-      analyser: get().analyser,
-      isLive: true
-    });
+      hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              console.error("HLS Network Error", data);
+              hlsInstance.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              console.error("HLS Media Error", data);
+              hlsInstance.recoverMediaError();
+              break;
+            default:
+              hlsInstance.destroy();
+              break;
+          }
+        }
+      });
 
-    newHowl.play();
+      set({
+        currentlyPlayingId: 'live-stream',
+        trackTitle: 'LIVE DJ SET',
+        trackArtist: 'IMMORTAL RAINDROPS',
+        howl: null, // We are not using Howl for HLS here
+        hls: hlsInstance,
+        analyser: get().analyser,
+        isLive: true
+      });
+
+    }
+    // --- NATIVE HLS SUPPORT (Safari) ---
+    else if (document.createElement('audio').canPlayType('application/vnd.apple.mpegurl')) {
+      // Fallback to Howl (which uses HTML5 Audio) or direct Audio element
+      // Since Howl manages audio nicely, try that first, but headers might fail.
+      // Safari usually handles ngrok fine without headers if it's the stream content.
+
+      const newHowl = new Howl({
+        src: [url],
+        html5: true,
+        format: ['m3u8'],
+        volume: volume,
+        onplay: () => {
+          set({ isPlaying: true, isBuffering: false });
+
+          // Visualizer
+          const ctx = Howler.ctx;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const sound = (newHowl as any)._sounds[0];
+          if (sound && sound._node) {
+            const audioNode = sound._node;
+            audioNode.crossOrigin = "anonymous";
+
+            let analyser = get().analyser;
+            if (!analyser && ctx) {
+              analyser = ctx.createAnalyser();
+              analyser.fftSize = 256;
+              set({ analyser });
+            }
+
+            if (analyser) {
+              try {
+                const source = ctx.createMediaElementSource(audioNode);
+                source.connect(analyser);
+                analyser.connect(ctx.destination);
+              } catch (e) { console.warn(e); }
+            }
+          }
+        },
+        onend: () => set({ isPlaying: false }),
+        // ... other handlers similar to playTrack
+      });
+
+      set({
+        currentlyPlayingId: 'live-stream',
+        trackTitle: 'LIVE DJ SET',
+        trackArtist: 'IMMORTAL RAINDROPS',
+        howl: newHowl,
+        hls: null,
+        analyser: get().analyser,
+        isLive: true
+      });
+      newHowl.play();
+    }
+    else {
+      console.error("HLS not supported");
+    }
   },
 
   togglePlay: () => {
@@ -313,6 +403,13 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     if (howl) {
       howl.seek(time);
       set({ seek: time });
+    }
+  },
+
+  setLiveState: (isLive: boolean, title?: string) => {
+    set({ isLive });
+    if (isLive && title) {
+      set({ trackTitle: title });
     }
   }
 }));
