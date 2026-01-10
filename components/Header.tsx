@@ -138,7 +138,7 @@ const Header = () => {
         className="fixed z-50 lg:hidden flex justify-center items-center overflow-hidden"
         initial={{ top: 0, width: "100%", borderRadius: 0, backgroundColor: "rgba(0,0,0,0.4)", backdropFilter: "blur(12px)" }}
         animate={{
-          top: isScrolled ? 18 : 0,
+          top: isScrolled ? 24 : 0,
           width: isScrolled ? "min(90%, 460px)" : "100%",
           borderRadius: isScrolled ? 9999 : 0,
           backgroundColor: "rgba(0,0,0,0.4)",
