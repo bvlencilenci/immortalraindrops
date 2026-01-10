@@ -131,11 +131,11 @@ const Header = () => {
   return (
     <>
       {/* --- MOBILE NAV SHIELD (Solid Black Background) --- */}
-      <div className="fixed top-0 left-0 w-full h-24 bg-black z-40 lg:hidden pointer-events-none" />
+      <div className="fixed top-0 left-0 w-full h-[90px] bg-black z-40 lg:hidden pointer-events-none" />
 
       {/* --- MOBILE SCROLL-MORPHING HEADER (< lg) --- */}
       <motion.nav
-        className="fixed z-[100] lg:hidden flex justify-center items-center overflow-hidden"
+        className="fixed z-50 lg:hidden flex justify-center items-center overflow-hidden"
         initial={{ top: 0, width: "100%", borderRadius: 0, backgroundColor: "rgba(0,0,0,0.4)", backdropFilter: "blur(12px)" }}
         animate={{
           top: isScrolled ? 18 : 0,
