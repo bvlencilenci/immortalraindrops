@@ -20,9 +20,8 @@ const SplashGate = () => {
 
   // Trigger Refs to ensure actions run exactly once
   const didResume = useRef(false);
-  const didPick = useRef(false);
-  const didPlay = useRef(false);
-  const randomTrackRef = useRef<any>(null);
+  const didPlayFirst = useRef(false);
+  const didPlaySecond = useRef(false);
 
   useEffect(() => {
     setMounted(true);
@@ -41,7 +40,8 @@ const SplashGate = () => {
   const handleEnter = async () => {
     setIsWarming(true);
     const startTime = Date.now();
-    const duration = 2500; // 2.5s total target
+    const duration = 3500; // 3.5s total target for dual-track sequence
+    const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
 
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -49,7 +49,7 @@ const SplashGate = () => {
       if (p > 100) p = 100;
       setProgress(p);
 
-      // --- PHASE 1: 10% -> Resume Audio Context ---
+      // --- PHASE 1: 0-20% -> Resume Audio Context & Ensure Fetch ---
       if (p >= 10 && !didResume.current) {
         didResume.current = true;
         if (Howler.ctx && Howler.ctx.state === 'suspended') {
@@ -57,28 +57,35 @@ const SplashGate = () => {
         }
       }
 
-      // --- PHASE 2: 40% -> Pick Random Track ---
-      if (p >= 40 && !didPick.current) {
-        didPick.current = true;
+      // --- PHASE 2: 30% -> First Trigger (Wake up R2 connection) ---
+      if (p >= 30 && !didPlayFirst.current) {
+        didPlayFirst.current = true;
         const currentTracks = tracksRef.current;
         if (currentTracks.length > 0) {
+          // Pick a random track
           const randomTrack = currentTracks[Math.floor(Math.random() * currentTracks.length)];
-          randomTrackRef.current = randomTrack;
-          // Pre-set playlist here so UI might update or prepare
           setPlaylist(currentTracks);
+
+          const ext = randomTrack.audio_ext || 'wav';
+          const audioUrl = `${r2BaseUrl}/${randomTrack.tile_id}/audio.${ext}`;
+          playTrack(randomTrack.id, audioUrl, randomTrack.title, randomTrack.artist);
         }
       }
 
-      // --- PHASE 3: 50% -> Play Track ---
-      if (p >= 50 && !didPlay.current) {
-        didPlay.current = true;
-        const track = randomTrackRef.current;
-        if (track) {
-          const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-          const ext = track.audio_ext || 'wav';
-          const audioUrl = `${r2BaseUrl}/${track.tile_id}/audio.${ext}`;
-          // Trigger play - fire and forget inside interval
-          playTrack(track.id, audioUrl, track.title, track.artist);
+      // --- PHASE 3: 70% -> Second Trigger (Confirm Warm & Active Entry Track) ---
+      if (p >= 70 && !didPlaySecond.current) {
+        didPlaySecond.current = true;
+        const currentTracks = tracksRef.current;
+        if (currentTracks.length > 1) { // Need at least pool to pick from
+          // Pick a NEW random track
+          let randomTrack = currentTracks[Math.floor(Math.random() * currentTracks.length)];
+
+          // Optional: Try to ensure it's different? (Simple retry once)
+          // We rely on random chance is fine, but nice to change it up.
+
+          const ext = randomTrack.audio_ext || 'wav';
+          const audioUrl = `${r2BaseUrl}/${randomTrack.tile_id}/audio.${ext}`;
+          playTrack(randomTrack.id, audioUrl, randomTrack.title, randomTrack.artist);
         }
       }
 
