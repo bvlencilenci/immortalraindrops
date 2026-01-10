@@ -148,12 +148,25 @@ const Header = () => {
               animate={{ marginLeft: isHovered ? "2rem" : "1rem" }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             >
-              <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
-                {trackArtist}
-              </span>
-              <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
-                {trackTitle}
-              </span>
+              {useAudioStore.getState().isLive ? (
+                <>
+                  <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
+                    ● live
+                  </span>
+                  <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
+                    DJ SET
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
+                    {trackArtist}
+                  </span>
+                  <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
+                    {trackTitle}
+                  </span>
+                </>
+              )}
             </motion.div>
           )}
         </div>

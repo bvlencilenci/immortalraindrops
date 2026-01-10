@@ -29,6 +29,8 @@ interface AudioStore {
   previousTrack: () => void;
   skipBack: () => void;
   adjustVolume: (vol: number) => void;
+  isLive: boolean;
+  playLiveStream: (url: string) => Promise<void>;
   updateSeek: () => void;
   seekTo: (time: number) => void;
 }
@@ -38,6 +40,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   trackTitle: null,
   trackArtist: null,
   isPlaying: false,
+  isLive: false,
   isBuffering: false,
   duration: 0,
   seek: 0,
@@ -59,7 +62,6 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
   playTrack: async (id, url, title, artist) => {
     // 0. FORCE RESUME CONTEXT (The Magic Key)
-    // We execute this blindly because checking state can be flaky on first interaction.
     if (Howler.ctx) {
       await Howler.ctx.resume();
     }
@@ -157,7 +159,73 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       trackTitle: title,
       trackArtist: artist,
       howl: newHowl,
-      analyser: get().analyser // Persist existing analyser or null
+      analyser: get().analyser, // Persist existing analyser or null
+      isLive: false // Reset live flag for normal tracks
+    });
+
+    newHowl.play();
+  },
+
+  playLiveStream: async (url) => {
+    if (Howler.ctx) {
+      await Howler.ctx.resume();
+    }
+
+    const { howl, volume } = get();
+    if (howl) {
+      howl.stop();
+      howl.unload();
+    }
+
+    const newHowl = new Howl({
+      src: [url],
+      html5: true,
+      format: ['m3u8'],
+      volume: volume,
+      onplay: () => {
+        set({ isPlaying: true, isBuffering: false });
+
+        // Visualizer Connection Logic (Same as normal track)
+        const ctx = Howler.ctx;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sound = (newHowl as any)._sounds[0];
+        if (sound && sound._node) {
+          const audioNode = sound._node;
+          audioNode.crossOrigin = "anonymous";
+
+          let analyser = get().analyser;
+          if (!analyser && ctx) {
+            analyser = ctx.createAnalyser();
+            analyser.fftSize = 256;
+            set({ analyser });
+          }
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (analyser && !(sound as any)._visualizerConnected) {
+            try {
+              const source = ctx.createMediaElementSource(audioNode);
+              source.connect(analyser);
+              analyser.connect(ctx.destination);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (sound as any)._visualizerConnected = true;
+            } catch (e) { console.warn(e); }
+          }
+        }
+      },
+      onend: () => set({ isPlaying: false }),
+      onpause: () => set({ isPlaying: false }),
+      onstop: () => set({ isPlaying: false }),
+      onloaderror: (id, err) => console.error("Live Stream Load Error", err),
+      onplayerror: (id, err) => console.error("Live Stream Play Error", err)
+    });
+
+    set({
+      currentlyPlayingId: 'live-stream',
+      trackTitle: 'LIVE DJ SET',
+      trackArtist: 'IMMORTAL RAINDROPS',
+      howl: newHowl,
+      analyser: get().analyser,
+      isLive: true
     });
 
     newHowl.play();
