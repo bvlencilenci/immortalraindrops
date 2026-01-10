@@ -8,8 +8,10 @@ export async function getTracks(): Promise<Track[]> {
     // Select specific columns to ensure we get exactly what we need
     const { data, error } = await supabase
       .from('tracks')
-      .select('id, created_at, title, artist, genre, media_type, tile_id, audio_ext, image_ext, tile_index, release_date, duration')
+      .select('id, created_at, title, artist, genre, media_type, tile_id, audio_ext, image_ext, tile_index, release_date')
       .order('tile_index', { ascending: true });
+
+    console.log('Supabase Fetch Result:', { dataLength: data?.length, error });
 
     if (error) {
       console.error('Supabase fetch error:', error);
