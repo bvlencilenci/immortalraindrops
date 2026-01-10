@@ -2,6 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = () => {
   const {
@@ -20,7 +23,9 @@ const Header = () => {
     seekTo
   } = useAudioStore();
 
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const prevVolumeRef = useRef(1.0);
 
   useEffect(() => {
@@ -67,6 +72,9 @@ const Header = () => {
     };
   }, [togglePlay, adjustVolume]);
 
+  // Hide header on root landing page
+  if (pathname === '/') return null;
+
   const isPlayerActive = !!currentlyPlayingId;
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
 
@@ -93,22 +101,60 @@ const Header = () => {
       {/* Padded Content Wrapper */}
       <div className="w-full h-full px-[2vw] grid grid-cols-3 items-center relative">
 
-        {/* BLOCK 1: Left - Station Identity & Meta */}
-        <div className="justify-self-start flex items-baseline gap-[1vw] z-10 shrink-0">
-          <div className="flex flex-col justify-center text-[#ECEEDF]">
-            <span className="font-mono text-[2.5vh] font-bold tracking-widest leading-none">IMMORTAL</span>
-            <span className="font-mono text-[2.5vh] font-bold tracking-widest leading-none">RAINDROPS</span>
+        {/* BLOCK 1: Left - Station Identity & Meta & Nav */}
+        <div className="justify-self-start flex items-center z-10 shrink-0">
+
+          {/* Interactive Title / Nav Container */}
+          <div
+            className="flex items-center gap-4 relative cursor-pointer group pr-6"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div className="flex flex-col text-[#ECEEDF]">
+              <span className="font-mono text-[2.5vh] font-bold tracking-widest leading-none">IMMORTAL</span>
+              <span className="font-mono text-[2.5vh] font-bold tracking-widest leading-none">RAINDROPS</span>
+            </div>
+
+            {/* Inactive State Hint (Vertical Lines) */}
+            <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
+              <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
+              <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
+              <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
+            </div>
+
+            {/* Horizontal Slide Navigation */}
+            <AnimatePresence>
+              {isHovered && (
+                <motion.div
+                  key="nav-links"
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: "auto", opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap"
+                >
+                  <Link href="/" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">HOME</Link>
+                  <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
+                  <Link href="/live" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {isPlayerActive && (
-            <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-[1.5vw] max-w-[20vw] md:max-w-[15vw]">
+            <motion.div
+              className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-[1.5vw] max-w-[20vw] md:max-w-[15vw]"
+              initial={{ marginLeft: "1rem" }}
+              animate={{ marginLeft: isHovered ? "2rem" : "1rem" }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
               <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
                 {trackArtist}
               </span>
               <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
                 {trackTitle}
               </span>
-            </div>
+            </motion.div>
           )}
         </div>
 
