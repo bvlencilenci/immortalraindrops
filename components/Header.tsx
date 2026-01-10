@@ -129,13 +129,16 @@ const Header = () => {
 
   return (
     <>
+      {/* --- MOBILE NAV SHIELD (Solid Black Background) --- */}
+      <div className="fixed top-0 left-0 w-full h-24 bg-black z-40 lg:hidden pointer-events-none" />
+
       {/* --- MOBILE SCROLL-MORPHING HEADER (< lg) --- */}
       <motion.nav
         className="fixed z-[100] lg:hidden flex justify-center items-center overflow-hidden"
         initial={{ top: 0, width: "100%", borderRadius: 0, backgroundColor: "rgba(0,0,0,0.4)", backdropFilter: "blur(12px)" }}
         animate={{
           top: isScrolled ? 16 : 0,
-          width: isScrolled ? "min(90%, 360px)" : "100%",
+          width: isScrolled ? "min(90%, 420px)" : "100%",
           borderRadius: isScrolled ? 9999 : 0,
           backgroundColor: "rgba(0,0,0,0.4)",
           border: isScrolled ? "1px solid rgba(255,255,255,0.1)" : "1px solid transparent",
@@ -143,29 +146,29 @@ const Header = () => {
           backdropFilter: "blur(12px)",
           left: isScrolled ? "50%" : "0%",
           x: isScrolled ? "-50%" : "0%",
-          height: 48,
+          height: 56, // h-14
         }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         layout
       >
-        <div className="w-full h-full px-6 flex items-center justify-center gap-6">
+        <div className="w-full h-full px-8 flex items-center justify-center gap-6">
           {/* Left: LIVE */}
-          <Link href="/live" className={`shrink-0 font-mono text-[10px] uppercase tracking-widest transition-colors duration-200 ${pathname === '/live' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}>
+          <Link href="/live" className={`shrink-0 font-mono text-[11px] uppercase tracking-widest transition-colors duration-200 ${pathname === '/live' ? 'text-white' : 'text-[#ECEEDF] hover:text-white'}`}>
             [ LIVE ]
           </Link>
 
           {/* Center: LOGO (Text) */}
           <Link href="/" className="shrink-0 flex flex-col items-center justify-center group leading-none">
-            <span className="font-mono text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+            <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
               IMMORTAL
             </span>
-            <span className="font-mono text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+            <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
               RAINDROPS
             </span>
           </Link>
 
           {/* Right: ARCHIVE */}
-          <Link href="/archive" className={`shrink-0 font-mono text-[10px] uppercase tracking-widest transition-colors duration-200 ${pathname === '/archive' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}>
+          <Link href="/archive" className={`shrink-0 font-mono text-[11px] uppercase tracking-widest transition-colors duration-200 ${pathname === '/archive' ? 'text-white' : 'text-[#ECEEDF] hover:text-white'}`}>
             [ ARCHIVE ]
           </Link>
         </div>
