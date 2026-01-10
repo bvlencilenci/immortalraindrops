@@ -148,10 +148,10 @@ const Header = () => {
 
             {/* Center: LOGO (Text) */}
             <Link href="/" className="flex flex-col items-center justify-center group leading-none">
-              <span className="font-mono font-bold text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+              <span className="font-mono text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
                 IMMORTAL
               </span>
-              <span className="font-mono font-bold text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+              <span className="font-mono text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
                 RAINDROPS
               </span>
             </Link>
@@ -179,13 +179,13 @@ const Header = () => {
           >
             <div className="flex flex-col text-[#ECEEDF]">
               <span
-                className="font-mono font-bold tracking-tighter leading-none whitespace-nowrap"
+                className="font-mono tracking-tighter leading-none whitespace-nowrap"
                 style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }} // Fluid Typography
               >
                 IMMORTAL
               </span>
               <span
-                className="font-mono font-bold tracking-tighter leading-none whitespace-nowrap"
+                className="font-mono tracking-tighter leading-none whitespace-nowrap"
                 style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
               >
                 RAINDROPS
