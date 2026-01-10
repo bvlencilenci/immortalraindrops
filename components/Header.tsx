@@ -19,6 +19,7 @@ const Header = () => {
     volume,
     adjustVolume,
     currentlyPlayingId,
+    hasEntered,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     seekTo
   } = useAudioStore();
@@ -107,8 +108,8 @@ const Header = () => {
     };
   }, [togglePlay, adjustVolume]);
 
-  // Hide header on root landing page
-  if (pathname === '/') return null;
+  // Hide header on root landing page OR if SplashGate is active (!hasEntered)
+  if (pathname === '/' || !hasEntered) return null;
 
   const isPlayerActive = !!currentlyPlayingId;
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
@@ -137,8 +138,8 @@ const Header = () => {
         className="fixed z-[100] lg:hidden flex justify-center items-center overflow-hidden"
         initial={{ top: 0, width: "100%", borderRadius: 0, backgroundColor: "rgba(0,0,0,0.4)", backdropFilter: "blur(12px)" }}
         animate={{
-          top: isScrolled ? 16 : 0,
-          width: isScrolled ? "min(90%, 420px)" : "100%",
+          top: isScrolled ? 18 : 0,
+          width: isScrolled ? "min(90%, 460px)" : "100%",
           borderRadius: isScrolled ? 9999 : 0,
           backgroundColor: "rgba(0,0,0,0.4)",
           border: isScrolled ? "1px solid rgba(255,255,255,0.1)" : "1px solid transparent",
@@ -146,7 +147,7 @@ const Header = () => {
           backdropFilter: "blur(12px)",
           left: isScrolled ? "50%" : "0%",
           x: isScrolled ? "-50%" : "0%",
-          height: 56, // h-14
+          height: 62, // +10% larger (approx)
         }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         layout
