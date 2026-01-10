@@ -81,7 +81,7 @@ const Header = () => {
     const cleanupPromise = setupListener();
 
     // 3. Keep existing scroll/key handlers
-    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     const handleKeyDown = (e: KeyboardEvent) => {
       /* existing handler logic */
       const target = e.target as HTMLElement;
