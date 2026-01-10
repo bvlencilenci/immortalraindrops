@@ -8,16 +8,18 @@ interface TileProps {
   id: string;
   title: string;
   artist: string;
-  media_type: string;
-  tile_index: number;
+  url: string;
+  coverImage?: string;
+  genre?: string;
+  r2_key?: string;
+  media_type?: string;
+  tile_index?: number;
   release_date?: string;
   audio_key?: string;
   image_key?: string;
-  r2_key?: string;
-  genre?: string;
 }
 
-const Tile = ({ id, title, artist, audio_key, image_key, genre, media_type, r2_key }: TileProps) => {
+const Tile = ({ id, title, artist, url, coverImage, audio_key, image_key, genre, media_type, r2_key }: TileProps) => {
   const {
     playTrack,
     currentlyPlayingId,
@@ -31,10 +33,9 @@ const Tile = ({ id, title, artist, audio_key, image_key, genre, media_type, r2_k
 
   // Construct absolute URLs from keys
   const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-  // If r2_key or url was passed previously, we now rely on audio_key/image_key from the new schema.
-  // We handle potential missing keys gracefully or fallback.
-  const audioUrl = audio_key ? `${r2BaseUrl}/${audio_key}` : '';
-  const imageUrl = image_key ? `${r2BaseUrl}/${image_key}` : '/images/placeholder.jpg';
+  // Check for R2 keys FIRST (new schema), then fallback to direct props (legacy/fallback)
+  const audioUrl = audio_key ? `${r2BaseUrl}/${audio_key}` : (url || '');
+  const imageUrl = image_key ? `${r2BaseUrl}/${image_key}` : (coverImage || '/images/placeholder.jpg');
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);

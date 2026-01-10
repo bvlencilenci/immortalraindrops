@@ -28,6 +28,8 @@ const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
           audio_key={track.audio_key}
           image_key={track.image_key}
           r2_key={track.r2_key}
+          url={track.url || ''}
+          coverImage={track.coverImage}
           genre={track.genre}
         />
       ))}
