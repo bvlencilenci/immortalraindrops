@@ -70,12 +70,18 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       await Howler.ctx.resume();
     }
 
-    const { howl, volume } = get();
+    const { howl, hls, volume } = get();
 
-    // Stop and unload previous
+    // Stop and unload previous Howl
     if (howl) {
       howl.stop();
       howl.unload();
+    }
+
+    // Stop and destroy previous HLS
+    if (hls) {
+      hls.destroy();
+      set({ hls: null });
     }
 
     // Determine format from URL to prevent guessing behavior
