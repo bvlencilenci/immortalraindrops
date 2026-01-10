@@ -13,6 +13,9 @@ interface AudioStore {
   volume: number;
   playlist: Track[];
 
+  hasEntered: boolean;
+  enterApp: () => Promise<void>;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   howl: Howl | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,6 +45,15 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   playlist: [],
   howl: null,
   analyser: null,
+
+  hasEntered: false,
+
+  enterApp: async () => {
+    if (Howler.ctx) {
+      await Howler.ctx.resume();
+    }
+    set({ hasEntered: true });
+  },
 
   setPlaylist: (tracks) => set({ playlist: tracks }),
 
