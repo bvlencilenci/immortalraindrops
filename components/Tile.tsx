@@ -209,10 +209,10 @@ const Tile = (props: TileProps) => {
       {/* 3. Metadata */}
       <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none">
         <span className="text-[15px] font-mono text-neutral-300 lowercase leading-none tracking-normal">
-          {artist || 'Unknown Artist'}
+          {artist || 'Unknown'}
         </span>
         <span className="text-[24px] md:text-[32px] font-bold uppercase leading-none tracking-tighter mt-1 text-[#ECEEDF]">
-          {title || 'Untitled'}
+          {title || '—'}
         </span>
       </div>
     </div>
