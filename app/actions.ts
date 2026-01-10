@@ -30,8 +30,9 @@ export async function getTracks(): Promise<Track[]> {
       artist: row.artist,
       genre: row.genre,
       media_type: row.media_type,
-      audio_key: row.audio_key,
-      image_key: row.image_key,
+      tile_id: row.tile_id,
+      audio_ext: row.audio_ext,
+      image_ext: row.image_ext,
       tile_index: row.tile_index,
       release_date: row.release_date,
       duration: row.duration || '0:00'

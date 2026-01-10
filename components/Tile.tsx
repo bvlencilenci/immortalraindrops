@@ -17,8 +17,9 @@ const Tile = (props: TileProps) => {
     genre,
     media_type,
     tile_index,
-    audio_key,
-    image_key
+    tile_id,
+    audio_ext,
+    image_ext
   } = props;
   const {
     playTrack,
@@ -29,9 +30,12 @@ const Tile = (props: TileProps) => {
 
   const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
 
-  // 3. R2 Asset Assembly
-  const audioUrl = `${r2BaseUrl}/${audio_key}`;
-  const imageUrl = `${r2BaseUrl}/${image_key}`;
+  // 3. R2 Asset Assembly (Convention Based)
+  const extAudio = audio_ext || 'mp3';
+  const extImage = image_ext || 'jpg';
+
+  const audioUrl = `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
+  const imageUrl = `${r2BaseUrl}/${tile_id}/visual.${extImage}`;
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);

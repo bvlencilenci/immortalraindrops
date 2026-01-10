@@ -163,7 +163,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const nextIndex = (currentIndex + 1) % playlist.length;
     const nextTrack = playlist[nextIndex];
     const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-    const audioUrl = `${r2BaseUrl}/${nextTrack.audio_key}`;
+    const ext = nextTrack.audio_ext || 'mp3';
+    const audioUrl = `${r2BaseUrl}/${nextTrack.tile_id}/audio.${ext}`;
 
     playTrack(nextTrack.id, audioUrl, nextTrack.title, nextTrack.artist);
   },
@@ -176,7 +177,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
     const prevTrack = playlist[prevIndex];
     const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-    const audioUrl = `${r2BaseUrl}/${prevTrack.audio_key}`;
+    const ext = prevTrack.audio_ext || 'mp3';
+    const audioUrl = `${r2BaseUrl}/${prevTrack.tile_id}/audio.${ext}`;
 
     playTrack(prevTrack.id, audioUrl, prevTrack.title, prevTrack.artist);
   },

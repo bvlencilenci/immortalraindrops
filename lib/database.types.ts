@@ -17,8 +17,9 @@ export interface Database {
           artist: string
           genre: string | null
           media_type: 'song' | 'dj set' | 'video' | 'image'
-          audio_key: string
-          image_key: string
+          tile_id: string
+          audio_ext: string | null
+          image_ext: string | null
           tile_index: number
           release_date: string
           duration: string | null
@@ -30,8 +31,9 @@ export interface Database {
           artist: string
           genre?: string | null
           media_type: 'song' | 'dj set' | 'video' | 'image'
-          audio_key: string
-          image_key: string
+          tile_id: string
+          audio_ext?: string | null
+          image_ext?: string | null
           tile_index: number
           release_date: string
           duration?: string | null
@@ -43,8 +45,9 @@ export interface Database {
           artist?: string
           genre?: string | null
           media_type?: 'song' | 'dj set' | 'video' | 'image'
-          audio_key?: string
-          image_key?: string
+          tile_id?: string
+          audio_ext?: string | null
+          image_ext?: string | null
           tile_index?: number
           release_date?: string
           duration?: string | null
