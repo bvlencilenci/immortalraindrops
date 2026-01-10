@@ -91,7 +91,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       src: [url],
       html5: false, // Force Web Audio mode for AnalyserNode compatibility
       preload: true,
-      format: ['wav'], // Explicitly set format as requested
+      format: [fileExt], // Explicitly match the file extension
       xhr: {
         withCredentials: false // Crucial for Archive.org / R2 CORS
       },
