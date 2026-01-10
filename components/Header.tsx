@@ -298,21 +298,21 @@ const Header = () => {
           {/* BLOCK 3: Right - Utility Stack (Desktop Only) */}
           <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
             {isPlayerActive && (
-              <div className="flex items-center gap-4 translate-y-[2px]">
-                <button
-                  className="flex items-center justify-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    adjustVolume(volume > 0 ? 0 : 0.5);
-                  }}
-                >
-                  <img
-                    src={getVolumeIcon()}
-                    alt="Volume"
-                    className="w-[2vh] h-[2vh] invert opacity-80"
-                  />
-                </button>
-                <div className="flex flex-col items-center gap-[0.5vh] w-[10vw] max-w-[120px] min-w-[80px]">
+              <div className="flex flex-col items-end gap-1 translate-y-[2px]">
+                <div className="flex items-center gap-4">
+                  <button
+                    className="flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      adjustVolume(volume > 0 ? 0 : 0.5);
+                    }}
+                  >
+                    <img
+                      src={getVolumeIcon()}
+                      alt="Volume"
+                      className="w-[2vh] h-[2vh] invert opacity-80"
+                    />
+                  </button>
                   <input
                     type="range"
                     min="0"
@@ -323,15 +323,15 @@ const Header = () => {
                       e.stopPropagation();
                       adjustVolume(parseFloat(e.target.value));
                     }}
-                    className="w-full h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
+                    className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
                     style={{
                       background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
                     }}
                   />
-                  <span className="w-full text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
-                    {formatTime(seek)} / {formatTime(duration)}
-                  </span>
                 </div>
+                <span className="w-full text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate pr-1">
+                  {formatTime(seek)} / {formatTime(duration)}
+                </span>
               </div>
             )}
           </div>
