@@ -182,16 +182,16 @@ const Header = () => {
         }`}>
 
         {/* Constraints Wrapper (Max Width: 1400px) */}
-        <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-3 items-center relative">
+        <div className="w-full h-full max-w-[1400px] mx-auto px-8 flex justify-between items-center relative">
 
-          {/* BLOCK 1: Left - Station Identity & Meta (Z-20) */}
-          <div className="justify-self-start flex items-center z-20 shrink-0">
+          {/* BLOCK 1: Left - Station Identity & Meta (Z-50) */}
+          <div className="flex items-center z-50 shrink-0">
             <div
-              className="flex items-center gap-8 relative cursor-pointer group shrink-0"
+              className="flex items-center gap-8 relative group shrink-0"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <Link href="/" className="flex flex-col text-[#ECEEDF]">
+              <Link href="/" className="flex flex-col text-[#ECEEDF] cursor-pointer">
                 <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
                   IMMORTAL
                 </span>
@@ -216,6 +216,7 @@ const Header = () => {
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                     className="flex items-center gap-x-6 lg:gap-x-12 overflow-hidden whitespace-nowrap pl-6"
                   >
+                    {/* HOME link removed, moved to Logo */}
                     <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
                     <Link href="/live" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
                   </motion.div>
@@ -229,6 +230,7 @@ const Header = () => {
                 initial={{ marginLeft: "1rem" }}
                 animate={{ marginLeft: isHovered ? "2rem" : "1rem" }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                style={{ zIndex: 50 }}
               >
                 {useAudioStore.getState().isLive ? (
                   <>
@@ -253,90 +255,76 @@ const Header = () => {
             )}
           </div>
 
-          {/* BLOCK 2: Center - Playback Controls (Z-50 + Occluder Mask) */}
-          <div className="col-span-1 justify-self-center z-50 pointer-events-auto w-auto flex flex-col items-center justify-center relative shrink-0">
+          {/* BLOCK 2: Right - Player Controls & Volume (Z-40, Transparent) */}
+          <div className="flex items-center gap-8 z-40 shrink-0">
             {isPlayerActive && (
               <>
-                {/* The Masking Wall (Transparent Blur) */}
-                <div
-                  className="absolute top-0 right-0 bottom-0 w-[120%] bg-white/5 backdrop-blur-md -z-10 pointer-events-none"
-                  style={{
-                    maskImage: 'linear-gradient(to right, transparent 0%, black 20%)',
-                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 20%)'
-                  }}
-                />
-
-                <div className="flex flex-col items-center">
-                  <div className="flex items-center gap-[2vw]">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                      className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
-                      title="Previous / Restart"
-                    >
-                      <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                      className="flex items-center justify-center bg-[#ECEEDF]/5 w-[7vh] h-[7vh] min-w-[50px] min-h-[50px] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110 active:scale-95"
-                      title={isPlaying ? "Pause" : "Play"}
-                    >
-                      <img
-                        src={isPlaying ? "/pause.svg" : "/play.svg"}
-                        alt={isPlaying ? "Pause" : "Play"}
-                        className="w-[3.5vh] h-[3.5vh] min-w-[20px] min-h-[20px] invert translate-x-[1px]"
-                      />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                      className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
-                      title="Skip"
-                    >
-                      <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* BLOCK 3: Right - Volume Controls */}
-          <div className="justify-self-end flex justify-end items-center z-50 shrink-0">
-            {isPlayerActive && (
-              <div className="flex flex-col items-end gap-1 translate-y-[2px]">
-                <div className="flex items-center gap-4">
+                {/* Play Controls */}
+                <div className="flex items-center gap-[2vw]">
                   <button
-                    className="flex items-center justify-center"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      adjustVolume(volume > 0 ? 0 : 0.5);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                    className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                    title="Previous / Restart"
+                  >
+                    <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                    className="flex items-center justify-center bg-[#ECEEDF]/5 w-[7vh] h-[7vh] min-w-[50px] min-h-[50px] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110 active:scale-95"
+                    title={isPlaying ? "Pause" : "Play"}
                   >
                     <img
-                      src={getVolumeIcon()}
-                      alt="Volume"
-                      className="w-[2vh] h-[2vh] invert opacity-80"
+                      src={isPlaying ? "/pause.svg" : "/play.svg"}
+                      alt={isPlaying ? "Pause" : "Play"}
+                      className="w-[3.5vh] h-[3.5vh] min-w-[20px] min-h-[20px] invert translate-x-[1px]"
                     />
                   </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      adjustVolume(parseFloat(e.target.value));
-                    }}
-                    className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
-                    style={{
-                      background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
-                    }}
-                  />
+                  <button
+                    onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                    className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                    title="Skip"
+                  >
+                    <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                  </button>
                 </div>
-                <span className="w-[10vw] max-w-[120px] min-w-[80px] text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
-                  {formatTime(seek)} / {formatTime(duration)}
-                </span>
-              </div>
+
+                {/* Volume Controls */}
+                <div className="flex flex-col items-end gap-1 translate-y-[2px]">
+                  <div className="flex items-center gap-4">
+                    <button
+                      className="flex items-center justify-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        adjustVolume(volume > 0 ? 0 : 0.5);
+                      }}
+                    >
+                      <img
+                        src={getVolumeIcon()}
+                        alt="Volume"
+                        className="w-[2vh] h-[2vh] invert opacity-80"
+                      />
+                    </button>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={volume}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        adjustVolume(parseFloat(e.target.value));
+                      }}
+                      className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
+                      style={{
+                        background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
+                      }}
+                    />
+                  </div>
+                  <span className="w-[10vw] max-w-[120px] min-w-[80px] text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
+                    {formatTime(seek)} / {formatTime(duration)}
+                  </span>
+                </div>
+              </>
             )}
           </div>
         </div>
