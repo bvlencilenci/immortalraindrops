@@ -258,12 +258,12 @@ const Header = () => {
           <div className="col-span-1 justify-self-center z-50 pointer-events-auto w-auto flex flex-col items-center justify-center relative">
             {isPlayerActive && (
               <>
-                {/* The Masking Wall */}
+                {/* The Masking Wall (Transparent Blur) */}
                 <div
-                  className="absolute top-0 right-0 bottom-0 w-[120%] bg-black -z-10 pointer-events-none"
+                  className="absolute top-0 right-0 bottom-0 w-[120%] bg-white/5 backdrop-blur-md -z-10 pointer-events-none"
                   style={{
-                    maskImage: 'linear-gradient(to right, transparent, black 15%)',
-                    WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%)'
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 20%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 20%)'
                   }}
                 />
 
