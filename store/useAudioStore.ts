@@ -7,6 +7,11 @@ export interface Track {
   artist: string;
   url: string;
   coverImage?: string;
+  r2_key?: string;
+  genre?: string;
+  media_type?: string;
+  audio_key?: string;
+  image_key?: string;
 }
 
 interface AudioStore {

@@ -5,6 +5,11 @@ export interface Track {
   url: string;
   coverImage: string;
   duration: string;
+  r2_key?: string;
+  genre?: string;
+  media_type?: string;
+  audio_key?: string;
+  image_key?: string;
 }
 
 const R2_URL = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';

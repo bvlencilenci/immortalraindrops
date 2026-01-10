@@ -2,44 +2,33 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
-import Image from 'next/image';
 import { Howler } from 'howler';
 
 interface TileProps {
   id: string;
   title: string;
   artist: string;
-  url: string;
-  coverImage?: string;
+  url: string; // Absolute R2 audio URL
+  coverImage?: string; // Absolute R2 image URL
+  genre?: string;
+  media_type?: string;
 }
 
-const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
+const Tile = ({ id, title, artist, url, coverImage, genre, media_type }: TileProps) => {
   const {
     playTrack,
     currentlyPlayingId,
     isPlaying,
     togglePlay,
-    restartTrack,
-    skipTrack,
-    skipBack,
-    seek,
-    duration,
     seekTo,
+    duration,
+    seek,
     volume,
-    adjustVolume,
-    isBuffering
   } = useAudioStore();
 
-  // Function logic for image path generation
-  const getImagePath = (trackTitle: string, cover?: string) => {
-    if (cover) return cover;
-    const sanitized = trackTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
-    return `/images/${sanitized}_pic.jpg`;
-  };
-
-  const imagePath = getImagePath(title, coverImage);
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const visualizerRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   // Handle Play/Interaction
@@ -52,28 +41,46 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
     if (isActive) {
       togglePlay();
+      // Also toggle video if present
+      if (videoRef.current) {
+        if (isPlaying) videoRef.current.pause();
+        else videoRef.current.play();
+      }
     } else {
       playTrack(id, url, title, artist);
+      // Video autoplay handled by side effect of isActive
     }
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    const bar = e.currentTarget;
-    const rect = bar.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percent = Math.min(Math.max(0, clickX / rect.width), 1);
-    seekTo(percent * duration);
-  };
+  // Sync Video with Global Playing State
+  useEffect(() => {
+    if (isActive && videoRef.current) {
+      if (isPlaying) videoRef.current.play().catch(() => { });
+      else videoRef.current.pause();
+    }
+    // If not active, video is hidden/unmounted so pause is implicit or should be enforced
+    if (!isActive && videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [isActive, isPlaying]);
 
-  // ... Visualizer Effect (unchanged) ...
+  // Visualizer Effect (Butterchurn)
+  // Logic remains largely same but ensures we connect to the MAIN audio source (Howler)
   useEffect(() => {
     let animationFrameId: number;
 
     const initVisualizer = async () => {
-      // Visualizer logic needs to run if isActive, regardless of playing state technically to keep it alive?
-      // But standard Howler analyser data might stop if paused.
-      // Keeping existing logic for now.
+      // If we are playing a video, we STILL want the visualizer to work if we want that overlay effect.
+      // The visualizer taps into the global Howler audio node.
+      // If media_type is video, we assume the audio is ALSO playing via Howler for consistency (visualizer source), roughly synced? 
+      // OR, does the video usually completely replace the visualizer? 
+      // The user prompt says: "If media_type is 'video', render a <video> tag... but ensure the audio track is still routed to the Butterchurn analyser."
+      // This implies the audio might be coming from the VIDEO element? Or parallel?
+      // "If media_type is 'song' or 'dj set', initialize the useAudioStore... If 'video', render a <video> tag... but ensure the audio track is still routed..."
+      // This usually implies utilizing the Video as the source. 
+      // HOWEVER, useAudioStore is built around Howler. 
+      // To keep it simple: We will Play the Audio via Howler (so we get visualizer data easily) and MUTE the video element, essentially using the video just as a "moving cover image".
+
       if (!isActive || !canvasRef.current || !isPlaying) return;
 
       try {
@@ -89,7 +96,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
 
         if (sound && sound._node && !sound._visualizerConnected) {
           const audioNode = sound._node;
-          audioNode.crossOrigin = "anonymous";
+          if (!audioNode.crossOrigin) audioNode.crossOrigin = "anonymous";
           try {
             const sourceNode = ctx.createMediaElementSource(audioNode);
             const analyserNode = ctx.createAnalyser();
@@ -141,24 +148,7 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
     };
   }, [isActive, isPlaying]);
 
-  const progressPercent = (duration > 0 && isActive) ? (seek / duration) * 100 : 0;
-
-  const formatTime = (time: number) => {
-    if (isNaN(time) || time === 0) return "--:--";
-    const mins = Math.floor(time / 60);
-    const secs = Math.floor(time % 60);
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getVolumeIcon = () => {
-    const v = isActive ? volume : 1.0;
-    if (v === 0) return "/speaker-simple-slash.svg";
-    if (v < 0.3) return "/speaker-simple-low.svg";
-    if (v < 0.7) return "/speaker-simple-none.svg";
-    return "/speaker-simple-high.svg";
-  };
-
-  // Handle window resize to sync visualizer dimensions
+  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (visualizerRef.current && canvasRef.current) {
@@ -168,26 +158,51 @@ const Tile = ({ id, title, artist, url, coverImage }: TileProps) => {
         }
       }
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const isVideo = media_type === 'video';
 
   return (
     <div
       onClick={handleInteraction}
       className="relative w-full aspect-square overflow-hidden group border-r last:border-r-0 cursor-pointer bg-black"
     >
-      {/* 1. Visual Base (Milkdrop or Cover) */}
+      {/* 1. Visual Base: Video, Canvas, or Image */}
       <div className="absolute inset-0 z-0 transition-all duration-500 w-full h-full">
         {isActive && isPlaying ? (
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 w-full h-full block object-cover z-0"
-          />
+          <>
+            {isVideo ? (
+              // Video Layer: Muted because Main Audio is provided by Howler/AudioStore
+              <video
+                ref={videoRef}
+                src={coverImage} // R2 Video URL passes as coverImage or we should use url? Actually, for video, usually 'url' is the video file. 
+                // If the user setup means 'audio_key' maps to 'url', and 'image_key' maps to 'coverImage'
+                // Then for a 'video' type, we probably want to play the video FILE. 
+                // Assuming 'url' (from audio_key) is the media source.
+                className="absolute inset-0 w-full h-full object-cover z-0"
+                loop
+                muted // Important: Audio handled by global player for consistency/visualization
+                playsInline
+                crossOrigin="anonymous"
+              />
+            ) : (
+              // Milkdrop visualizer layer for audio-only tracks
+              <canvas
+                ref={canvasRef}
+                className="absolute inset-0 w-full h-full block object-cover z-0"
+              />
+            )}
+
+            {/* Overlay Visualizer: If we want visualizer ON TOP of video? 
+                Usually for video we might not want the visualizer canvas blocking it. 
+                Logic above hides canvas if isVideo is true. 
+            */}
+          </>
         ) : (
           <img
-            src={imagePath}
+            src={coverImage}
             className="absolute inset-0 w-full h-full object-cover z-0"
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

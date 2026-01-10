@@ -25,6 +25,8 @@ const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
           artist={track.artist}
           url={track.url}
           coverImage={track.coverImage}
+          genre={track.genre}
+          r2_key={track.r2_key}
         />
       ))}
     </div>
