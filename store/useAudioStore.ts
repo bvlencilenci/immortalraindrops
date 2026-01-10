@@ -46,9 +46,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   setPlaylist: (tracks) => set({ playlist: tracks }),
 
   playTrack: async (id, url, title, artist) => {
-    // Explicitly resume Context if suspended (Autoplay policy)
-    // Using await to ensure context is ready before creating new Howl instance
-    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+    // 0. FORCE RESUME CONTEXT (The Magic Key)
+    // We execute this blindly because checking state can be flaky on first interaction.
+    if (Howler.ctx) {
       await Howler.ctx.resume();
     }
 
@@ -66,8 +66,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const newHowl = new Howl({
       src: [url],
       html5: true,
-      preload: 'metadata', // Required for R2 byte-range requests to support seeking without downloading the whole file
-      pool: 1, // Minimize resource usage
+      preload: true, // Force full preload/buffer for instant start
       format: [fileExt], // Explicitly match the file extension
       xhr: {
         withCredentials: false // Crucial for Archive.org / R2 CORS
@@ -101,7 +100,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
             try {
               const source = ctx.createMediaElementSource(audioNode);
               source.connect(analyser);
+
+              // 4. CRITICAL: Sink to Destination (Speakers)
+              // Without this, audio goes to analyser but never reaches output.
               analyser.connect(ctx.destination);
+
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (sound as any)._visualizerConnected = true;
             } catch (e) {
