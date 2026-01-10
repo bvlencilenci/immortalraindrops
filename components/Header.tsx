@@ -134,10 +134,37 @@ const Header = () => {
       }`}>
 
       {/* Constraints Wrapper (Max Width: 1600px) */}
-      <div className="w-full h-full max-w-[1600px] mx-auto px-4 md:px-8 grid grid-cols-3 items-center relative">
+      <div className="w-full h-full max-w-[1600px] mx-auto px-4 md:px-8 flex items-center justify-between md:grid md:grid-cols-3 relative">
+
+        {/* --- MOBILE NAV GRID (Visible < md) --- */}
+        <div className="flex md:hidden w-full items-center justify-between px-2">
+          <Link href="/live" className="flex items-center gap-2 group">
+            {useAudioStore.getState().isLive && (
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+            )}
+            <span className={`font-mono text-[#ECEEDF] text-[13px] uppercase tracking-[0.1em] ${pathname === '/live' ? 'opacity-100 font-bold' : 'opacity-70'}`}>
+              [ LIVE ]
+            </span>
+          </Link>
+
+          <Link href="/archive" className="flex items-center gap-2 group">
+            <span className={`font-mono text-[#ECEEDF] text-[13px] uppercase tracking-[0.1em] ${pathname === '/archive' ? 'opacity-100 font-bold' : 'opacity-70'}`}>
+              [ ARCHIVE ]
+            </span>
+          </Link>
+
+          {/* About / Info Placeholder */}
+          <div className="flex items-center gap-2 group opacity-50 cursor-not-allowed">
+            <span className="font-mono text-[#ECEEDF] text-[13px] uppercase tracking-[0.1em]">
+              [ ABOUT ]
+            </span>
+          </div>
+        </div>
+
+        {/* --- DESKTOP LAYOUT (Hidden < md) --- */}
 
         {/* BLOCK 1: Left - Station Identity & Meta (Desktop) */}
-        <div className="justify-self-start flex items-center z-10 shrink-0">
+        <div className="hidden md:flex justify-self-start items-center z-10 shrink-0">
 
           {/* Title - Hidden on Mobile if Player is Active to save space, or kept small? 
               User request: "Center-align track metadata" on mobile. 
@@ -221,7 +248,7 @@ const Header = () => {
         </div>
 
         {/* BLOCK 2: Center - Playback Controls */}
-        <div className="col-span-3 md:col-span-1 justify-self-center z-20 pointer-events-auto w-full md:w-auto flex flex-col items-center justify-center">
+        <div className="hidden md:flex col-span-3 md:col-span-1 justify-self-center z-20 pointer-events-auto w-full md:w-auto flex-col items-center justify-center">
           {isPlayerActive && (
             <div className="flex flex-col items-center">
               {/* Mobile Metadata (Centered) */}
@@ -303,9 +330,9 @@ const Header = () => {
         </div>
       </div>
 
-      {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) */}
+      {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
       {isPlayerActive && (
-        <div className="absolute bottom-0 left-0 right-0 w-full h-[3px] bg-transparent z-[60] group/scrubber">
+        <div className="hidden md:block absolute bottom-0 left-0 right-0 w-full h-[3px] bg-transparent z-[60] group/scrubber">
           {/* Hit area larger than visible line */}
           <input
             type="range"
