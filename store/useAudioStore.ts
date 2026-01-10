@@ -72,12 +72,15 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     // Set Buffering State
     set({ isBuffering: true });
 
+    // Determine format from URL to prevent guessing behavior
+    const fileExt = url.split('.').pop()?.toLowerCase() || 'mp3';
+
     const newHowl = new Howl({
       src: [url],
       html5: true,
       preload: 'metadata', // Required for R2 byte-range requests to support seeking without downloading the whole file
       pool: 1, // Minimize resource usage
-      format: ['mp3', 'wav'],
+      format: [fileExt], // Explicitly match the file extension
       xhr: {
         withCredentials: false // Crucial for Archive.org / R2 CORS
       },
@@ -93,10 +96,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (newHowl as any)._sounds[0];
         if (sound && sound._node) {
-          const audioNode = sound._node;
-          if (!audioNode.crossOrigin) {
-            audioNode.crossOrigin = "anonymous";
-          }
+          sound._node.crossOrigin = "anonymous";
         }
       },
       onend: () => {
