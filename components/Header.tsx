@@ -329,7 +329,7 @@ const Header = () => {
                     }}
                   />
                 </div>
-                <span className="w-full text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate pr-1">
+                <span className="w-[10vw] max-w-[120px] min-w-[80px] text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
                   {formatTime(seek)} / {formatTime(duration)}
                 </span>
               </div>
