@@ -133,33 +133,35 @@ const Header = () => {
       : "bg-[#0F0E0E]"
       }`}>
 
-      {/* Constraints Wrapper (Max Width: 1600px) */}
-      <div className="w-full h-full max-w-[1600px] mx-auto px-4 md:px-8 flex items-center justify-between md:grid md:grid-cols-3 relative">
+      {/* Constraints Wrapper (Max Width: 1400px) */}
+      <div className="w-full h-full max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between md:grid md:grid-cols-3 relative">
 
         {/* --- MOBILE NAV GRID (Visible < md) --- */}
-        <div className="flex md:hidden w-full items-center justify-between px-2">
-          <Link href="/live" className="flex items-center gap-2 group">
-            {useAudioStore.getState().isLive && (
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
-            )}
-            <span className={`font-mono text-[#ECEEDF] text-[13px] uppercase tracking-[0.1em] ${pathname === '/live' ? 'opacity-100 font-bold' : 'opacity-70'}`}>
+        {/* --- MOBILE FLOATING TACTILE TAB (< lg) --- */}
+        {/* Fixed top-center pill */}
+        <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] lg:hidden w-auto">
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-full h-12 px-6 flex items-center justify-between gap-6 shadow-2xl min-w-[300px]">
+            {/* Left: LIVE */}
+            <Link href="/live" className={`font-mono text-[10px] uppercase tracking-widest transition-colors duration-200 ${pathname === '/live' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}>
               [ LIVE ]
-            </span>
-          </Link>
+            </Link>
 
-          <Link href="/archive" className="flex items-center gap-2 group">
-            <span className={`font-mono text-[#ECEEDF] text-[13px] uppercase tracking-[0.1em] ${pathname === '/archive' ? 'opacity-100 font-bold' : 'opacity-70'}`}>
+            {/* Center: LOGO (Text) */}
+            <Link href="/" className="flex flex-col items-center justify-center group leading-none">
+              <span className="font-mono font-bold text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+                IMMORTAL
+              </span>
+              <span className="font-mono font-bold text-[10px] text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+                RAINDROPS
+              </span>
+            </Link>
+
+            {/* Right: ARCHIVE */}
+            <Link href="/archive" className={`font-mono text-[10px] uppercase tracking-widest transition-colors duration-200 ${pathname === '/archive' ? 'text-white' : 'text-neutral-400 hover:text-white'}`}>
               [ ARCHIVE ]
-            </span>
-          </Link>
-
-          {/* About / Info Placeholder */}
-          <div className="flex items-center gap-2 group opacity-50 cursor-not-allowed">
-            <span className="font-mono text-[#ECEEDF] text-[13px] uppercase tracking-[0.1em]">
-              [ ABOUT ]
-            </span>
+            </Link>
           </div>
-        </div>
+        </nav>
 
         {/* --- DESKTOP LAYOUT (Hidden < md) --- */}
 
@@ -177,13 +179,13 @@ const Header = () => {
           >
             <div className="flex flex-col text-[#ECEEDF]">
               <span
-                className="font-mono font-bold tracking-widest leading-none whitespace-nowrap"
+                className="font-mono font-bold tracking-tighter leading-none whitespace-nowrap"
                 style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }} // Fluid Typography
               >
                 IMMORTAL
               </span>
               <span
-                className="font-mono font-bold tracking-widest leading-none whitespace-nowrap"
+                className="font-mono font-bold tracking-tighter leading-none whitespace-nowrap"
                 style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
               >
                 RAINDROPS
