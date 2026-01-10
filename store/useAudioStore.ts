@@ -59,19 +59,6 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       Howler.ctx.resume();
     }
 
-    // Setup Analyser if not exists
-    let analyser = get().analyser;
-    if (!analyser && typeof window !== 'undefined') {
-      const ctx = Howler.ctx;
-      if (ctx) {
-        analyser = ctx.createAnalyser();
-        analyser.fftSize = 256;
-      }
-    }
-
-    // Set Buffering State
-    set({ isBuffering: true });
-
     // Determine format from URL to prevent guessing behavior
     const fileExt = url.split('.').pop()?.toLowerCase() || 'mp3';
 
@@ -90,13 +77,22 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         requestAnimationFrame(get().updateSeek);
 
         // Visualizer Connection & Partial Content Support
-        // We set crossOrigin to "anonymous" to allow the AnalyserNode to access audio data 
-        // from Cloudflare R2 / remote sources without tainting the canvas.
-        // This is critical for the "Liquid Glass" visualizer effects.
+        const ctx = Howler.ctx;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (newHowl as any)._sounds[0];
+
         if (sound && sound._node) {
-          sound._node.crossOrigin = "anonymous";
+          const audioNode = sound._node;
+          // 1. Force CORS immediately
+          audioNode.crossOrigin = "anonymous";
+
+          // 2. Delayed Analyzer Setup (Wait for stream to be active)
+          let analyser = get().analyser;
+          if (!analyser && ctx) {
+            analyser = ctx.createAnalyser();
+            analyser.fftSize = 256;
+            set({ analyser });
+          }
         }
       },
       onend: () => {
@@ -131,7 +127,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       trackTitle: title,
       trackArtist: artist,
       howl: newHowl,
-      analyser: analyser
+      analyser: get().analyser // Persist existing analyser or null
     });
 
     newHowl.play();

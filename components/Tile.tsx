@@ -206,12 +206,13 @@ const Tile = (props: TileProps) => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
       {/* 3. Metadata */}
+      {/* 3. Metadata */}
       <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none">
         <span className="text-[15px] font-mono text-neutral-300 lowercase leading-none tracking-normal">
-          {artist}
+          {artist || 'Unknown Artist'}
         </span>
-        <span className="text-[24px] md:text-[32px] font-bold uppercase leading-none tracking-tighter mt-2 text-[#ECEEDF]">
-          {title}
+        <span className="text-[24px] md:text-[32px] font-bold uppercase leading-none tracking-tighter mt-1 text-[#ECEEDF]">
+          {title || 'Untitled'}
         </span>
       </div>
     </div>
