@@ -298,7 +298,7 @@ const Header = () => {
           {/* BLOCK 3: Right - Utility Stack (Desktop Only) */}
           <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
             {isPlayerActive && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 translate-y-[2px]">
                 <button
                   className="flex items-center justify-center"
                   onClick={(e) => {
