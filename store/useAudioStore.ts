@@ -77,7 +77,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       html5: true,
       preload: 'metadata', // Required for R2 byte-range requests to support seeking without downloading the whole file
       pool: 1, // Minimize resource usage
-      format: ['mp3'],
+      format: ['mp3', 'wav'],
       xhr: {
         withCredentials: false // Crucial for Archive.org / R2 CORS
       },
@@ -163,7 +163,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const nextIndex = (currentIndex + 1) % playlist.length;
     const nextTrack = playlist[nextIndex];
     const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-    const ext = nextTrack.audio_ext || 'mp3';
+    const ext = nextTrack.audio_ext || 'wav';
     const audioUrl = `${r2BaseUrl}/${nextTrack.tile_id}/audio.${ext}`;
 
     playTrack(nextTrack.id, audioUrl, nextTrack.title, nextTrack.artist);
@@ -177,7 +177,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
     const prevTrack = playlist[prevIndex];
     const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-    const ext = prevTrack.audio_ext || 'mp3';
+    const ext = prevTrack.audio_ext || 'wav';
     const audioUrl = `${r2BaseUrl}/${prevTrack.tile_id}/audio.${ext}`;
 
     playTrack(prevTrack.id, audioUrl, prevTrack.title, prevTrack.artist);

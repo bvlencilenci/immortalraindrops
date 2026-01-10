@@ -31,11 +31,13 @@ const Tile = (props: TileProps) => {
   const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
 
   // 3. R2 Asset Assembly (Convention Based)
-  const extAudio = audio_ext || 'mp3';
+  const extAudio = audio_ext || 'wav';
   const extImage = image_ext || 'jpg';
 
   const audioUrl = `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
   const imageUrl = `${r2BaseUrl}/${tile_id}/visual.${extImage}`;
+
+  console.log('Tile constructed:', { tile_id, audioUrl, imageUrl });
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
