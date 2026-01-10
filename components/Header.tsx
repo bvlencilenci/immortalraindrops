@@ -298,7 +298,7 @@ const Header = () => {
           {/* BLOCK 3: Right - Utility Stack (Desktop Only) */}
           <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
             {isPlayerActive && (
-              <div className="flex flex-col items-center gap-[0.5vh]">
+              { isPlayerActive && (
                 <div className="flex items-center gap-4">
                   <button
                     className="flex items-center justify-center"
@@ -313,26 +313,28 @@ const Header = () => {
                       className="w-[2vh] h-[2vh] invert opacity-80"
                     />
                   </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      adjustVolume(parseFloat(e.target.value));
-                    }}
-                    className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
-                    style={{
-                      background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
-                    }}
-                  />
+                  <div className="flex flex-col items-center gap-[0.5vh]">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={volume}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        adjustVolume(parseFloat(e.target.value));
+                      }}
+                      className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
+                      style={{
+                        background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
+                      }}
+                    />
+                    <span className="font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums">
+                      {formatTime(seek)} / {formatTime(duration)}
+                    </span>
+                  </div>
                 </div>
-                <span className="font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums">
-                  {formatTime(seek)} / {formatTime(duration)}
-                </span>
-              </div>
+              )}
             )}
           </div>
         </div>
