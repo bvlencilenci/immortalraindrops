@@ -1,19 +1,6 @@
 import { create } from 'zustand';
 import { Howl, Howler } from 'howler';
-
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  url: string;
-  coverImage?: string;
-  r2_key?: string;
-  genre?: string;
-  media_type?: string;
-  audio_key?: string;
-  image_key?: string;
-  tileIndex?: number;
-}
+import { Track } from '../types';
 
 interface AudioStore {
   currentlyPlayingId: string | null;
@@ -175,8 +162,10 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const currentIndex = playlist.findIndex(t => t.id === currentlyPlayingId);
     const nextIndex = (currentIndex + 1) % playlist.length;
     const nextTrack = playlist[nextIndex];
+    const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
+    const audioUrl = `${r2BaseUrl}/${nextTrack.audio_key}`;
 
-    playTrack(nextTrack.id, nextTrack.url, nextTrack.title, nextTrack.artist);
+    playTrack(nextTrack.id, audioUrl, nextTrack.title, nextTrack.artist);
   },
 
   previousTrack: () => {
@@ -186,8 +175,10 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const currentIndex = playlist.findIndex(t => t.id === currentlyPlayingId);
     const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
     const prevTrack = playlist[prevIndex];
+    const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
+    const audioUrl = `${r2BaseUrl}/${prevTrack.audio_key}`;
 
-    playTrack(prevTrack.id, prevTrack.url, prevTrack.title, prevTrack.artist);
+    playTrack(prevTrack.id, audioUrl, prevTrack.title, prevTrack.artist);
   },
 
   skipBack: () => {

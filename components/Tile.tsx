@@ -1,41 +1,37 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import { Howler } from 'howler';
+import { Track } from '../types';
 
-interface TileProps {
-  id: string;
-  title: string;
-  artist: string;
-  url: string;
-  coverImage?: string;
-  genre?: string;
-  r2_key?: string;
-  media_type?: string;
-  tile_index?: number;
-  release_date?: string;
-  audio_key?: string;
-  image_key?: string;
+interface TileProps extends Track {
+  // Add any extra props if needed, otherwise this is just Track
 }
 
-const Tile = ({ id, title, artist, url, coverImage, audio_key, image_key, genre, media_type, r2_key }: TileProps) => {
+const Tile = (props: TileProps) => {
+  const {
+    id,
+    title,
+    artist,
+    genre,
+    media_type,
+    tile_index,
+    audio_key,
+    image_key
+  } = props;
   const {
     playTrack,
     currentlyPlayingId,
     isPlaying,
     togglePlay,
-    seekTo,
-    duration,
-    seek,
-    volume,
   } = useAudioStore();
 
-  // Construct absolute URLs from keys
   const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-  // Check for R2 keys FIRST (new schema), then fallback to direct props (legacy/fallback)
-  const audioUrl = audio_key ? `${r2BaseUrl}/${audio_key}` : (url || '');
-  const imageUrl = image_key ? `${r2BaseUrl}/${image_key}` : (coverImage || '/images/placeholder.jpg');
+
+  // 3. R2 Asset Assembly
+  const audioUrl = `${r2BaseUrl}/${audio_key}`;
+  const imageUrl = `${r2BaseUrl}/${image_key}`;
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,7 +55,6 @@ const Tile = ({ id, title, artist, url, coverImage, audio_key, image_key, genre,
       }
     } else {
       playTrack(id, audioUrl, title, artist);
-      // Video autoplay handled by side effect of isActive
     }
   };
 
@@ -69,29 +64,16 @@ const Tile = ({ id, title, artist, url, coverImage, audio_key, image_key, genre,
       if (isPlaying) videoRef.current.play().catch(() => { });
       else videoRef.current.pause();
     }
-    // If not active, video is hidden/unmounted so pause is implicit or should be enforced
     if (!isActive && videoRef.current) {
       videoRef.current.pause();
     }
   }, [isActive, isPlaying]);
 
   // Visualizer Effect (Butterchurn)
-  // Logic remains largely same but ensures we connect to the MAIN audio source (Howler)
   useEffect(() => {
     let animationFrameId: number;
 
     const initVisualizer = async () => {
-      // If we are playing a video, we STILL want the visualizer to work if we want that overlay effect.
-      // The visualizer taps into the global Howler audio node.
-      // If media_type is video, we assume the audio is ALSO playing via Howler for consistency (visualizer source), roughly synced? 
-      // OR, does the video usually completely replace the visualizer? 
-      // The user prompt says: "If media_type is 'video', render a <video> tag... but ensure the audio track is still routed to the Butterchurn analyser."
-      // This implies the audio might be coming from the VIDEO element? Or parallel?
-      // "If media_type is 'song' or 'dj set', initialize the useAudioStore... If 'video', render a <video> tag... but ensure the audio track is still routed..."
-      // This usually implies utilizing the Video as the source. 
-      // HOWEVER, useAudioStore is built around Howler. 
-      // To keep it simple: We will Play the Audio via Howler (so we get visualizer data easily) and MUTE the video element, essentially using the video just as a "moving cover image".
-
       if (!isActive || !canvasRef.current || !isPlaying) return;
 
       try {
@@ -185,34 +167,30 @@ const Tile = ({ id, title, artist, url, coverImage, audio_key, image_key, genre,
         {isActive && isPlaying ? (
           <>
             {isVideo ? (
-              // Video Layer: Muted because Main Audio is provided by Howler/AudioStore
+              // 4. Media Handling: Video
               <video
                 ref={videoRef}
                 src={imageUrl}
                 className="absolute inset-0 w-full h-full object-cover z-0"
                 loop
-                muted // Important: Audio handled by global player for consistency/visualization
+                muted // Audio governed by global store
                 playsInline
-                crossOrigin="anonymous"
+                crossOrigin="anonymous" // 5. Fix CORS
               />
             ) : (
-              // Milkdrop visualizer layer for audio-only tracks
+              // Audio Visualizer
               <canvas
                 ref={canvasRef}
                 className="absolute inset-0 w-full h-full block object-cover z-0"
               />
             )}
-
-            {/* Overlay Visualizer: If we want visualizer ON TOP of video? 
-                Usually for video we might not want the visualizer canvas blocking it. 
-                Logic above hides canvas if isVideo is true. 
-            */}
           </>
         ) : (
           <img
             src={imageUrl}
             className="absolute inset-0 w-full h-full object-cover z-0"
-            alt=""
+            alt={title}
+            crossOrigin="anonymous" // 5. Fix CORS for images too
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
@@ -221,7 +199,7 @@ const Tile = ({ id, title, artist, url, coverImage, audio_key, image_key, genre,
       {/* 2. Text Protection & Hover Layer */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
-      {/* 3. Metadata & Safe-Area Offset */}
+      {/* 3. Metadata */}
       <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none">
         <span className="text-[15px] font-mono text-neutral-300 lowercase leading-none tracking-normal">
           {artist}

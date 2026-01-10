@@ -1,73 +1,43 @@
 'use server';
 
-import { tracks as staticTracks, Track } from '../data/tracks';
-
-// Simplified D1 Interface for TypeScript
-interface D1Database {
-  prepare: (query: string) => D1PreparedStatement;
-}
-
-interface D1PreparedStatement {
-  bind: (...values: any[]) => D1PreparedStatement; // eslint-disable-line @typescript-eslint/no-explicit-any
-  all: <T = any>() => Promise<D1Result<T>>; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-interface D1Result<T> {
-  results: T[];
-  success: boolean;
-  // eslint-disable-line @typescript-eslint/no-explicit-any
-  meta: any;
-}
+import { tracks } from '../data/tracks';
+import { Track } from '../types';
 
 export async function getTracks(): Promise<Track[]> {
-  try {
-    const DB = process.env.DB as unknown as D1Database;
+  const { DB } = process.env as Record<string, any>;
 
-    if (DB && typeof DB.prepare === 'function') {
-      const { results } = await DB.prepare(
-        `SELECT id, title, artist, genre, media_type, audio_key, image_key, tile_index, duration 
-         FROM tracks 
-         ORDER BY tile_index ASC`
-      ).all();
-
-      if (results && results.length > 0) {
-        const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
-
-        // eslint-disable-line @typescript-eslint/no-explicit-any
-        const mappedTracks = results.map((row: any) => {
-          const audioUrl = row.audio_key
-            ? `${r2BaseUrl}/${row.audio_key}`
-            : '';
-
-          const imageUrl = row.image_key
-            ? `${r2BaseUrl}/${row.image_key}`
-            : '/images/placeholder.jpg';
-
-          return {
-            id: row.id || `track-${Math.random()}`,
-            title: row.title || 'Untitled',
-            artist: row.artist || 'Unknown',
-            genre: row.genre,
-            media_type: row.media_type || 'song', // Default to song
-            audio_key: row.audio_key,
-            image_key: row.image_key,
-            // Map to app state props
-            coverImage: imageUrl,
-            duration: row.duration || '0:00',
-            url: audioUrl,
-            tileIndex: row.tile_index
-          };
-        });
-
-        // Fill in gaps? For now just return what we have. 
-        // The user mentioned "If a specific tile_index has no database entry, render a placeholder 'Locked' tile state."
-        // This logic is best handled in the UI mapping or by pre-filling the array here to matching standard grid size (e.g. 6).
-        return mappedTracks;
-      }
-    }
-  } catch (error) {
-    console.warn("Failed to fetch tracks from D1 DB. Falling back to static data.", error);
+  if (!DB) {
+    console.warn('D1 Database binding not found. Using static data.');
+    // Simulate async
+    return new Promise((resolve) => setTimeout(() => resolve(tracks), 100));
   }
 
-  return staticTracks;
+  try {
+    // 2. Select strictly and order by tile_index
+    const { results } = await DB.prepare(
+      `SELECT * FROM tracks ORDER BY tile_index ASC`
+    ).all();
+
+    if (!results || results.length === 0) {
+      return tracks;
+    }
+
+    // Map strict schema
+    return results.map((row: any) => ({
+      id: row.id.toString(),
+      created_at: row.created_at || new Date().toISOString(),
+      title: row.title,
+      artist: row.artist,
+      genre: row.genre,
+      media_type: row.media_type,
+      audio_key: row.audio_key,
+      image_key: row.image_key,
+      tile_index: row.tile_index,
+      release_date: row.release_date,
+      duration: row.duration || '0:00'
+    }));
+  } catch (error) {
+    console.error('Failed to fetch tracks from D1:', error);
+    return tracks;
+  }
 }

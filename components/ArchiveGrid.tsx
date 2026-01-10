@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import Tile from './Tile';
-import { useAudioStore, Track } from '../store/useAudioStore';
+import { useAudioStore } from '../store/useAudioStore';
+import { Track } from '../types';
 
 interface ArchiveGridProps {
   tracks: Track[];
@@ -23,14 +24,14 @@ const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
           id={track.id}
           title={track.title}
           artist={track.artist}
-          tile_index={track.tileIndex || 0}
-          media_type={track.media_type || 'song'}
+          tile_index={track.tile_index}
+          media_type={track.media_type}
           audio_key={track.audio_key}
           image_key={track.image_key}
-          r2_key={track.r2_key}
-          url={track.url || ''}
-          coverImage={track.coverImage}
-          genre={track.genre}
+          release_date={track.release_date}
+          genre={track.genre || null}
+          duration={track.duration || null}
+          created_at={track.created_at || new Date().toISOString()} // Fallback for strict type satisfaction
         />
       ))}
     </div>

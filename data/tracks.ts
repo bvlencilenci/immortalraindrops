@@ -1,99 +1,96 @@
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: string;
-  // Computed URL Props (optional/legacy support for fallback)
-  url?: string;
-  coverImage?: string;
 
-  // New Schema Props
-  media_type?: string;
-  audio_key?: string;
-  image_key?: string;
-  tileIndex?: number;
-  genre?: string;
-}
-
-const R2_URL = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
+import { Track } from '../types';
 
 export const tracks: Track[] = [
   {
     id: "track1",
+    created_at: "2024-05-08T00:00:00Z",
     title: "may 8 mix",
     artist: "p/rpose",
+    genre: null,
     media_type: "song",
     audio_key: "may-8-calm-mix/may%208%20calm%20mix.mp3",
-    image_key: "may-8-calm-mix/cover.jpg", // Placeholder key, fallback uses existing logic
-    url: `${R2_URL}/may-8-calm-mix/may%208%20calm%20mix.mp3`,
-    coverImage: "/images/may8mix_pic.jpg",
-    duration: "0:00",
-    tileIndex: 0
+    image_key: "may-8-calm-mix/cover.jpg",
+    tile_index: 0,
+    release_date: "2024-05-08",
+    duration: "0:00"
   },
   {
     id: "track2",
+    created_at: "2024-01-01T00:00:00Z",
     title: "test2",
     artist: "Null Pointer",
+    genre: null,
     media_type: "song",
     audio_key: "CanonInD_261/CanoninD.mp3",
-    url: `${R2_URL}/CanonInD_261/CanoninD.mp3`,
-    coverImage: "/images/test2_pic.jpg",
-    duration: "5:34",
-    tileIndex: 1
+    image_key: "test2_pic.jpg",
+    tile_index: 1,
+    release_date: "2024-01-01",
+    duration: "5:34"
   },
   {
     id: "track3",
+    created_at: "2024-02-01T00:00:00Z",
     title: "test3",
     artist: "Memory Leak",
+    genre: null,
     media_type: "song",
     audio_key: "mythium/JLS_ATI.mp3",
-    url: `${R2_URL}/mythium/JLS_ATI.mp3`,
-    coverImage: "/images/test3_pic.jpg",
-    duration: "4:20",
-    tileIndex: 2
+    image_key: "test3_pic.jpg",
+    tile_index: 2,
+    release_date: "2024-02-01",
+    duration: "4:20"
   },
   {
     id: "track4",
+    created_at: "2024-03-01T00:00:00Z",
     title: "test4",
     artist: "Stack Trace",
+    genre: null,
     media_type: "song",
     audio_key: "testmp3testfile/mp3test.mp3",
-    url: `${R2_URL}/testmp3testfile/mp3test.mp3`,
-    coverImage: "/images/test4_pic.jpg",
-    duration: "0:12",
-    tileIndex: 3
+    image_key: "test4_pic.jpg",
+    tile_index: 3,
+    release_date: "2024-03-01",
+    duration: "0:12"
   },
   {
     id: "track5",
+    created_at: "2024-04-01T00:00:00Z",
     title: "test5",
     artist: "Void Walker",
+    genre: null,
     media_type: "song",
     audio_key: "testmp3testfile/mp3test.mp3",
-    url: `${R2_URL}/testmp3testfile/mp3test.mp3`,
-    coverImage: "/images/test5_pic.jpg",
-    duration: "0:15",
-    tileIndex: 4
+    image_key: "test5_pic.jpg",
+    tile_index: 4,
+    release_date: "2024-04-01",
+    duration: "0:15"
   },
   {
     id: "track6",
+    created_at: "2024-05-01T00:00:00Z",
     title: "test6",
     artist: "Kernel Panic",
+    genre: null,
     media_type: "song",
     audio_key: "testmp3testfile/mp3test.mp3",
-    url: `${R2_URL}/testmp3testfile/mp3test.mp3`,
-    coverImage: "/images/test6_pic.jpg",
-    duration: "0:18",
-    tileIndex: 5
+    image_key: "test6_pic.jpg",
+    tile_index: 5,
+    release_date: "2024-05-01",
+    duration: "0:18"
   },
   {
     id: "tile-4",
+    created_at: "2024-06-01T00:00:00Z",
     title: "UNTITLED BURIAL FINAL MASTER",
     artist: "p/rpose",
+    genre: null,
     media_type: "song",
     audio_key: "UNTITLED%20BURIAL%20FINAL%20MASTER%20.wav",
-    url: `${R2_URL}/UNTITLED%20BURIAL%20FINAL%20MASTER%20.wav`,
-    coverImage: "/images/placeholder.jpg",
-    duration: "0:00",
-    tileIndex: 6
+    image_key: "placeholder.jpg",
+    tile_index: 6,
+    release_date: "2024-06-01",
+    duration: "0:00"
   }
 ];
