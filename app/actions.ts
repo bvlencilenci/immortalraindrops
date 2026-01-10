@@ -2,28 +2,29 @@
 
 import { tracks } from '../data/tracks';
 import { Track } from '../types';
+import { supabase } from '../lib/supabase';
 
 export async function getTracks(): Promise<Track[]> {
-  const { DB } = process.env as Record<string, any>;
-
-  if (!DB) {
-    console.warn('D1 Database binding not found. Using static data.');
-    // Simulate async
-    return new Promise((resolve) => setTimeout(() => resolve(tracks), 100));
-  }
-
   try {
-    // 2. Select strictly and order by tile_index
-    const { results } = await DB.prepare(
-      `SELECT id, created_at, title, artist, genre, media_type, tile_id, audio_ext, image_ext, tile_index, release_date, duration FROM tracks ORDER BY tile_index ASC`
-    ).all();
+    // Select specific columns to ensure we get exactly what we need
+    const { data, error } = await supabase
+      .from('tracks')
+      .select('id, created_at, title, artist, genre, media_type, tile_id, audio_ext, image_ext, tile_index, release_date, duration')
+      .order('tile_index', { ascending: true });
 
-    if (!results || results.length === 0) {
+    if (error) {
+      console.error('Supabase fetch error:', error);
+      return tracks; // Fallback to static data on error
+    }
+
+    if (!data || data.length === 0) {
+      console.warn('Supabase returned no content. Using static fallback.');
       return tracks;
     }
 
     // Map strict schema
-    return results.map((row: any) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data.map((row: any) => ({
       id: row.id.toString(),
       created_at: row.created_at || new Date().toISOString(),
       title: row.title,
@@ -38,7 +39,7 @@ export async function getTracks(): Promise<Track[]> {
       duration: row.duration || '0:00'
     }));
   } catch (error) {
-    console.error('Failed to fetch tracks from D1:', error);
+    console.error('Unexpected error fetching tracks:', error);
     return tracks;
   }
 }
