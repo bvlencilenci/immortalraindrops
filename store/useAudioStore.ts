@@ -89,7 +89,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
     const newHowl = new Howl({
       src: [url],
-      html5: false, // Force Web Audio mode for AnalyserNode compatibility
+      html5: true, // Enable HTML5 Audio for progressive buffering (streaming)
       preload: true,
       format: [fileExt], // Explicitly match the file extension
       xhr: {
@@ -107,8 +107,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
         if (sound && sound._node) {
           const audioNode = sound._node;
-          // 1. Force CORS immediately
-          audioNode.crossOrigin = "anonymous";
+          // 1. Force CORS immediately on the audio element
+          // This is critical for createMediaElementSource to output signal
+          if (!audioNode.crossOrigin) {
+            audioNode.crossOrigin = "anonymous";
+          }
 
           // 2. Delayed Analyzer Setup (Wait for stream to be active)
           let analyser = get().analyser;
