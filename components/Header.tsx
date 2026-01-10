@@ -133,21 +133,34 @@ const Header = () => {
       : "bg-[#0F0E0E]"
       }`}>
 
-      {/* Padded Content Wrapper */}
-      <div className="w-full h-full px-[2vw] grid grid-cols-3 items-center relative">
+      {/* Constraints Wrapper (Max Width: 1600px) */}
+      <div className="w-full h-full max-w-[1600px] mx-auto px-4 md:px-8 grid grid-cols-3 items-center relative">
 
-        {/* BLOCK 1: Left - Station Identity & Meta & Nav */}
+        {/* BLOCK 1: Left - Station Identity & Meta (Desktop) */}
         <div className="justify-self-start flex items-center z-10 shrink-0">
 
-          {/* Interactive Title / Nav Container */}
+          {/* Title - Hidden on Mobile if Player is Active to save space, or kept small? 
+              User request: "Center-align track metadata" on mobile. 
+              Let's hide the Title on mobile if player is active to focus on Metadata. 
+          */}
           <div
-            className="flex items-center gap-4 relative cursor-pointer group pr-6"
+            className={`flex items-center gap-4 relative cursor-pointer group pr-6 ${isPlayerActive ? 'hidden md:flex' : 'flex'}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             <div className="flex flex-col text-[#ECEEDF]">
-              <span className="font-mono text-[2.5vh] font-bold tracking-widest leading-none">IMMORTAL</span>
-              <span className="font-mono text-[2.5vh] font-bold tracking-widest leading-none">RAINDROPS</span>
+              <span
+                className="font-mono font-bold tracking-widest leading-none whitespace-nowrap"
+                style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }} // Fluid Typography
+              >
+                IMMORTAL
+              </span>
+              <span
+                className="font-mono font-bold tracking-widest leading-none whitespace-nowrap"
+                style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
+              >
+                RAINDROPS
+              </span>
             </div>
 
             {/* Inactive State Hint (Vertical Lines) */}
@@ -157,7 +170,7 @@ const Header = () => {
               <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
             </div>
 
-            {/* Horizontal Slide Navigation */}
+            {/* Horizontal Slide Navigation - Desktop Only */}
             <AnimatePresence>
               {isHovered && (
                 <motion.div
@@ -166,7 +179,7 @@ const Header = () => {
                   animate={{ width: "auto", opacity: 1 }}
                   exit={{ width: 0, opacity: 0 }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap"
+                  className="hidden md:flex items-center gap-x-6 lg:gap-x-12 overflow-hidden whitespace-nowrap pl-6" // Added lg:gap-12
                 >
                   <Link href="/" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">HOME</Link>
                   <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
@@ -176,9 +189,10 @@ const Header = () => {
             </AnimatePresence>
           </div>
 
+          {/* Desktop Metadata (Left aligned next to title) */}
           {isPlayerActive && (
             <motion.div
-              className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-[1.5vw] max-w-[20vw] md:max-w-[15vw]"
+              className="hidden md:flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]"
               initial={{ marginLeft: "1rem" }}
               animate={{ marginLeft: isHovered ? "2rem" : "1rem" }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -195,10 +209,10 @@ const Header = () => {
               ) : (
                 <>
                   <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
-                    {trackArtist}
+                    {trackArtist || 'Unknown Artist'}
                   </span>
                   <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
-                    {trackTitle}
+                    {trackTitle || 'Unknown Track'}
                   </span>
                 </>
               )}
@@ -207,43 +221,51 @@ const Header = () => {
         </div>
 
         {/* BLOCK 2: Center - Playback Controls */}
-        <div className="justify-self-center z-20 pointer-events-auto">
+        <div className="col-span-3 md:col-span-1 justify-self-center z-20 pointer-events-auto w-full md:w-auto flex flex-col items-center justify-center">
           {isPlayerActive && (
-            <div className="flex items-center gap-[2vw]">
-              <button
-                onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110"
-                title="Previous / Restart"
-              >
-                <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] invert" />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                className="flex items-center justify-center bg-[#ECEEDF]/5 w-[6vh] h-[6vh] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110"
-                title={isPlaying ? "Pause" : "Play"}
-              >
-                <img
-                  src={isPlaying ? "/pause.svg" : "/play.svg"}
-                  alt={isPlaying ? "Pause" : "Play"}
-                  className="w-[4vh] h-[4vh] invert translate-x-[1px]"
-                />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110"
-                title="Skip"
-              >
-                <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] invert" />
-              </button>
+            <div className="flex flex-col items-center">
+              {/* Mobile Metadata (Centered) */}
+              <div className="flex md:hidden flex-col items-center mb-2">
+                <span className="text-xs font-mono text-neutral-400 lowercase tracking-widest">{useAudioStore.getState().isLive ? '● live' : trackArtist}</span>
+                <span className="text-sm font-bold text-[#ECEEDF] uppercase tracking-wider">{useAudioStore.getState().isLive ? 'DJ SET' : trackTitle}</span>
+              </div>
+
+              <div className="flex items-center gap-8 md:gap-[2vw]">
+                <button
+                  onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                  className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                  title="Previous / Restart"
+                >
+                  <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                  className="flex items-center justify-center bg-[#ECEEDF]/5 w-[7vh] h-[7vh] min-w-[50px] min-h-[50px] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110 active:scale-95"
+                  title={isPlaying ? "Pause" : "Play"}
+                >
+                  <img
+                    src={isPlaying ? "/pause.svg" : "/play.svg"}
+                    alt={isPlaying ? "Pause" : "Play"}
+                    className="w-[3.5vh] h-[3.5vh] min-w-[20px] min-h-[20px] invert translate-x-[1px]"
+                  />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                  className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                  title="Skip"
+                >
+                  <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* BLOCK 3: Right - Utility Stack */}
-        <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
+        {/* BLOCK 3: Right - Utility Stack (Desktop Only for Volume) */}
+        <div className="hidden md:flex justify-self-end flex-1 justify-end items-center z-10 shrink-0">
           {isPlayerActive && (
             <div className="flex flex-col items-end gap-[0.5vh]">
-              <div className="flex items-center gap-[1vw]">
+              <div className="flex items-center gap-4">
                 <button
                   className="flex items-center justify-center"
                   onClick={(e) => {
@@ -254,7 +276,7 @@ const Header = () => {
                   <img
                     src={getVolumeIcon()}
                     alt="Volume"
-                    className="w-[2vh] h-[2vh] invert"
+                    className="w-[2vh] h-[2vh] invert opacity-80"
                   />
                 </button>
                 <input
@@ -267,13 +289,13 @@ const Header = () => {
                     e.stopPropagation();
                     adjustVolume(parseFloat(e.target.value));
                   }}
-                  className="w-[10vw] max-w-[150px] min-w-[80px] h-[3px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[1.5vh] [&::-webkit-slider-thumb]:w-[1.5vh] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-[#ECEEDF] outline-none"
+                  className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
                   style={{
                     background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
                   }}
                 />
               </div>
-              <span className="font-mono text-[1.5vh] text-[#ECEEDF] tracking-widest leading-none tabular-nums">
+              <span className="font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums">
                 {formatTime(seek)} / {formatTime(duration)}
               </span>
             </div>
@@ -283,7 +305,8 @@ const Header = () => {
 
       {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) */}
       {isPlayerActive && (
-        <div className="absolute bottom-0 left-0 right-0 w-full h-[0.5vh] bg-transparent z-[60]">
+        <div className="absolute bottom-0 left-0 right-0 w-full h-[3px] bg-transparent z-[60] group/scrubber">
+          {/* Hit area larger than visible line */}
           <input
             type="range"
             min="0"

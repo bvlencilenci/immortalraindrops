@@ -80,6 +80,9 @@ const Tile = (props: TileProps) => {
     let animationFrameId: number;
 
     const initVisualizer = async () => {
+      // PERF: Disable visualizer on mobile screens to save battery/resources
+      if (typeof window !== 'undefined' && window.innerWidth < 768) return;
+
       if (!isActive || !canvasRef.current || !isPlaying) return;
 
       try {
@@ -177,7 +180,7 @@ const Tile = (props: TileProps) => {
               <video
                 ref={videoRef}
                 src={imageUrl}
-                className="absolute inset-0 w-full h-full object-cover z-0"
+                className="absolute inset-0 w-full h-full object-cover z-0 hidden md:block" // Hidden on mobile for perf
                 loop
                 muted // Audio governed by global store
                 playsInline
@@ -187,7 +190,7 @@ const Tile = (props: TileProps) => {
               // Audio Visualizer
               <canvas
                 ref={canvasRef}
-                className="absolute inset-0 w-full h-full block object-cover z-0"
+                className="absolute inset-0 w-full h-full object-cover z-0 hidden md:block" // Hidden on mobile for perf
               />
             )}
           </>
