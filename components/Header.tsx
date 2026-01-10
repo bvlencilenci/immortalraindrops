@@ -182,10 +182,10 @@ const Header = () => {
         }`}>
 
         {/* Constraints Wrapper (Max Width: 1400px) */}
-        <div className="w-full h-full max-w-[1400px] mx-auto px-8 flex justify-between items-center relative">
+        <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-3 items-center relative">
 
-          {/* Left: Station Identity & Meta (Z-20 to slide under occluder) */}
-          <div className="flex items-center z-20 shrink-0">
+          {/* BLOCK 1: Left - Station Identity & Meta (Z-20) */}
+          <div className="justify-self-start flex items-center z-20 shrink-0">
             <div
               className="flex items-center gap-8 relative cursor-pointer group"
               onMouseEnter={() => setIsHovered(true)}
@@ -254,44 +254,55 @@ const Header = () => {
             )}
           </div>
 
-          {/* Right: Occluder Wall (Controls + Volume) (Z-30) */}
-          {isPlayerActive && (
-            <div
-              className="flex items-center gap-6 z-30 h-full pl-12"
-              style={{ background: 'linear-gradient(to right, transparent, #000000 20%)' }}
-            >
-              {/* Playback Controls */}
-              <div className="flex flex-col items-center">
-                <div className="flex items-center gap-[2vw]">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                    className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
-                    title="Previous / Restart"
-                  >
-                    <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                    className="flex items-center justify-center bg-[#ECEEDF]/5 w-[7vh] h-[7vh] min-w-[50px] min-h-[50px] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110 active:scale-95"
-                    title={isPlaying ? "Pause" : "Play"}
-                  >
-                    <img
-                      src={isPlaying ? "/pause.svg" : "/play.svg"}
-                      alt={isPlaying ? "Pause" : "Play"}
-                      className="w-[3.5vh] h-[3.5vh] min-w-[20px] min-h-[20px] invert translate-x-[1px]"
-                    />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                    className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
-                    title="Skip"
-                  >
-                    <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
-                  </button>
-                </div>
-              </div>
+          {/* BLOCK 2: Center - Playback Controls (Z-50 + Occluder Mask) */}
+          <div className="col-span-1 justify-self-center z-50 pointer-events-auto w-auto flex flex-col items-center justify-center relative">
+            {isPlayerActive && (
+              <>
+                {/* The Masking Wall */}
+                <div
+                  className="absolute top-0 right-0 bottom-0 w-[120%] bg-black -z-10 pointer-events-none"
+                  style={{
+                    maskImage: 'linear-gradient(to right, transparent, black 15%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%)'
+                  }}
+                />
 
-              {/* Volume & Timestamp */}
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center gap-[2vw]">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                      className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                      title="Previous / Restart"
+                    >
+                      <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                      className="flex items-center justify-center bg-[#ECEEDF]/5 w-[7vh] h-[7vh] min-w-[50px] min-h-[50px] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110 active:scale-95"
+                      title={isPlaying ? "Pause" : "Play"}
+                    >
+                      <img
+                        src={isPlaying ? "/pause.svg" : "/play.svg"}
+                        alt={isPlaying ? "Pause" : "Play"}
+                        className="w-[3.5vh] h-[3.5vh] min-w-[20px] min-h-[20px] invert translate-x-[1px]"
+                      />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                      className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                      title="Skip"
+                    >
+                      <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* BLOCK 3: Right - Volume Controls */}
+          <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
+            {isPlayerActive && (
               <div className="flex flex-col items-end gap-1 translate-y-[2px]">
                 <div className="flex items-center gap-4">
                   <button
@@ -327,8 +338,8 @@ const Header = () => {
                   {formatTime(seek)} / {formatTime(duration)}
                 </span>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
