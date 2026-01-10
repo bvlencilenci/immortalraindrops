@@ -187,15 +187,21 @@ const Header = () => {
           {/* BLOCK 1: Left - Station Identity & Meta */}
           <div className="justify-self-start flex items-center z-10 shrink-0">
             <div
-              className={`flex items-center gap-8 relative cursor-pointer group`}
+              className="flex items-center gap-8 relative cursor-pointer group"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               <div className="flex flex-col text-[#ECEEDF]">
-                <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
+                <span
+                  className="font-mono tracking-tighter leading-none whitespace-nowrap"
+                  style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
+                >
                   IMMORTAL
                 </span>
-                <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
+                <span
+                  className="font-mono tracking-tighter leading-none whitespace-nowrap"
+                  style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
+                >
                   RAINDROPS
                 </span>
               </div>
