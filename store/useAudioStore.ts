@@ -46,18 +46,18 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   setPlaylist: (tracks) => set({ playlist: tracks }),
 
   playTrack: async (id, url, title, artist) => {
+    // Explicitly resume Context if suspended (Autoplay policy)
+    // Using await to ensure context is ready before creating new Howl instance
+    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+      await Howler.ctx.resume();
+    }
+
     const { howl, volume } = get();
 
     // Stop and unload previous
     if (howl) {
       howl.stop();
       howl.unload();
-    }
-
-    // Explicitly resume Context if suspended (Autoplay policy)
-    // Using await to ensure context is ready before creating new Howl instance
-    if (Howler.ctx && Howler.ctx.state === 'suspended') {
-      await Howler.ctx.resume();
     }
 
     // Determine format from URL to prevent guessing behavior
