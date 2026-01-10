@@ -100,10 +100,12 @@ const SplashGate = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black gap-8">
+    <div
+      onClick={!isWarming ? handleEnter : undefined}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black gap-8"
+    >
       {!isWarming ? (
         <button
-          onClick={handleEnter}
           className="text-[#ECEEDF] text-[32px] md:text-[48px] font-bold uppercase tracking-tighter hover:opacity-70 transition-opacity"
         >
           CLICK TO ENTER
