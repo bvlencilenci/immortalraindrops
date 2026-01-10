@@ -89,9 +89,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
     const newHowl = new Howl({
       src: [url],
-      html5: true,
-      preload: true, // Force full preload/buffer for instant start
-      format: [fileExt], // Explicitly match the file extension
+      html5: false, // Force Web Audio mode for AnalyserNode compatibility
+      preload: true,
+      format: ['wav'], // Explicitly set format as requested
       xhr: {
         withCredentials: false // Crucial for Archive.org / R2 CORS
       },
