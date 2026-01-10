@@ -187,7 +187,7 @@ const Header = () => {
           {/* BLOCK 1: Left - Station Identity & Meta (Z-20) */}
           <div className="justify-self-start flex items-center z-20 shrink-0">
             <div
-              className="flex items-center gap-8 relative cursor-pointer group"
+              className="flex items-center gap-8 relative cursor-pointer group shrink-0"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
@@ -255,7 +255,7 @@ const Header = () => {
           </div>
 
           {/* BLOCK 2: Center - Playback Controls (Z-50 + Occluder Mask) */}
-          <div className="col-span-1 justify-self-center z-50 pointer-events-auto w-auto flex flex-col items-center justify-center relative">
+          <div className="col-span-1 justify-self-center z-50 pointer-events-auto w-auto flex flex-col items-center justify-center relative shrink-0">
             {isPlayerActive && (
               <>
                 {/* The Masking Wall (Transparent Blur) */}
@@ -301,7 +301,7 @@ const Header = () => {
           </div>
 
           {/* BLOCK 3: Right - Volume Controls */}
-          <div className="justify-self-end flex-1 flex justify-end items-center z-10 shrink-0">
+          <div className="justify-self-end flex justify-end items-center z-50 shrink-0">
             {isPlayerActive && (
               <div className="flex flex-col items-end gap-1 translate-y-[2px]">
                 <div className="flex items-center gap-4">
