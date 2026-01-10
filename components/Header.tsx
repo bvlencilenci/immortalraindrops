@@ -182,26 +182,20 @@ const Header = () => {
         }`}>
 
         {/* Constraints Wrapper (Max Width: 1400px) */}
-        <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-3 items-center relative">
+        <div className="w-full h-full max-w-[1400px] mx-auto px-12 grid grid-cols-3 items-center relative">
 
           {/* BLOCK 1: Left - Station Identity & Meta */}
           <div className="justify-self-start flex items-center z-10 shrink-0">
             <div
-              className={`flex items-center gap-8 relative cursor-pointer group px-6`}
+              className={`flex items-center gap-8 relative cursor-pointer group`}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               <div className="flex flex-col text-[#ECEEDF]">
-                <span
-                  className="font-mono tracking-tighter leading-none whitespace-nowrap"
-                  style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
-                >
+                <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
                   IMMORTAL
                 </span>
-                <span
-                  className="font-mono tracking-tighter leading-none whitespace-nowrap"
-                  style={{ fontSize: 'clamp(1rem, 2.5vh, 2rem)' }}
-                >
+                <span className="font-mono tracking-tighter leading-none whitespace-nowrap text-lg md:text-xl">
                   RAINDROPS
                 </span>
               </div>
