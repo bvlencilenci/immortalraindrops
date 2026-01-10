@@ -94,6 +94,20 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
             analyser.fftSize = 256;
             set({ analyser });
           }
+
+          // 3. Connect Visualizer Immediately
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (analyser && !(sound as any)._visualizerConnected) {
+            try {
+              const source = ctx.createMediaElementSource(audioNode);
+              source.connect(analyser);
+              analyser.connect(ctx.destination);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (sound as any)._visualizerConnected = true;
+            } catch (e) {
+              console.warn("Visualizer connection error or already connected:", e);
+            }
+          }
         }
       },
       onend: () => {
