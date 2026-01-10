@@ -24,8 +24,8 @@ export const tracks: Track[] = [
     genre: null,
     media_type: "song",
     tile_id: "tile-2",
-    audio_ext: "mp3",
-    image_ext: "jpg",
+    audio_ext: "wav",
+    image_ext: "png",
     tile_index: 1,
     release_date: "2024-01-01",
     duration: "5:34"
