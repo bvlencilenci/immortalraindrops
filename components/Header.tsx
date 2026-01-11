@@ -193,17 +193,18 @@ const Header = () => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            <Link href="/" className="flex flex-col text-[#ECEEDF] cursor-pointer">
-              <span className="block font-mono tracking-tighter leading-[0.9] whitespace-nowrap text-lg md:text-xl">
+            {/* Center: LOGO (Text) */}
+            <Link
+              href="/"
+              className="ml-24 shrink-0 flex flex-col items-start justify-center group leading-none"
+            >
+              <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
                 IMMORTAL
               </span>
-              <span className="block font-mono tracking-tighter leading-[0.9] whitespace-nowrap text-lg md:text-xl">
+              <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
                 RAINDROPS
               </span>
             </Link>
-
-            {/* Fixed Spacer (60px) */}
-            <div className="w-[60px] flex-shrink-0" />
 
             <div className="flex items-center gap-4">
               <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
