@@ -24,7 +24,7 @@ export async function getTracks(): Promise<Track[]> {
 
     // Map strict schema
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data.map((row: any) => ({
+    const tracks = data.map((row: any) => ({
       id: row.id.toString(),
       created_at: row.created_at || new Date().toISOString(),
       title: row.title,
@@ -38,6 +38,26 @@ export async function getTracks(): Promise<Track[]> {
       release_date: row.release_date,
       duration: row.duration || '0:00'
     }));
+
+    // MOCK: Inject Tile 4 if missing (Requested by USER)
+    if (tracks.length === 3) {
+      tracks.push({
+        id: '999', // Temporary Mock ID
+        created_at: new Date().toISOString(),
+        title: 'Activated Tile 4',
+        artist: 'Immortal Raindrops',
+        genre: 'Ambient',
+        media_type: 'audio',
+        tile_id: 'tile_1', // Fallback to Tile 1 assets to ensure playability
+        audio_ext: 'mp3',
+        image_ext: 'jpg',
+        tile_index: 4,
+        release_date: new Date().toISOString(),
+        duration: '0:00'
+      });
+    }
+
+    return tracks;
   } catch (error) {
     console.error('Unexpected error fetching tracks:', error);
     return [];
