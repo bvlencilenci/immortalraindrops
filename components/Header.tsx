@@ -289,9 +289,40 @@ const Header = () => {
 
         {/* Progress bar - OUTSIDE the padded wrapper, full width */}
         {isPlayerActive && (
+          <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">
+
+            {/* Interaction Layer (Invisible Input - Massive Hitbox) */}
+            <div className="absolute bottom-[-18px] left-0 w-full h-[48px] z-50">
+              <input
+                type="range"
+                min="0"
+                max={duration || 100}
+                step="0.1"
+                value={seek}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  seekTo(parseFloat(e.target.value));
+                }}
+                className="w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+
+            {/* Visual Track Layer (Pointer Events None) */}
+            <div className="absolute bottom-0 left-0 w-full h-[3px] group-hover/scrubber:h-[6px] transition-all duration-200">
+              {/* Background */}
+              <div className="absolute top-0 left-0 w-full h-full bg-[#ECEEDF]/10" />
+              {/* Progress */}
+              <div
+                className="absolute top-0 left-0 h-full bg-[#FF0000] relative"
+                style={{ width: `${(seek / (duration || 1)) * 100}%` }}
+              >
+                {/* Thumb */}
+                <div className="absolute right-[-4px] top-1/2 -translate-y-1/2 w-[8px] h-[8px] bg-[#ECEEDF] rounded-full opacity-0 group-hover/scrubber:opacity-100 transition-opacity duration-200 shadow-[0_0_10px_rgba(236,238,223,0.5)]" />
+              </div>
+            </div>
           </div>
         )}
-    </header >
+      </header>
     </>
   );
 };
