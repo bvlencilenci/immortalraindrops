@@ -287,34 +287,6 @@ const Header = () => {
                   </button>
                 </div>
 
-                {/* Metadata Sliding Overlay (Z-50) */}
-                <motion.div
-                  className="absolute left-full pl-6 flex flex-col justify-center whitespace-nowrap z-50 pointer-events-none"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {useAudioStore.getState().isLive ? (
-                    <>
-                      <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
-                        ● live
-                      </span>
-                      <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
-                        DJ SET
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
-                        {trackArtist || 'Unknown Artist'}
-                      </span>
-                      <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
-                        {trackTitle || 'Unknown Track'}
-                      </span>
-                    </>
-                  )}
-                </motion.div>
-
               </div>
             )}
           </div>
