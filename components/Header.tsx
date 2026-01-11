@@ -159,7 +159,10 @@ const Header = () => {
           </Link>
 
           {/* Center: LOGO (Text) */}
-          <Link href="/" className="shrink-0 flex flex-col items-center justify-center group leading-none">
+          <Link
+            href="/"
+            className="ml-12 shrink-0 flex flex-col items-center justify-center group leading-none"
+          >
             <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
               IMMORTAL
             </span>
@@ -186,7 +189,7 @@ const Header = () => {
 
           {/* BLOCK 1: Left - Station Identity (Z-50) */}
           <div
-            className="justify-self-start flex items-center z-50 pl-10 gap-12 group"
+            className="justify-self-start flex items-center z-50 pl-10 group"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -198,6 +201,9 @@ const Header = () => {
                 RAINDROPS
               </span>
             </Link>
+
+            {/* Fixed Spacer (60px) */}
+            <div className="w-[60px] flex-shrink-0" />
 
             <div className="flex items-center gap-4">
               <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
@@ -224,7 +230,7 @@ const Header = () => {
             </div>
 
             {isPlayerActive && (
-              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]">
+              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 ml-10 max-w-[20vw] md:max-w-[15vw]">
                 {useAudioStore.getState().isLive ? (
                   <>
                     <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
