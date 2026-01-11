@@ -179,115 +179,163 @@ const Header = () => {
       </motion.nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
-      <header className={`hidden lg:block fixed top-0 left-0 right-0 w-full h-[10vh] min-h-[60px] z-50 transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
+      <header className={`hidden lg:flex sticky top-0 left-0 right-0 w-full h-[10vh] min-h-[60px] z-50 transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
         ? "bg-[#ECEEDF]/5 border-b border-[#ECEEDF]/10 bg-gradient-to-b from-[#ECEEDF]/10 to-transparent"
         : "bg-[#0F0E0E]"
         }`}>
 
-        {/* Content Wrapper */}
-        <div className="relative w-full h-full max-w-[1400px] mx-auto px-8 flex items-center justify-between">
+        {/* Constraints Wrapper (Max Width: 1400px) */}
+        <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center relative">
 
-          {/* LEFT ZONE - Station Identity & Metadata (HORIZONTAL layout) */}
-          <div className="flex items-center gap-6">
-
-            {/* Logo & Nav Group */}
-            <div
-              className="flex items-center gap-6 group"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
+          {/* BLOCK 1: Left - Station Identity (Z-50) */}
+          <div
+            className="justify-self-start flex items-center z-50 gap-x-8 group"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {/* Center: LOGO (Text) */}
+            <Link
+              href="/"
+              className="ml-20 shrink-0 flex flex-col items-start justify-center group leading-none"
             >
-              {/* Station Name */}
-              <Link href="/" className="flex flex-col font-mono tracking-widest whitespace-nowrap cursor-pointer group">
-                <span className="text-[#ECEEDF] text-sm leading-none opacity-90 group-hover:opacity-100 transition-opacity">IMMORTAL</span>
-                <span className="text-[#ECEEDF] text-sm leading-none opacity-90 group-hover:opacity-100 transition-opacity">RAINDROPS</span>
-              </Link>
+              <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+                IMMORTAL
+              </span>
+              <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
+                RAINDROPS
+              </span>
+            </Link>
 
-              {/* Nav Decorator & Links */}
-              <div className="flex items-center gap-4">
-                <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
-                  <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
-                  <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
-                  <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
-                </div>
-
-                <AnimatePresence>
-                  {isHovered && (
-                    <motion.div
-                      key="nav-links"
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: "auto", opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                      className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap"
-                    >
-                      <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
-                      <Link href="/live" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+            <div className="flex items-center gap-4">
+              <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
+                <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
+                <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
+                <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
               </div>
+
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.div
+                    key="nav-links"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: "auto", opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex items-center gap-x-6 lg:gap-x-12 overflow-hidden whitespace-nowrap pl-2"
+                  >
+                    <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
+                    <Link href="/live" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Metadata - NEXT to station name, with separator */}
             {isPlayerActive && (
-              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/30 pl-4 font-mono">
+              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]">
                 {useAudioStore.getState().isLive ? (
                   <>
-                    <span className="text-[#FF0000] text-xs whitespace-nowrap animate-pulse lowercase">● live</span>
-                    <span className="text-[#ECEEDF] text-sm whitespace-nowrap uppercase font-bold">DJ SET</span>
+                    <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
+                      ● live
+                    </span>
+                    <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
+                      DJ SET
+                    </span>
                   </>
                 ) : (
                   <>
-                    <span className="text-[#ECEEDF]/70 text-xs whitespace-nowrap lowercase">{trackArtist || 'Unknown Artist'}</span>
-                    <span className="text-[#ECEEDF] text-sm whitespace-nowrap uppercase font-bold">{trackTitle || 'Unknown Track'}</span>
+                    <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
+                      {trackArtist || 'Unknown Artist'}
+                    </span>
+                    <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
+                      {trackTitle || 'Unknown Track'}
+                    </span>
                   </>
                 )}
               </div>
             )}
           </div>
 
-          {/* CENTER - Playback controls (Absolute Center) */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+          {/* BLOCK 2: Center - Player Buttons & Meta (Z-40) */}
+          <div className="col-span-1 justify-self-center pointer-events-auto w-auto flex items-center justify-center relative">
             {isPlayerActive && (
-              <div className="flex items-center gap-[2vw]">
-                <button onClick={(e) => { e.stopPropagation(); skipBack(); }} className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95" title="Previous">
-                  <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
-                </button>
-                <button onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="flex items-center justify-center bg-[#ECEEDF]/5 w-[7vh] h-[7vh] min-w-[50px] min-h-[50px] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110 active:scale-95" title="Play/Pause">
-                  <img src={isPlaying ? "/pause.svg" : "/play.svg"} alt="Play/Pause" className="w-[3.5vh] h-[3.5vh] min-w-[20px] min-h-[20px] invert translate-x-[1px]" />
-                </button>
-                <button onClick={(e) => { e.stopPropagation(); skipTrack(); }} className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95" title="Skip">
-                  <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
-                </button>
+              <div className="relative flex items-center">
+
+                {/* Buttons (Z-40) */}
+                <div className="flex items-center gap-[2vw] z-40 relative">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                    className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                    title="Previous / Restart"
+                  >
+                    <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                    className="flex items-center justify-center bg-[#ECEEDF]/5 w-[7vh] h-[7vh] min-w-[50px] min-h-[50px] rounded-full transition-all duration-200 border border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 hover:scale-110 active:scale-95"
+                    title={isPlaying ? "Pause" : "Play"}
+                  >
+                    <img
+                      src={isPlaying ? "/pause.svg" : "/play.svg"}
+                      alt={isPlaying ? "Pause" : "Play"}
+                      className="w-[3.5vh] h-[3.5vh] min-w-[20px] min-h-[20px] invert translate-x-[1px]"
+                    />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                    className="flex items-center justify-center transition-all duration-200 opacity-100 hover:scale-110 active:scale-95"
+                    title="Skip"
+                  >
+                    <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
+                  </button>
+                </div>
+
               </div>
             )}
           </div>
 
-          {/* RIGHT ZONE - Volume & Timestamp */}
-          <div className="flex flex-col items-end gap-1">
+          {/* BLOCK 3: Right - Volume Controls (Z-40) */}
+          <div className="justify-self-end flex justify-end items-center z-40">
             {isPlayerActive && (
-              <>
+              <div className="flex flex-col items-end gap-1 translate-y-[2px]">
                 <div className="flex items-center gap-4">
-                  <button onClick={(e) => { e.stopPropagation(); adjustVolume(volume > 0 ? 0 : 0.5); }} className="flex items-center justify-center">
-                    <img src={getVolumeIcon()} alt="Volume" className="w-[2vh] h-[2vh] invert opacity-80" />
+                  <button
+                    className="flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      adjustVolume(volume > 0 ? 0 : 0.5);
+                    }}
+                  >
+                    <img
+                      src={getVolumeIcon()}
+                      alt="Volume"
+                      className="w-[2vh] h-[2vh] invert opacity-80"
+                    />
                   </button>
                   <input
-                    type="range" min="0" max="1" step="0.01" value={volume}
-                    onChange={(e) => { e.stopPropagation(); adjustVolume(parseFloat(e.target.value)); }}
-                    className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer bg-[#ECEEDF]/20 opacity-80 hover:opacity-100"
-                    style={{ background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)` }}
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      adjustVolume(parseFloat(e.target.value));
+                    }}
+                    className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
+                    style={{
+                      background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
+                    }}
                   />
                 </div>
                 <span className="w-[10vw] max-w-[120px] min-w-[80px] text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
                   {formatTime(seek)} / {formatTime(duration)}
                 </span>
-              </>
+              </div>
             )}
           </div>
-
         </div>
 
-        {/* Progress bar - OUTSIDE the padded wrapper, full width */}
+        {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
         {isPlayerActive && (
           <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">
 
@@ -303,21 +351,28 @@ const Header = () => {
                   e.stopPropagation();
                   seekTo(parseFloat(e.target.value));
                 }}
-                className="w-full h-full opacity-0 cursor-pointer"
+                className="w-full h-full cursor-pointer focus-visible:outline-none appearance-none"
+                aria-label="Playback position"
+                style={{
+                  accentColor: 'transparent',
+                  background: 'transparent',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none',
+                  opacity: 0
+                }}
               />
             </div>
 
             {/* Visual Track Layer (Pointer Events None) */}
-            <div className="absolute bottom-0 left-0 w-full h-[3px] group-hover/scrubber:h-[6px] transition-all duration-200">
-              {/* Background */}
-              <div className="absolute top-0 left-0 w-full h-full bg-[#ECEEDF]/10" />
-              {/* Progress */}
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#ECEEDF]/20 group-hover/scrubber:h-[6px] transition-all duration-200 ease-out pointer-events-none">
+              {/* Progress Fill */}
               <div
-                className="absolute top-0 left-0 h-full bg-[#FF0000] relative"
-                style={{ width: `${(seek / (duration || 1)) * 100}%` }}
+                className="h-full bg-[#ECEEDF] relative transition-all duration-200 ease-out"
+                style={{ width: `${progressPercent}%` }}
               >
-                {/* Thumb */}
-                <div className="absolute right-[-4px] top-1/2 -translate-y-1/2 w-[8px] h-[8px] bg-[#ECEEDF] rounded-full opacity-0 group-hover/scrubber:opacity-100 transition-opacity duration-200 shadow-[0_0_10px_rgba(236,238,223,0.5)]" />
+                {/* Thumb (Right Edge of Progress) */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 group-hover/scrubber:w-4 group-hover/scrubber:h-4 bg-[#ECEEDF] rounded-full shadow-[0_0_10px_rgba(236,238,223,0.5)] transition-all duration-200 ease-out translate-x-1/2" />
               </div>
             </div>
           </div>
