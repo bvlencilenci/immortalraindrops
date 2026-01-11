@@ -185,21 +185,21 @@ const Header = () => {
         <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center relative">
 
           {/* BLOCK 1: Left - Station Identity (Z-50) */}
-          <div className="justify-self-start flex items-center z-50">
-            <div
-              className="flex items-center gap-8 relative group"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              <Link href="/" className="flex flex-col text-[#ECEEDF] cursor-pointer ml-8 -mr-8">
-                <span className="block font-mono tracking-tighter leading-[0.9] whitespace-nowrap text-lg md:text-xl">
-                  IMMORTAL
-                </span>
-                <span className="block font-mono tracking-tighter leading-[0.9] whitespace-nowrap text-lg md:text-xl">
-                  RAINDROPS
-                </span>
-              </Link>
+          <div
+            className="justify-self-start flex items-center z-50 pl-10 gap-12 group"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <Link href="/" className="flex flex-col text-[#ECEEDF] cursor-pointer">
+              <span className="block font-mono tracking-tighter leading-[0.9] whitespace-nowrap text-lg md:text-xl">
+                IMMORTAL
+              </span>
+              <span className="block font-mono tracking-tighter leading-[0.9] whitespace-nowrap text-lg md:text-xl">
+                RAINDROPS
+              </span>
+            </Link>
 
+            <div className="flex items-center gap-4">
               <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
                 <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
                 <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
@@ -214,7 +214,7 @@ const Header = () => {
                     animate={{ width: "auto", opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex items-center gap-x-6 lg:gap-x-12 overflow-hidden whitespace-nowrap pl-6"
+                    className="flex items-center gap-x-6 lg:gap-x-12 overflow-hidden whitespace-nowrap pl-2"
                   >
                     <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
                     <Link href="/live" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
@@ -224,12 +224,7 @@ const Header = () => {
             </div>
 
             {isPlayerActive && (
-              <motion.div
-                className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]"
-                initial={{ marginLeft: "1rem" }}
-                animate={{ marginLeft: isHovered ? "2rem" : "1rem" }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              >
+              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]">
                 {useAudioStore.getState().isLive ? (
                   <>
                     <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
@@ -249,7 +244,7 @@ const Header = () => {
                     </span>
                   </>
                 )}
-              </motion.div>
+              </div>
             )}
           </div>
 
