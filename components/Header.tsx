@@ -189,14 +189,14 @@ const Header = () => {
 
           {/* BLOCK 1: Left - Station Identity (Z-50) */}
           <div
-            className="justify-self-start flex items-center z-50 pl-10 group"
+            className="justify-self-start flex items-center z-50 gap-x-8 group"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             {/* Center: LOGO (Text) */}
             <Link
               href="/"
-              className="ml-24 shrink-0 flex flex-col items-start justify-center group leading-none"
+              className="ml-20 shrink-0 flex flex-col items-start justify-center group leading-none"
             >
               <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity">
                 IMMORTAL
@@ -231,7 +231,7 @@ const Header = () => {
             </div>
 
             {isPlayerActive && (
-              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 ml-10 max-w-[20vw] md:max-w-[15vw]">
+              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]">
                 {useAudioStore.getState().isLive ? (
                   <>
                     <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
