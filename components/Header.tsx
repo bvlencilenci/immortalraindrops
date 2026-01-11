@@ -191,7 +191,7 @@ const Header = () => {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <Link href="/" className="flex flex-col text-[#ECEEDF] cursor-pointer">
+              <Link href="/" className="flex flex-col text-[#ECEEDF] cursor-pointer ml-8 -mr-8">
                 <span className="block font-mono tracking-tighter leading-[0.9] whitespace-nowrap text-lg md:text-xl">
                   IMMORTAL
                 </span>
