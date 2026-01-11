@@ -182,7 +182,7 @@ const Header = () => {
         }`}>
 
         {/* Constraints Wrapper (Max Width: 1400px) */}
-        <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-[1fr_auto_1fr] items-center relative">
+        <div className="w-full h-full max-w-[1400px] mx-auto px-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center relative">
 
           {/* BLOCK 1: Left - Station Identity (Z-50) */}
           <div className="justify-self-start flex items-center z-50">
