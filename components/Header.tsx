@@ -222,6 +222,35 @@ const Header = () => {
                 )}
               </AnimatePresence>
             </div>
+
+            {isPlayerActive && (
+              <motion.div
+                className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]"
+                initial={{ marginLeft: "1rem" }}
+                animate={{ marginLeft: isHovered ? "2rem" : "1rem" }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {useAudioStore.getState().isLive ? (
+                  <>
+                    <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
+                      ● live
+                    </span>
+                    <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
+                      DJ SET
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
+                      {trackArtist || 'Unknown Artist'}
+                    </span>
+                    <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
+                      {trackTitle || 'Unknown Track'}
+                    </span>
+                  </>
+                )}
+              </motion.div>
+            )}
           </div>
 
           {/* BLOCK 2: Center - Player Buttons & Meta (Z-40) */}
@@ -257,34 +286,6 @@ const Header = () => {
                     <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[24px] min-h-[24px] invert opacity-80" />
                   </button>
                 </div>
-
-                {/* Metadata Sliding Overlay (Z-50) */}
-                <motion.div
-                  className="absolute left-full pl-6 flex flex-col justify-center whitespace-nowrap z-50 pointer-events-none"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {useAudioStore.getState().isLive ? (
-                    <>
-                      <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
-                        ● live
-                      </span>
-                      <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
-                        DJ SET
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate">
-                        {trackArtist || 'Unknown Artist'}
-                      </span>
-                      <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate">
-                        {trackTitle || 'Unknown Track'}
-                      </span>
-                    </>
-                  )}
-                </motion.div>
 
               </div>
             )}
