@@ -185,10 +185,10 @@ const Header = () => {
         }`}>
 
         {/* Content Wrapper */}
-        <div className="relative w-full h-full max-w-[1400px] mx-auto px-8 flex items-center justify-between">
+        <div className="relative w-full h-full max-w-[1400px] mx-auto flex items-center justify-between">
 
           {/* LEFT ZONE - Station Identity & Metadata (HORIZONTAL layout) */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 pl-8">
 
             {/* Logo & Nav Group */}
             <div
@@ -264,7 +264,7 @@ const Header = () => {
           </div>
 
           {/* RIGHT ZONE - Volume & Timestamp */}
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-1 pr-8">
             {isPlayerActive && (
               <>
                 <div className="flex items-center gap-4">
