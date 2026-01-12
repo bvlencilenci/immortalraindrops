@@ -104,7 +104,7 @@ export default function UploadPage() {
       });
       if (!presignRes.ok) throw new Error('Failed to get upload authorization');
 
-      const { tileId, nextIndex, audioUrl, visualUrl, audioKey, visualKey } = await presignRes.json();
+      const { tileId, nextIndex, audioUrl, visualUrl } = await presignRes.json();
       setProgress(20);
 
       // 2. Upload to R2 (Parallel)
@@ -132,7 +132,7 @@ export default function UploadPage() {
 
       setProgress(80);
 
-      // 3. Finalize Metadata in DB
+      // 3. Finalize Metadata in DB (ONLY after successful R2 upload)
       const finalizeRes = await finalizeUpload({
         title,
         artist,
@@ -165,7 +165,6 @@ export default function UploadPage() {
       setStatus(STATE.ERROR);
       setErrorTarget('generic');
 
-      // Removed alert, auto-reset after delay
       setTimeout(() => setStatus(STATE.IDLE), 3000);
     }
   };
@@ -187,8 +186,7 @@ export default function UploadPage() {
 
   // Helper for shelf styling
   const getShelfStyle = (target: ErrorTarget, current: ErrorTarget) => {
-    // Regular Shelf: border-b only, faint opacity
-    // Error: border-b, red opacity
+    // 1px Bottom Border (Shelf)
     const isError = current === target;
     return `w-full bg-transparent p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none transition-colors border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/10 placeholder-[#ECEEDF]/30 hover:border-[#ECEEDF]/20'
       }`;
@@ -197,7 +195,7 @@ export default function UploadPage() {
   return (
     <main className="flex-1 w-full min-h-screen bg-[#000000] flex flex-col items-center justify-center p-8 pt-[120px] gap-16">
 
-      {status === STATE.PREVIEW ? (
+      {status === STATE.PREVIEW || status === STATE.UPLOADING ? (
         /* --- PREVIEW MODE --- */
         <div className="flex flex-col items-center gap-8 animate-in fade-in zoom-in duration-300">
 
@@ -238,13 +236,14 @@ export default function UploadPage() {
           <div className="flex gap-8 mt-4 items-center">
             <button
               onClick={handleCancelPreview}
-              className="font-mono text-[#ECEEDF]/50 text-sm tracking-[0.2em] uppercase hover:text-[#ECEEDF] transition-colors border-b border-transparent hover:border-[#ECEEDF]"
+              disabled={status === STATE.UPLOADING}
+              className={`font-mono text-[#ECEEDF]/50 text-sm tracking-[0.2em] uppercase hover:text-[#ECEEDF] transition-colors border-b border-transparent hover:border-[#ECEEDF] ${status === STATE.UPLOADING ? 'opacity-20 cursor-not-allowed' : ''}`}
             >
               CANCEL
             </button>
 
             {status === STATE.UPLOADING ? (
-              <span className="font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase animate-pulse">
+              <span className="font-mono text-[#ECEEDF]/60 text-xs tracking-[0.3em] uppercase animate-pulse">
                 UPLOADING... {progress}%
               </span>
             ) : (
@@ -289,7 +288,7 @@ export default function UploadPage() {
               onClick={onAudioClick}
               className={`${getShelfStyle('audio', errorTarget)} cursor-pointer flex justify-between items-center group`}
             >
-              <span className="text-[#ECEEDF]/40 text-sm group-hover:text-[#ECEEDF]/60 transition-colors">
+              <span className="text-[#ECEEDF]/40 text-sm tracking-widest group-hover:text-[#ECEEDF]/60 transition-colors">
                 [ AUDIO_SOURCE ]
               </span>
               <span className={`text-xs ${audioFile ? 'text-[#ECEEDF]' : 'text-[#ECEEDF]/20'}`}>
@@ -309,7 +308,7 @@ export default function UploadPage() {
               onClick={onVisualClick}
               className={`${getShelfStyle('image', errorTarget)} cursor-pointer flex justify-between items-center group`}
             >
-              <span className="text-[#ECEEDF]/40 text-sm group-hover:text-[#ECEEDF]/60 transition-colors">
+              <span className="text-[#ECEEDF]/40 text-sm tracking-widest group-hover:text-[#ECEEDF]/60 transition-colors">
                 [ VISUAL_SOURCE ]
               </span>
               <span className={`text-xs ${imageFile ? 'text-[#ECEEDF]' : 'text-[#ECEEDF]/20'}`}>
@@ -331,7 +330,7 @@ export default function UploadPage() {
             <button
               onClick={handlePreview}
               className={`
-                 font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase transition-all duration-300 px-8 py-2
+                 font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase transition-all duration-300 px-8 py-2 border border-transparent hover:border-[#ECEEDF]/20
                  ${(!artist || !title || !audioFile || !imageFile)
                   ? `opacity-20 cursor-not-allowed`
                   : `opacity-100 hover:tracking-[0.3em]`
