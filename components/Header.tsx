@@ -232,7 +232,11 @@ const Header = () => {
 
             {isPlayerActive && (
               <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw]">
-                {useAudioStore.getState().isLive ? (
+                {pathname === '/upload' ? (
+                  <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest">
+                    UPLOAD MODE
+                  </span>
+                ) : useAudioStore.getState().isLive ? (
                   <>
                     <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse">
                       ● live
