@@ -3,14 +3,14 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { supabase } from '@/lib/supabase';
 
-const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.R2_ACCOUNT_ID;
+const R2_PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN;
 const ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
 const SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
 const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'immortal-assets';
 
 const s3Client = new S3Client({
   region: 'auto',
-  endpoint: `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  endpoint: `https://${R2_PUBLIC_DOMAIN}`,
   credentials: {
     accessKeyId: ACCESS_KEY_ID || '',
     secretAccessKey: SECRET_ACCESS_KEY || '',
@@ -19,6 +19,10 @@ const s3Client = new S3Client({
 });
 
 export async function GET(request: NextRequest) {
+  if (!process.env.R2_PUBLIC_DOMAIN) {
+    return NextResponse.json({ error: 'R2_PUBLIC_DOMAIN not configured' }, { status: 500 });
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams; // Fixed: Use nextUrl.searchParams
     const audioExt = searchParams.get('audioExt');
