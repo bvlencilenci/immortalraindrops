@@ -90,8 +90,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const cacheBustedUrl = `${url}?t=${Date.now()}`;
     const newHowl = new Howl({
       src: [cacheBustedUrl],
-      html5: false, // Use Web Audio for reliable CORS and Visualizer support (loads full file)
-      preload: true,
+      html5: true, // ENABLE STREAMING: Browser handles chunked buffering (Range requests)
+      preload: false, // CRITICAL: Defer load to inject CORS attribute
       format: [fileExt],
       xhr: {
         withCredentials: false
@@ -121,33 +121,17 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           if (analyser && !(sound as any)._visualizerConnected) {
             try {
-              // Handle HTML5 Audio vs Web Audio Node
-              if (audioNode instanceof HTMLMediaElement) {
-                // HTML5 Audio (e.g. Live Stream)
-                if (!audioNode.crossOrigin) audioNode.crossOrigin = "anonymous";
-                const source = ctx.createMediaElementSource(audioNode);
-                source.connect(analyser);
-              } else {
-                // Web Audio (Standard Tracks)
-                // For Howler Web Audio, _node is the AudioBufferSourceNode or GainNode.
-                // We need to connect it to the analyser.
-                // NOTE: Howler connects _node -> _gain -> _panner -> masterGain -> destination
-                // We can tap into the masterGain or the node itself.
-                // Connecting the node directly might duplicate audio if we don't disconnect, 
-                // but we just want to TAP it.
-                // Safest is to connect the Howler Master Gain to the analyser? 
-                // No, we want per-track.
-                // Let's connect the audioNode to the analyser.
-                // Web Audio allows fan-out (one output to multiple inputs).
-                audioNode.connect(analyser);
+              // Ensure crossOrigin is preserved/set (redundant safety check)
+              if (audioNode instanceof HTMLMediaElement && !audioNode.crossOrigin) {
+                audioNode.crossOrigin = "anonymous";
               }
 
-              // Ensure Analyser goes to Destination (for HTML5 case mostly, but good practice if chain broken)
-              // Actually for Web Audio, Howler handles proper routing to destination. 
-              // We ONLY need to connect analyser to destination if we broke the chain or using MediaElementSource unique routing.
-              // For MediaElementSource, we MUST connect analyser->destination.
               if (audioNode instanceof HTMLMediaElement) {
-                analyser.connect(ctx.destination);
+                const source = ctx.createMediaElementSource(audioNode);
+                source.connect(analyser);
+                analyser.connect(ctx.destination); // Required for MediaElementSource
+              } else {
+                audioNode.connect(analyser); // Fallback for Web Audio (shouldn't hit with html5:true)
               }
 
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -184,6 +168,16 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         }
       }
     });
+
+    // CRITICAL FIX: Inject CORS attribute BEFORE loading to support Visualizer + Streaming
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sound = (newHowl as any)._sounds[0];
+    if (sound && sound._node && sound._node instanceof HTMLMediaElement) {
+      sound._node.crossOrigin = 'anonymous';
+    }
+
+    // Now start the load/play chain
+    newHowl.play();
 
     set({
       currentlyPlayingId: id,
