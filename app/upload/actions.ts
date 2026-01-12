@@ -48,7 +48,11 @@ export async function finalizeUpload(params: FinalizeUploadParams) {
 
     if (insertError) {
       console.error('Supabase Finalize Error:', insertError);
-      return { success: false, error: 'Failed to register track. Files uploaded to R2, but DB Sync failed.' };
+      // Return specific error details to client for debugging
+      return {
+        success: false,
+        error: `DB Sync Failed: ${insertError.message} (Code: ${insertError.code}) - ${insertError.details || 'No details'}`
+      };
     }
 
     console.log('Track Registered Successfully.');
