@@ -128,14 +128,16 @@ export default function UploadPage() {
 
     try {
       // 1. Get Presigned URLs
-      const params = new URLSearchParams({
-        audioExt: audioFile.name.split('.').pop() || 'mp3',
-        imageExt: imageFile.name.split('.').pop() || 'jpg',
-        audioType: audioFile.type,
-        imageType: imageFile.type,
+      const presignRes = await fetch('/api/upload/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          audioExt: audioFile.name.split('.').pop() || 'mp3',
+          imageExt: imageFile.name.split('.').pop() || 'jpg',
+          audioType: audioFile.type,
+          imageType: imageFile.type,
+        }),
       });
-
-      const presignRes = await fetch(`/api/upload/sign?${params}`);
       if (!presignRes.ok) throw new Error('Failed to get upload authorization');
 
       const { tileId, nextIndex, audioUrl, visualUrl, audioKey, visualKey } = await presignRes.json();

@@ -18,17 +18,13 @@ const s3Client = new S3Client({
   requestChecksumCalculation: 'WHEN_REQUIRED',
 });
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   if (!process.env.R2_PUBLIC_DOMAIN) {
     return NextResponse.json({ error: 'R2_PUBLIC_DOMAIN not configured' }, { status: 500 });
   }
 
   try {
-    const searchParams = request.nextUrl.searchParams; // Fixed: Use nextUrl.searchParams
-    const audioExt = searchParams.get('audioExt');
-    const imageExt = searchParams.get('imageExt');
-    const audioType = searchParams.get('audioType');
-    const imageType = searchParams.get('imageType');
+    const { audioExt, imageExt, audioType, imageType } = await request.json();
 
     if (!audioExt || !imageExt || !audioType || !imageType) {
       return NextResponse.json({ error: 'Missing file metadata' }, { status: 400 });
