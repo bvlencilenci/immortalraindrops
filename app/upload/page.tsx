@@ -186,7 +186,7 @@ export default function UploadPage() {
 
   // Helper for shelf styling
   const getShelfStyle = (target: ErrorTarget, current: ErrorTarget) => {
-    // 1px Bottom Border (Shelf)
+    // 1px Bottom Border (Shelf), no side borders
     const isError = current === target;
     return `w-full bg-transparent p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none transition-colors border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/10 placeholder-[#ECEEDF]/30 hover:border-[#ECEEDF]/20'
       }`;
@@ -243,8 +243,8 @@ export default function UploadPage() {
             </button>
 
             {status === STATE.UPLOADING ? (
-              <span className="font-mono text-[#ECEEDF]/60 text-xs tracking-[0.3em] uppercase animate-pulse">
-                UPLOADING... {progress}%
+              <span className="font-mono text-[#ECEEDF]/40 text-xs tracking-[0.4em] uppercase animate-pulse">
+                SYNCING_DATA... {progress}%
               </span>
             ) : (
               <button
