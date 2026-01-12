@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 const R2_PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN;
 const ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
 const SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
-const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'immortal-assets';
+// const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'immortal-assets'; // Not used with public domain endpoint
 
 const s3Client = new S3Client({
   region: 'auto',
@@ -51,14 +51,16 @@ export async function POST(request: NextRequest) {
     const visualKey = `${tileId}/visual.${imageExt}`;
 
     // 3. Generate Presigned URLs
+    // Note: We use an empty bucket string because the R2_PUBLIC_DOMAIN endpoint 
+    // already points to the correct bucket context for this specific setup.
     const audioUrl = await getSignedUrl(s3Client, new PutObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: '',
       Key: audioKey,
       ContentType: audioType,
     }), { expiresIn: 3600 });
 
     const visualUrl = await getSignedUrl(s3Client, new PutObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: '',
       Key: visualKey,
       ContentType: imageType,
     }), { expiresIn: 3600 });
