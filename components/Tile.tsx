@@ -34,6 +34,7 @@ const Tile = (props: TileProps) => {
   const extAudio = audio_ext || 'wav';
   const extImage = image_ext || 'jpg';
 
+  // Strict R2 Routing (User Requested)
   const audioUrl = `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
   const imageUrl = `${r2BaseUrl}/${tile_id}/visual.${extImage}`;
 
