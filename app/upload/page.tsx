@@ -34,11 +34,6 @@ export default function UploadPage() {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  // Drag State (used for visual feedback only if needed)
-  const [isDraggingAudio, setIsDraggingAudio] = useState(false);
-  const [isDraggingImage, setIsDraggingImage] = useState(false);
-
-
   // CLEANUP
   useEffect(() => {
     return () => {
@@ -66,40 +61,9 @@ export default function UploadPage() {
     if (errorTarget === 'image') setErrorTarget(null);
   };
 
-  // --- KEYBOARD & INPUT HANDLERS ---
+  // --- FILE INPUT TRIGGERS ---
   const onAudioClick = () => audioInputRef.current?.click();
-  const onAudioKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onAudioClick();
-    }
-  };
-  const onAudioDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDraggingAudio(false);
-    if (e.dataTransfer.files?.[0]?.type.startsWith('audio/')) {
-      handleAudioSelect(e.dataTransfer.files[0]);
-    } else {
-      setErrorTarget('audio');
-    }
-  };
-
   const onVisualClick = () => imageInputRef.current?.click();
-  const onVisualKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onVisualClick();
-    }
-  };
-  const onVisualDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDraggingImage(false);
-    if (e.dataTransfer.files?.[0]?.type.startsWith('image/')) {
-      handleVisualSelect(e.dataTransfer.files[0]);
-    } else {
-      setErrorTarget('image');
-    }
-  };
 
   // --- ACTIONS ---
   const handlePreview = () => {
@@ -196,7 +160,8 @@ export default function UploadPage() {
       console.error('Upload Flow Error:', error);
       setStatus(STATE.ERROR);
       setErrorTarget('generic');
-      // alert(`UPLOAD ERROR: ${(error as Error).message}`); // Removed alert as per "Subtle Error Handling" request
+
+      // Removed alert, auto-reset after delay
       setTimeout(() => setStatus(STATE.IDLE), 3000);
     }
   };
@@ -216,20 +181,17 @@ export default function UploadPage() {
     );
   }
 
-  // Error Utilities
-  const getBorderColor = (target: ErrorTarget, current: ErrorTarget) => {
-    // Invisible inputs shouldn't have borders unless error
-    if (current === target) return 'border-b border-[#cc0000]/50';
-    return 'border-none';
-  };
-
-  const getShelfBorder = (target: ErrorTarget, current: ErrorTarget) => {
-    if (current === target) return 'border-t border-b border-[#cc0000]/50';
-    return 'border-t border-b border-[#ECEEDF]/10';
+  // Helper for shelf styling
+  const getShelfStyle = (target: ErrorTarget, current: ErrorTarget) => {
+    // Regular Shelf: border-b only, faint opacity
+    // Error: border-b, red opacity
+    const isError = current === target;
+    return `w-full bg-transparent p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none transition-colors border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/10 placeholder-[#ECEEDF]/30 hover:border-[#ECEEDF]/20'
+      }`;
   };
 
   return (
-    <main className="flex-1 w-full min-h-screen bg-[#000000] flex flex-col items-center justify-center p-8 pt-[120px] gap-12">
+    <main className="flex-1 w-full min-h-screen bg-[#000000] flex flex-col items-center justify-center p-8 pt-[120px] gap-16">
 
       {status === STATE.PREVIEW ? (
         /* --- PREVIEW MODE --- */
@@ -269,62 +231,66 @@ export default function UploadPage() {
             </div>
           </div>
 
-          <div className="flex gap-8 mt-4">
+          <div className="flex gap-8 mt-4 items-center">
             <button
               onClick={handleCancelPreview}
               className="font-mono text-[#ECEEDF]/50 text-sm tracking-[0.2em] uppercase hover:text-[#ECEEDF] transition-colors border-b border-transparent hover:border-[#ECEEDF]"
             >
               CANCEL
             </button>
-            <button
-              onClick={handlePostToArchive}
-              className="font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase border border-[#ECEEDF]/20 px-8 py-2 hover:bg-[#ECEEDF] hover:text-black transition-all"
-            >
-              POST TO ARCHIVE
-            </button>
+
+            {status === STATE.UPLOADING ? (
+              <span className="font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase animate-pulse">
+                UPLOADING... {progress}%
+              </span>
+            ) : (
+              <button
+                onClick={handlePostToArchive}
+                className="font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase border border-[#ECEEDF]/20 px-8 py-2 hover:bg-[#ECEEDF] hover:text-black transition-all"
+              >
+                POST TO ARCHIVE
+              </button>
+            )}
+
           </div>
 
         </div>
       ) : (
-        /* --- INPUT MODE --- */
-        <>
-          {/* Metadata Inputs (Invisible look) */}
-          <div className="w-full max-w-[800px] flex flex-col md:flex-row gap-8">
+        /* --- INPUT MODE (SHELF AESTHETIC) --- */
+        <div className="w-full max-w-[600px] flex flex-col gap-12">
+
+          {/* Metadata Shelves */}
+          <div className="flex flex-col gap-8">
             <input
               type="text"
               placeholder="ARTIST"
               value={artist}
               onChange={(e) => { setArtist(e.target.value); if (errorTarget === 'artist') setErrorTarget(null); }}
-              className={`flex-1 bg-transparent p-2 font-mono text-[#ECEEDF] placeholder-[#ECEEDF]/30 focus:outline-none focus:ring-0 transition-colors uppercase tracking-wider text-center ${getBorderColor('artist', errorTarget)}`}
+              className={getShelfStyle('artist', errorTarget)}
             />
             <input
               type="text"
               placeholder="TITLE"
               value={title}
               onChange={(e) => { setTitle(e.target.value); if (errorTarget === 'title') setErrorTarget(null); }}
-              className={`flex-1 bg-transparent p-2 font-mono text-[#ECEEDF] placeholder-[#ECEEDF]/30 focus:outline-none focus:ring-0 transition-colors uppercase tracking-wider text-center ${getBorderColor('title', errorTarget)}`}
+              className={getShelfStyle('title', errorTarget)}
             />
           </div>
 
-          {/* File Selection Area (Shelf look) */}
-          <div className="w-full max-w-[800px] flex flex-col md:flex-row gap-8 h-[250px]">
+          {/* File Shelves */}
+          <div className="flex flex-col gap-8">
 
-            {/* AUDIO BOX */}
+            {/* AUDIO */}
             <div
-              role="button"
-              tabIndex={0}
               onClick={onAudioClick}
-              onKeyDown={onAudioKeyDown}
-              onDragOver={(e) => { e.preventDefault(); setIsDraggingAudio(true); }}
-              onDragLeave={() => setIsDraggingAudio(false)}
-              onDrop={onAudioDrop}
-              className={`
-                flex-1 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden group outline-none
-                ${getShelfBorder('audio', errorTarget)}
-                ${(audioFile || isDraggingAudio) ? 'bg-[#ECEEDF]/5' : 'hover:bg-[#ECEEDF]/5'}
-                focus:bg-[#ECEEDF]/5
-              `}
+              className={`${getShelfStyle('audio', errorTarget)} cursor-pointer flex justify-between items-center group`}
             >
+              <span className="text-[#ECEEDF]/40 text-sm group-hover:text-[#ECEEDF]/60 transition-colors">
+                [ AUDIO_SOURCE ]
+              </span>
+              <span className={`text-xs ${audioFile ? 'text-[#ECEEDF]' : 'text-[#ECEEDF]/20'}`}>
+                {audioFile ? audioFile.name : 'SELECT FILE'}
+              </span>
               <input
                 type="file"
                 ref={audioInputRef}
@@ -332,34 +298,19 @@ export default function UploadPage() {
                 onChange={(e) => e.target.files?.[0] && handleAudioSelect(e.target.files[0])}
                 accept="audio/*"
               />
-              <div className="z-10 text-center space-y-2 pointer-events-none p-4">
-                <span className={`font-mono text-[10px] tracking-[0.2em] uppercase block ${audioFile ? 'text-[#ECEEDF] opacity-100' : 'text-[#ECEEDF] opacity-40'}`}>
-                  {audioFile ? 'AUDIO READY' : 'AUDIO'}
-                </span>
-                {audioFile && (
-                  <span className="font-mono text-[#ECEEDF]/70 text-xs tracking-wider uppercase block truncate max-w-[200px]">
-                    {audioFile.name}
-                  </span>
-                )}
-              </div>
             </div>
 
-            {/* IMAGE BOX */}
+            {/* VISUAL */}
             <div
-              role="button"
-              tabIndex={0}
               onClick={onVisualClick}
-              onKeyDown={onVisualKeyDown}
-              onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
-              onDragLeave={() => setIsDraggingImage(false)}
-              onDrop={onVisualDrop}
-              className={`
-                flex-1 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden group outline-none
-                ${getShelfBorder('image', errorTarget)}
-                ${(imageFile || isDraggingImage) ? 'bg-[#ECEEDF]/5' : 'hover:bg-[#ECEEDF]/5'}
-                focus:bg-[#ECEEDF]/5
-              `}
+              className={`${getShelfStyle('image', errorTarget)} cursor-pointer flex justify-between items-center group`}
             >
+              <span className="text-[#ECEEDF]/40 text-sm group-hover:text-[#ECEEDF]/60 transition-colors">
+                [ VISUAL_SOURCE ]
+              </span>
+              <span className={`text-xs ${imageFile ? 'text-[#ECEEDF]' : 'text-[#ECEEDF]/20'}`}>
+                {imageFile ? imageFile.name : 'SELECT FILE'}
+              </span>
               <input
                 type="file"
                 ref={imageInputRef}
@@ -367,50 +318,28 @@ export default function UploadPage() {
                 onChange={(e) => e.target.files?.[0] && handleVisualSelect(e.target.files[0])}
                 accept="image/*"
               />
-              <div className="z-10 text-center space-y-2 pointer-events-none p-4">
-                <span className={`font-mono text-[10px] tracking-[0.2em] uppercase block ${imageFile ? 'text-[#ECEEDF] opacity-100' : 'text-[#ECEEDF] opacity-40'}`}>
-                  {imageFile ? 'VISUAL READY' : 'VISUAL'}
-                </span>
-                {imageFile && (
-                  <span className="font-mono text-[#ECEEDF]/70 text-xs tracking-wider uppercase block truncate max-w-[200px]">
-                    {imageFile.name}
-                  </span>
-                )}
-              </div>
-              {/* Bg Preview */}
-              {previewUrl && (
-                <div className="absolute inset-0 -z-10 opacity-20">
-                  <Image src={previewUrl} alt="Preview" fill className="object-cover blur-sm" />
-                </div>
-              )}
             </div>
+
           </div>
 
-          {/* Action / Status Area */}
-          <div className="w-full max-w-[800px] h-[60px] flex items-center justify-center">
-            {status === STATE.IDLE || status === STATE.ERROR ? (
-              <button
-                onClick={handlePreview}
-                className={`
-                  font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase transition-all duration-300 border px-8 py-2
-                  ${(!artist || !title || !audioFile || !imageFile)
-                    ? `border-transparent opacity-20 ${(errorTarget === 'generic') ? 'text-[#cc0000]' : ''}`
-                    : `border-[#ECEEDF]/20 opacity-100 hover:bg-[#ECEEDF] hover:text-black hover:scale-105`
-                  }
-                  ${errorTarget === 'generic' ? 'border-[#cc0000]/50 text-[#cc0000]' : ''}
-                `}
-              >
-                {status === STATE.ERROR ? 'RETRY' : 'PREVIEW TILE'}
-              </button>
-            ) : status === STATE.UPLOADING ? (
-              <div className="flex flex-col items-center gap-2">
-                <span className="font-mono text-[#ECEEDF] text-sm tracking-wider uppercase animate-pulse">
-                  UPLOADING... {progress}%
-                </span>
-              </div>
-            ) : null}
+          {/* Preview Button */}
+          <div className="flex justify-center pt-8">
+            <button
+              onClick={handlePreview}
+              className={`
+                 font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase transition-all duration-300 px-8 py-2
+                 ${(!artist || !title || !audioFile || !imageFile)
+                  ? `opacity-20 cursor-not-allowed`
+                  : `opacity-100 hover:tracking-[0.3em]`
+                }
+                 ${errorTarget === 'generic' ? 'text-[#cc0000]' : ''}
+               `}
+            >
+              {status === STATE.ERROR ? 'RETRY' : 'PREVIEW TILE'}
+            </button>
           </div>
-        </>
+
+        </div>
       )}
     </main>
   );
