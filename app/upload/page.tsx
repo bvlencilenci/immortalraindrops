@@ -108,16 +108,20 @@ export default function UploadPage() {
       setProgress(20);
 
       // 2. Upload to R2 (Parallel)
+      // Convert to Blob to strip "filename" metadata that might trigger complex preflight
+      const audioBlob = audioFile.slice(0, audioFile.size, audioFile.type);
+      const imageBlob = imageFile.slice(0, imageFile.size, imageFile.type);
+
       const uploadAudio = fetch(audioUrl, {
         method: 'PUT',
-        body: audioFile,
+        body: audioBlob,
         headers: {
           'Content-Type': audioFile.type
         }
       });
       const uploadImage = fetch(visualUrl, {
         method: 'PUT',
-        body: imageFile,
+        body: imageBlob,
         headers: {
           'Content-Type': imageFile.type
         }
