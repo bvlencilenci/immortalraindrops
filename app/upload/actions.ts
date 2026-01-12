@@ -1,6 +1,14 @@
 'use server';
 
 import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Service Role Client to bypass Row Level Security (RLS)
+// Use SUPABASE_SERVICE_ROLE_KEY from env.local
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 interface FinalizeUploadParams {
   title: string;
@@ -26,7 +34,7 @@ export async function finalizeUpload(params: FinalizeUploadParams) {
     // If a race condition occurred and this index is taken, the upload might fail or we double-up.
     // We could check uniqueness here, but for now we proceed with insertion.
 
-    const { error: insertError } = await supabase
+    const { error: insertError } = await supabaseAdmin
       .from('tracks')
       .insert({
         title,
