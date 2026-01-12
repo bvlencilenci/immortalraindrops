@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { uploadFile } from './actions';
+import { finalizeUpload } from './actions';
 import Image from 'next/image';
 
 // Explicit State Constants
@@ -31,12 +31,13 @@ export default function UploadPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Drag State
+  const audioInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Drag State (used for visual feedback only if needed)
   const [isDraggingAudio, setIsDraggingAudio] = useState(false);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
 
-  const audioInputRef = useRef<HTMLInputElement>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
 
   // CLEANUP
   useEffect(() => {
@@ -66,8 +67,6 @@ export default function UploadPage() {
   };
 
   // --- KEYBOARD & INPUT HANDLERS ---
-
-  // Audio Zone
   const onAudioClick = () => audioInputRef.current?.click();
   const onAudioKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -81,11 +80,10 @@ export default function UploadPage() {
     if (e.dataTransfer.files?.[0]?.type.startsWith('audio/')) {
       handleAudioSelect(e.dataTransfer.files[0]);
     } else {
-      setErrorTarget('audio'); // Invalid type feedback?
+      setErrorTarget('audio');
     }
   };
 
-  // Image Zone
   const onVisualClick = () => imageInputRef.current?.click();
   const onVisualKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -121,59 +119,71 @@ export default function UploadPage() {
     setStatus(STATE.IDLE);
   };
 
+  // --- CLIENT-SIDE UPLOAD ---
   const handlePostToArchive = async () => {
     if (!audioFile || !imageFile) return;
 
     setStatus(STATE.UPLOADING);
-    setProgress(0);
-
-    const progressInterval = setInterval(() => {
-      setProgress(prev => (prev >= 90 ? prev : prev + 10));
-    }, 100);
+    setProgress(5);
 
     try {
-      const formData = new FormData();
-      formData.append('audioFile', audioFile);
-      formData.append('imageFile', imageFile);
-      formData.append('title', title);
-      formData.append('artist', artist);
+      // 1. Get Presigned URLs
+      const params = new URLSearchParams({
+        audioExt: audioFile.name.split('.').pop() || 'mp3',
+        imageExt: imageFile.name.split('.').pop() || 'jpg',
+        audioType: audioFile.type,
+        imageType: imageFile.type,
+      });
 
-      const result = await uploadFile(formData);
+      const presignRes = await fetch(`/api/upload/sign?${params}`);
+      if (!presignRes.ok) throw new Error('Failed to get upload authorization');
 
-      clearInterval(progressInterval);
+      const { tileId, nextIndex, audioUrl, visualUrl, audioKey, visualKey } = await presignRes.json();
+      setProgress(20);
+
+      // 2. Upload to R2 (Parallel)
+      const uploadAudio = fetch(audioUrl, { method: 'PUT', body: audioFile });
+      const uploadImage = fetch(visualUrl, { method: 'PUT', body: imageFile });
+
+      const results = await Promise.all([uploadAudio, uploadImage]);
+      if (results.some(r => !r.ok)) throw new Error('Failed to upload files to storage');
+
+      setProgress(80);
+
+      // 3. Finalize Metadata in DB
+      const finalizeRes = await finalizeUpload({
+        title,
+        artist,
+        tileIndex: nextIndex,
+        tileId,
+        audioExt: audioFile.name.split('.').pop() || 'mp3',
+        imageExt: imageFile.name.split('.').pop() || 'jpg',
+      });
+
+      if (!finalizeRes.success) throw new Error(finalizeRes.error);
+
+      // Success!
       setProgress(100);
+      setResultTileId(finalizeRes.tileId || tileId);
+      setStatus(STATE.SUCCESS);
 
-      if (result.success) {
-        setResultTileId(result.tileId || 'TILE-UNKNOWN');
-        setStatus(STATE.SUCCESS);
-        setTimeout(() => {
-          setStatus(STATE.IDLE);
-          setProgress(0);
-          setAudioFile(null);
-          setImageFile(null);
-          setPreviewUrl(null);
-          setTitle('');
-          setArtist('');
-          setResultTileId(null);
-        }, 4000);
-      } else {
-        setStatus(STATE.ERROR);
-        setErrorTarget('generic');
-        console.error(result.error);
-        // We stay in ERROR state to let user retry or see what happened
-        // But for minimal UI, maybe we just flash error? 
-        // User requested subtle red border. 
-        // We'll reset status to IDLE but keep error target highlighting if specific?
-        // Actually generic error usually means server side.
-        // Let's go back to IDLE so they can retry, but maybe keep the red border on the button or general area.
-        setTimeout(() => setStatus(STATE.IDLE), 2000);
-      }
+      setTimeout(() => {
+        setStatus(STATE.IDLE);
+        setProgress(0);
+        setAudioFile(null);
+        setImageFile(null);
+        setPreviewUrl(null);
+        setTitle('');
+        setArtist('');
+        setResultTileId(null);
+      }, 4000);
+
     } catch (error) {
-      clearInterval(progressInterval);
+      console.error('Upload Flow Error:', error);
       setStatus(STATE.ERROR);
       setErrorTarget('generic');
-      console.error(error);
-      setTimeout(() => setStatus(STATE.IDLE), 2000);
+      // alert(`UPLOAD ERROR: ${(error as Error).message}`); // Removed alert as per "Subtle Error Handling" request
+      setTimeout(() => setStatus(STATE.IDLE), 3000);
     }
   };
 
@@ -194,10 +204,14 @@ export default function UploadPage() {
 
   // Error Utilities
   const getBorderColor = (target: ErrorTarget, current: ErrorTarget) => {
-    // If upload failed generically, maybe highlight everything subtly? Or just rely on the button state.
-    // If validation failed, highlight specific input.
-    if (current === target) return 'border-[#cc0000]/50';
-    return 'border-[#ECEEDF]/20';
+    // Invisible inputs shouldn't have borders unless error
+    if (current === target) return 'border-b border-[#cc0000]/50';
+    return 'border-none';
+  };
+
+  const getShelfBorder = (target: ErrorTarget, current: ErrorTarget) => {
+    if (current === target) return 'border-t border-b border-[#cc0000]/50';
+    return 'border-t border-b border-[#ECEEDF]/10';
   };
 
   return (
@@ -260,25 +274,25 @@ export default function UploadPage() {
       ) : (
         /* --- INPUT MODE --- */
         <>
-          {/* Metadata Inputs */}
+          {/* Metadata Inputs (Invisible look) */}
           <div className="w-full max-w-[800px] flex flex-col md:flex-row gap-8">
             <input
               type="text"
               placeholder="ARTIST"
               value={artist}
               onChange={(e) => { setArtist(e.target.value); if (errorTarget === 'artist') setErrorTarget(null); }}
-              className={`flex-1 bg-transparent border-b p-2 font-mono text-[#ECEEDF] placeholder-[#ECEEDF]/40 focus:outline-none focus:border-[#ECEEDF] transition-colors uppercase tracking-wider text-center md:text-left ${getBorderColor('artist', errorTarget)}`}
+              className={`flex-1 bg-transparent p-2 font-mono text-[#ECEEDF] placeholder-[#ECEEDF]/30 focus:outline-none focus:ring-0 transition-colors uppercase tracking-wider text-center ${getBorderColor('artist', errorTarget)}`}
             />
             <input
               type="text"
               placeholder="TITLE"
               value={title}
               onChange={(e) => { setTitle(e.target.value); if (errorTarget === 'title') setErrorTarget(null); }}
-              className={`flex-1 bg-transparent border-b p-2 font-mono text-[#ECEEDF] placeholder-[#ECEEDF]/40 focus:outline-none focus:border-[#ECEEDF] transition-colors uppercase tracking-wider text-center md:text-left ${getBorderColor('title', errorTarget)}`}
+              className={`flex-1 bg-transparent p-2 font-mono text-[#ECEEDF] placeholder-[#ECEEDF]/30 focus:outline-none focus:ring-0 transition-colors uppercase tracking-wider text-center ${getBorderColor('title', errorTarget)}`}
             />
           </div>
 
-          {/* File Selection Area */}
+          {/* File Selection Area (Shelf look) */}
           <div className="w-full max-w-[800px] flex flex-col md:flex-row gap-8 h-[250px]">
 
             {/* AUDIO BOX */}
@@ -291,9 +305,10 @@ export default function UploadPage() {
               onDragLeave={() => setIsDraggingAudio(false)}
               onDrop={onAudioDrop}
               className={`
-                flex-1 border flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden group outline-none
-                ${(audioFile || isDraggingAudio) ? 'border-[#ECEEDF]/40 bg-[#ECEEDF]/5' : (errorTarget === 'audio' ? 'border-[#cc0000]/50' : 'border-[#ECEEDF]/10 hover:border-[#ECEEDF]/20')}
-                focus:border-[#ECEEDF]/60
+                flex-1 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden group outline-none
+                ${getShelfBorder('audio', errorTarget)}
+                ${(audioFile || isDraggingAudio) ? 'bg-[#ECEEDF]/5' : 'hover:bg-[#ECEEDF]/5'}
+                focus:bg-[#ECEEDF]/5
               `}
             >
               <input
@@ -304,17 +319,12 @@ export default function UploadPage() {
                 accept="audio/*"
               />
               <div className="z-10 text-center space-y-2 pointer-events-none p-4">
-                <span className={`font-mono text-lg tracking-widest uppercase block ${audioFile ? 'text-[#ECEEDF] opacity-100' : 'text-[#ECEEDF]/50'}`}>
-                  {audioFile ? '[AUDIO SELECTED]' : '[SELECT AUDIO]'}
+                <span className={`font-mono text-[10px] tracking-[0.2em] uppercase block ${audioFile ? 'text-[#ECEEDF] opacity-100' : 'text-[#ECEEDF] opacity-40'}`}>
+                  {audioFile ? 'AUDIO READY' : 'AUDIO'}
                 </span>
                 {audioFile && (
                   <span className="font-mono text-[#ECEEDF]/70 text-xs tracking-wider uppercase block truncate max-w-[200px]">
                     {audioFile.name}
-                  </span>
-                )}
-                {status === STATE.UPLOADING && (
-                  <span className="font-mono text-[#ECEEDF] text-xs tracking-widest block mt-2">
-                    {progress}%
                   </span>
                 )}
               </div>
@@ -330,9 +340,10 @@ export default function UploadPage() {
               onDragLeave={() => setIsDraggingImage(false)}
               onDrop={onVisualDrop}
               className={`
-                flex-1 border flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden group outline-none
-                ${(imageFile || isDraggingImage) ? 'border-[#ECEEDF]/40 bg-[#ECEEDF]/5' : (errorTarget === 'image' ? 'border-[#cc0000]/50' : 'border-[#ECEEDF]/10 hover:border-[#ECEEDF]/20')}
-                focus:border-[#ECEEDF]/60
+                flex-1 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden group outline-none
+                ${getShelfBorder('image', errorTarget)}
+                ${(imageFile || isDraggingImage) ? 'bg-[#ECEEDF]/5' : 'hover:bg-[#ECEEDF]/5'}
+                focus:bg-[#ECEEDF]/5
               `}
             >
               <input
@@ -343,17 +354,12 @@ export default function UploadPage() {
                 accept="image/*"
               />
               <div className="z-10 text-center space-y-2 pointer-events-none p-4">
-                <span className={`font-mono text-lg tracking-widest uppercase block ${imageFile ? 'text-[#ECEEDF] opacity-100' : 'text-[#ECEEDF]/50'}`}>
-                  {imageFile ? '[VISUAL SELECTED]' : '[SELECT VISUAL]'}
+                <span className={`font-mono text-[10px] tracking-[0.2em] uppercase block ${imageFile ? 'text-[#ECEEDF] opacity-100' : 'text-[#ECEEDF] opacity-40'}`}>
+                  {imageFile ? 'VISUAL READY' : 'VISUAL'}
                 </span>
                 {imageFile && (
                   <span className="font-mono text-[#ECEEDF]/70 text-xs tracking-wider uppercase block truncate max-w-[200px]">
                     {imageFile.name}
-                  </span>
-                )}
-                {status === STATE.UPLOADING && (
-                  <span className="font-mono text-[#ECEEDF] text-xs tracking-widest block mt-2">
-                    {progress}%
                   </span>
                 )}
               </div>
@@ -380,7 +386,7 @@ export default function UploadPage() {
                   ${errorTarget === 'generic' ? 'border-[#cc0000]/50 text-[#cc0000]' : ''}
                 `}
               >
-                {status === STATE.ERROR ? 'RETRY UPLOAD' : 'PREVIEW TILE'}
+                {status === STATE.ERROR ? 'RETRY' : 'PREVIEW TILE'}
               </button>
             ) : status === STATE.UPLOADING ? (
               <div className="flex flex-col items-center gap-2">
