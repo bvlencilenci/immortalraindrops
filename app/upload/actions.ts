@@ -17,17 +17,19 @@ interface FinalizeUploadParams {
   tileId: string;
   audioExt: string;
   imageExt: string;
+  mediaType: 'song' | 'dj set' | 'video' | 'image';
+  duration?: string;
 }
 
 export async function finalizeUpload(params: FinalizeUploadParams) {
   try {
-    const { title, artist, tileIndex, tileId, audioExt, imageExt } = params;
+    const { title, artist, tileIndex, tileId, audioExt, imageExt, mediaType } = params;
 
     if (!title || !artist || !tileId) {
       return { success: false, error: 'Missing metadata for finalization' };
     }
 
-    console.log(`Finalizing Upload: "${title}" [${tileId}]`);
+    console.log(`Finalizing Upload: "${title}" [${tileId}] (${mediaType})`);
 
     // Insert into Supabase
     // Note: We use the index/id provided because the files are already physically at this location in R2.
@@ -43,6 +45,9 @@ export async function finalizeUpload(params: FinalizeUploadParams) {
         tile_id: tileId,
         audio_ext: audioExt,
         image_ext: imageExt,
+        // REQUIRED: Set media_type from selection
+        media_type: mediaType,
+        release_date: new Date().toISOString(),
         created_at: new Date().toISOString(),
       });
 

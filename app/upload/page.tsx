@@ -19,6 +19,7 @@ type ErrorTarget = 'artist' | 'title' | 'audio' | 'image' | 'generic' | null;
 export default function UploadPage() {
   const [status, setStatus] = useState<UploadState>(STATE.IDLE);
   const [progress, setProgress] = useState(0);
+  const [mediaType, setMediaType] = useState<'song' | 'dj set' | 'video' | 'image'>('song');
   const [errorTarget, setErrorTarget] = useState<ErrorTarget>(null);
   const [resultTileId, setResultTileId] = useState<string | null>(null);
 
@@ -140,6 +141,7 @@ export default function UploadPage() {
         tileId,
         audioExt: audioFile.name.split('.').pop() || 'mp3',
         imageExt: imageFile.name.split('.').pop() || 'jpg',
+        mediaType: mediaType,
       });
 
       if (!finalizeRes.success) throw new Error(finalizeRes.error);
@@ -260,10 +262,26 @@ export default function UploadPage() {
         </div>
       ) : (
         /* --- INPUT MODE (SHELF AESTHETIC) --- */
-        <div className="w-full max-w-[600px] flex flex-col gap-12">
+        <div className="w-full max-w-[800px] flex flex-col gap-12">
 
-          {/* Metadata Shelves */}
-          <div className="flex flex-col gap-8">
+          {/* METADATA INPUTS (Shelf) */}
+          <div className="w-full flex flex-col gap-0 border-t border-[#ECEEDF]/10">
+
+            {/* Media Type Selector */}
+            <div className="flex w-full border-b border-[#ECEEDF]/10">
+              {['song', 'dj set', 'video'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setMediaType(type as any)}
+                  className={`flex-1 p-4 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors
+                    ${mediaType === type ? 'text-[#ECEEDF] bg-[#ECEEDF]/10' : 'text-[#ECEEDF]/40 hover:text-[#ECEEDF]/70'}
+                  `}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+
             <input
               type="text"
               placeholder="ARTIST"
