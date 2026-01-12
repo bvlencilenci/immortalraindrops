@@ -15,6 +15,7 @@ const s3Client = new S3Client({
     accessKeyId: R2_ACCESS_KEY_ID || '',
     secretAccessKey: R2_SECRET_ACCESS_KEY || '',
   },
+  requestChecksumCalculation: 'WHEN_REQUIRED',
 });
 
 export async function GET(request: NextRequest) {

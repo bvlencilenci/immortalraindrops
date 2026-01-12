@@ -142,8 +142,20 @@ export default function UploadPage() {
       setProgress(20);
 
       // 2. Upload to R2 (Parallel)
-      const uploadAudio = fetch(audioUrl, { method: 'PUT', body: audioFile });
-      const uploadImage = fetch(visualUrl, { method: 'PUT', body: imageFile });
+      const uploadAudio = fetch(audioUrl, {
+        method: 'PUT',
+        body: audioFile,
+        headers: {
+          'Content-Type': audioFile.type
+        }
+      });
+      const uploadImage = fetch(visualUrl, {
+        method: 'PUT',
+        body: imageFile,
+        headers: {
+          'Content-Type': imageFile.type
+        }
+      });
 
       const results = await Promise.all([uploadAudio, uploadImage]);
       if (results.some(r => !r.ok)) throw new Error('Failed to upload files to storage');
