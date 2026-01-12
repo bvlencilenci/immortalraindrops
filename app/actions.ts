@@ -40,20 +40,7 @@ export async function getTracks(): Promise<Track[]> {
     }));
 
     // MOCK: Inject Tile 4 if missing (Requested by USER)
-    tracks.push({
-      id: '999', // Temporary Mock ID
-      created_at: new Date().toISOString(),
-      title: 'Activated Tile 4',
-      artist: 'Immortal Raindrops',
-      genre: 'Ambient',
-      media_type: 'audio',
-      tile_id: 'tile-1', // Fallback to Tile 1 assets to ensure playability
-      audio_ext: 'mp3',
-      image_ext: 'jpg',
-      tile_index: 4,
-      release_date: new Date().toISOString(),
-      duration: '0:00'
-    });
+    // Mock data removed to reflect true database state
 
     return tracks;
   } catch (error) {
