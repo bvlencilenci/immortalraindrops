@@ -87,55 +87,73 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     // Determine format from URL to prevent guessing behavior
     const fileExt = url.split('.').pop()?.toLowerCase() || 'mp3';
 
+    const cacheBustedUrl = `${url}?t=${Date.now()}`;
     const newHowl = new Howl({
-      src: [url],
-      html5: true, // Enable HTML5 Audio for progressive buffering (streaming)
+      src: [cacheBustedUrl],
+      html5: false, // Use Web Audio for reliable CORS and Visualizer support (loads full file)
       preload: true,
-      format: [fileExt], // Explicitly match the file extension
+      format: [fileExt],
       xhr: {
-        withCredentials: false // Crucial for Archive.org / R2 CORS
+        withCredentials: false
       },
       volume: volume,
       onplay: () => {
         set({ isPlaying: true, isBuffering: false, duration: newHowl.duration() });
         requestAnimationFrame(get().updateSeek);
 
-        // Visualizer Connection & Partial Content Support
+        // Visualizer Connection
         const ctx = Howler.ctx;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sound = (newHowl as any)._sounds[0];
 
-        if (sound && sound._node) {
+        if (sound && sound._node && ctx) {
           const audioNode = sound._node;
-          // 1. Force CORS immediately on the audio element
-          // This is critical for createMediaElementSource to output signal
-          if (!audioNode.crossOrigin) {
-            audioNode.crossOrigin = "anonymous";
-          }
-
-          // 2. Delayed Analyzer Setup (Wait for stream to be active)
           let analyser = get().analyser;
-          if (!analyser && ctx) {
+
+          // Initialize Analyser if needed
+          if (!analyser) {
             analyser = ctx.createAnalyser();
             analyser.fftSize = 256;
             set({ analyser });
           }
 
-          // 3. Connect Visualizer Immediately
+          // Connect if not already connected
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           if (analyser && !(sound as any)._visualizerConnected) {
             try {
-              const source = ctx.createMediaElementSource(audioNode);
-              source.connect(analyser);
+              // Handle HTML5 Audio vs Web Audio Node
+              if (audioNode instanceof HTMLMediaElement) {
+                // HTML5 Audio (e.g. Live Stream)
+                if (!audioNode.crossOrigin) audioNode.crossOrigin = "anonymous";
+                const source = ctx.createMediaElementSource(audioNode);
+                source.connect(analyser);
+              } else {
+                // Web Audio (Standard Tracks)
+                // For Howler Web Audio, _node is the AudioBufferSourceNode or GainNode.
+                // We need to connect it to the analyser.
+                // NOTE: Howler connects _node -> _gain -> _panner -> masterGain -> destination
+                // We can tap into the masterGain or the node itself.
+                // Connecting the node directly might duplicate audio if we don't disconnect, 
+                // but we just want to TAP it.
+                // Safest is to connect the Howler Master Gain to the analyser? 
+                // No, we want per-track.
+                // Let's connect the audioNode to the analyser.
+                // Web Audio allows fan-out (one output to multiple inputs).
+                audioNode.connect(analyser);
+              }
 
-              // 4. CRITICAL: Sink to Destination (Speakers)
-              // Without this, audio goes to analyser but never reaches output.
-              analyser.connect(ctx.destination);
+              // Ensure Analyser goes to Destination (for HTML5 case mostly, but good practice if chain broken)
+              // Actually for Web Audio, Howler handles proper routing to destination. 
+              // We ONLY need to connect analyser to destination if we broke the chain or using MediaElementSource unique routing.
+              // For MediaElementSource, we MUST connect analyser->destination.
+              if (audioNode instanceof HTMLMediaElement) {
+                analyser.connect(ctx.destination);
+              }
 
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (sound as any)._visualizerConnected = true;
             } catch (e) {
-              console.warn("Visualizer connection error or already connected:", e);
+              console.warn("Visualizer connection error:", e);
             }
           }
         }
