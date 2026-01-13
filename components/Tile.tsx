@@ -207,6 +207,7 @@ const Tile = (props: TileProps) => {
             className="absolute inset-0 w-full h-full object-cover z-0"
             alt={title}
             crossOrigin="anonymous" // 5. Fix CORS for images too
+            loading="lazy"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}

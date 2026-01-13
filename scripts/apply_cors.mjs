@@ -41,10 +41,11 @@ const s3 = new S3Client({
 
 const corsRules = [
   {
-    AllowedHeaders: ['*'],
+    AllowedHeaders: ['Range', 'Content-Type', '*'],
     AllowedMethods: ['GET', 'PUT', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
     AllowedOrigins: ['*'],
-    MaxAgeSeconds: 3000,
+    ExposeHeaders: ['Content-Length', 'Content-Range', 'ETag'],
+    MaxAgeSeconds: 3600,
   },
 ];
 

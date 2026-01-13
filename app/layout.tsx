@@ -5,7 +5,7 @@ import SplashGate from '../components/SplashGate';
 
 export const metadata: Metadata = {
   title: 'Immortal Raindrops',
-  description: 'Cyber-Brutalist Ambient Archive',
+  description: 'IMMORTAL RAINDROPS WORLDWIDE',
 };
 
 export default function RootLayout({
