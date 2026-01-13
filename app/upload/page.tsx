@@ -13,6 +13,8 @@ const STATE = {
   ERROR: 'UPLOAD_ERROR',
 } as const;
 
+import { loadPreferences, savePreferences } from '@/utils/uploadPreferences';
+
 type UploadState = typeof STATE[keyof typeof STATE];
 type ErrorTarget = 'artist' | 'title' | 'audio' | 'image' | 'generic' | null;
 
@@ -39,6 +41,17 @@ export default function UploadPage() {
 
   const audioInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // LOAD PREFERENCES ON MOUNT (Once Unlocked, or just check local storage safely)
+  // Since lock state is ephemeral (no sesssion), we can just load prefs on mount.
+  // Although waiting for unlock is UX cleaner so we don't flash content.
+  useEffect(() => {
+    if (isUnlocked) {
+      const prefs = loadPreferences();
+      setMediaType(prefs.defaultType);
+      if (prefs.lastArtist) setArtist(prefs.lastArtist);
+    }
+  }, [isUnlocked]);
 
   // CLEANUP
   useEffect(() => {
@@ -169,6 +182,12 @@ export default function UploadPage() {
 
       if (!finalizeRes.success) throw new Error(finalizeRes.error);
 
+      // SAVE PREFERENCES
+      savePreferences({
+        defaultType: mediaType,
+        lastArtist: artist,
+      });
+
       // Success!
       setProgress(100);
       setResultTileId(finalizeRes.tileId || tileId);
@@ -181,7 +200,14 @@ export default function UploadPage() {
         setImageFile(null);
         setPreviewUrl(null);
         setTitle('');
-        setArtist('');
+        // Do NOT reset Artist if preference dictates, but for now we follow simple reset logic
+        // However, user story says "Clear artist field if user manually deletes it" implies it should persist across sessions.
+        // We will keep the artist name in the input if we just saved it? 
+        // Actually, UX convention is usually to clear form for next upload. 
+        // But since we pre-fill on mount, let's allow it to clear here but it will re-fill next refresh.
+        // Or better: keep it if they are doing batch uploads.
+        // Let's NOT clear artist here to facilitate batch upload flow for same artist.
+        // setArtist(''); // DISABLED to support batch flow
         setResultTileId(null);
       }, 4000);
 
