@@ -128,12 +128,18 @@ export default function UploadPage() {
         }
       });
 
-      const results = await Promise.all([uploadAudio, uploadImage]);
-      if (results.some(r => !r.ok)) throw new Error('Failed to upload files to storage');
+      const [audioRes, imageRes] = await Promise.all([uploadAudio, uploadImage]);
+
+      // CRITICAL: Prevent Ghost Tiles by ensuring R2 upload succeeded BEFORE DB Sync
+      if (!audioRes.ok || !imageRes.ok) {
+        throw new Error(`R2 Upload Failed: Audio(${audioRes.status}) Image(${imageRes.status})`);
+      }
 
       setProgress(80);
 
       // 3. Finalize Metadata in DB (ONLY after successful R2 upload)
+      // Use process.env.NEXT_PUBLIC_R2_URL logic implicitly by storing relative paths if needed, 
+      // but here we just pass metadata. URL construction happens in Tile.tsx.
       const finalizeRes = await finalizeUpload({
         title,
         artist,
@@ -171,6 +177,17 @@ export default function UploadPage() {
     }
   };
 
+  // --- DROPDOWN STATE ---
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const getShelfStyle = (target: ErrorTarget, current: ErrorTarget) => {
+    // 1px Bottom Border (Shelf), no side borders
+    const isError = current === target;
+    // IMPROVEMENT 2 & 4: Visible focus state and subtle background
+    return `w-full bg-[#ECEEDF]/5 p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none focus:ring-1 focus:ring-[#ECEEDF]/80 transition-all border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/20 placeholder-[#ECEEDF]/50 hover:border-[#ECEEDF]/40'
+      }`;
+  };
+
   if (status === STATE.SUCCESS) {
     return (
       <main className="flex-1 w-full min-h-screen bg-[#000000] flex flex-col items-center justify-center">
@@ -186,105 +203,52 @@ export default function UploadPage() {
     );
   }
 
-  // Helper for shelf styling
-  const getShelfStyle = (target: ErrorTarget, current: ErrorTarget) => {
-    // 1px Bottom Border (Shelf), no side borders
-    const isError = current === target;
-    return `w-full bg-transparent p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none transition-colors border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/10 placeholder-[#ECEEDF]/30 hover:border-[#ECEEDF]/20'
-      }`;
-  };
-
   return (
-    <main className="flex-1 w-full min-h-screen bg-[#000000] flex flex-col items-center justify-center p-8 pt-[120px] gap-16">
+    <main className="flex-1 w-full min-h-screen bg-[#000000] pt-[110px] pb-12 px-6 md:px-12 lg:px-20">
 
-      {status === STATE.PREVIEW || status === STATE.UPLOADING ? (
-        /* --- PREVIEW MODE --- */
-        <div className="flex flex-col items-center gap-8 animate-in fade-in zoom-in duration-300">
+      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
 
-          <h2 className="font-mono text-[#ECEEDF]/50 text-sm tracking-widest uppercase mb-4">
-            PREVIEW TILE
-          </h2>
+        {/* LEFT COLUMN: FORM (60%) */}
+        <div className="w-full lg:col-span-7 flex flex-col gap-8">
 
-          {/* TILE PREVIEW */}
-          <div className="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-black border border-[#ECEEDF]/10 group overflow-hidden">
+          {/* SECTION 1: TYPE SELECTOR */}
+          <div className="flex flex-col gap-4">
+            {/* Header spacer (16px visual adj) */}
+            <div className="h-4 hidden lg:block" />
 
-            {/* Image */}
-            {previewUrl && (
-              <div className="absolute inset-0 w-full h-full">
-                <Image
-                  src={previewUrl}
-                  alt="Preview"
-                  fill
-                  className="object-cover opacity-80"
-                />
-              </div>
-            )}
-
-            {/* Overlay Text */}
-            <div className="absolute inset-0 flex flex-col justify-between p-6 z-10 bg-black/20">
-              <div className="w-full">
-                <span className="font-mono text-[#ECEEDF] text-lg uppercase tracking-wider leading-none drop-shadow-md">
-                  {artist}
-                </span>
-              </div>
-              <div className="w-full text-right">
-                <span className="font-mono text-[#ECEEDF] text-lg uppercase tracking-wider leading-none drop-shadow-md">
-                  {title}
-                </span>
+            <div className="w-full flex flex-col gap-4">
+              <div className="text-[#ECEEDF]/40 text-[11px] tracking-widest pl-3 mb-1 font-mono uppercase">[ TYPE ]</div>
+              <div className="flex flex-col gap-2">
+                {['song', 'dj set', 'video'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setMediaType(type as any);
+                      setArtist('');
+                      setTitle('');
+                    }}
+                    aria-pressed={mediaType === type}
+                    className={`
+                      flex items-center gap-3 px-4 py-3 font-mono text-[13px] text-left transition-all duration-200 border-none focus:outline-none focus:bg-[#ECEEDF]/10 rounded-sm
+                      ${mediaType === type
+                        ? 'text-[#ECEEDF] bg-[#ECEEDF]/10'
+                        : 'text-[#ECEEDF]/50 hover:bg-[#ECEEDF]/5 hover:text-[#ECEEDF]/80'}
+                    `}
+                  >
+                    <span className={`w-[12px] font-bold ${mediaType === type ? 'opacity-100' : 'opacity-0'}`}>&gt;</span>
+                    <span className="uppercase tracking-wider">{type}</span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
-          <div className="flex gap-8 mt-4 items-center">
-            <button
-              onClick={handleCancelPreview}
-              disabled={status === STATE.UPLOADING}
-              className={`font-mono text-[#ECEEDF]/50 text-sm tracking-[0.2em] uppercase hover:text-[#ECEEDF] transition-colors border-b border-transparent hover:border-[#ECEEDF] ${status === STATE.UPLOADING ? 'opacity-20 cursor-not-allowed' : ''}`}
-            >
-              CANCEL
-            </button>
-
-            {status === STATE.UPLOADING ? (
-              <span className="font-mono text-[#ECEEDF]/40 text-xs tracking-[0.4em] uppercase animate-pulse">
-                SYNCING_DATA... {progress}%
-              </span>
-            ) : (
-              <button
-                onClick={handlePostToArchive}
-                className="font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase border border-[#ECEEDF]/20 px-8 py-2 hover:bg-[#ECEEDF] hover:text-black transition-all"
-              >
-                POST TO ARCHIVE
-              </button>
-            )}
-
-          </div>
-
-        </div>
-      ) : (
-        /* --- INPUT MODE (SHELF AESTHETIC) --- */
-        <div className="w-full max-w-[800px] flex flex-col gap-12">
-
-          {/* METADATA INPUTS (Shelf) */}
-          <div className="w-full flex flex-col gap-0 border-t border-[#ECEEDF]/10">
-
-            {/* Media Type Selector */}
-            <div className="flex w-full border-b border-[#ECEEDF]/10">
-              {['song', 'dj set', 'video'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setMediaType(type as any)}
-                  className={`flex-1 p-4 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors
-                    ${mediaType === type ? 'text-[#ECEEDF] bg-[#ECEEDF]/10' : 'text-[#ECEEDF]/40 hover:text-[#ECEEDF]/70'}
-                  `}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-
+          {/* SECTION 2: METADATA */}
+          <div className="w-full flex flex-col gap-4">
             <input
               type="text"
               placeholder="ARTIST"
+              aria-label="Artist Name"
               value={artist}
               onChange={(e) => { setArtist(e.target.value); if (errorTarget === 'artist') setErrorTarget(null); }}
               className={getShelfStyle('artist', errorTarget)}
@@ -292,76 +256,152 @@ export default function UploadPage() {
             <input
               type="text"
               placeholder="TITLE"
+              aria-label="Title"
               value={title}
               onChange={(e) => { setTitle(e.target.value); if (errorTarget === 'title') setErrorTarget(null); }}
               className={getShelfStyle('title', errorTarget)}
             />
           </div>
 
-          {/* File Shelves */}
-          <div className="flex flex-col gap-8">
-
-            {/* AUDIO */}
-            <div
-              onClick={onAudioClick}
-              className={`${getShelfStyle('audio', errorTarget)} cursor-pointer flex justify-between items-center group`}
-            >
-              <span className="text-[#ECEEDF]/40 text-sm tracking-widest group-hover:text-[#ECEEDF]/60 transition-colors">
+          {/* SECTION 3: FILES */}
+          <div className="flex flex-col gap-6">
+            {/* AUDIO INPUT */}
+            <div className="flex justify-between items-center p-6 bg-white/[0.03] rounded-xl border border-white/10 transition-all hover:bg-white/5 hover:border-white/20">
+              <span className="text-white/60 text-[11px] tracking-widest font-mono uppercase">
                 [ AUDIO_SOURCE ]
               </span>
-              <span className={`text-xs ${audioFile ? 'text-[#ECEEDF]' : 'text-[#ECEEDF]/20'}`}>
-                {audioFile ? audioFile.name : 'SELECT FILE'}
-              </span>
+              <button
+                onClick={() => audioInputRef.current?.click()}
+                className="px-6 py-3 bg-transparent border border-white/30 rounded-lg text-white/70 cursor-pointer font-mono text-[11px] tracking-widest transition-all hover:bg-white/[0.08] hover:border-white/50 hover:text-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Select audio file"
+              >
+                {audioFile ? (
+                  <span className="text-[#ECEEDF]">{audioFile.name}</span>
+                ) : (
+                  'SELECT FILE'
+                )}
+              </button>
               <input
                 type="file"
                 ref={audioInputRef}
                 className="hidden"
                 onChange={(e) => e.target.files?.[0] && handleAudioSelect(e.target.files[0])}
                 accept="audio/*"
+                aria-hidden="true"
               />
             </div>
 
-            {/* VISUAL */}
-            <div
-              onClick={onVisualClick}
-              className={`${getShelfStyle('image', errorTarget)} cursor-pointer flex justify-between items-center group`}
-            >
-              <span className="text-[#ECEEDF]/40 text-sm tracking-widest group-hover:text-[#ECEEDF]/60 transition-colors">
+            {/* VISUAL INPUT */}
+            <div className="flex justify-between items-center p-6 bg-white/[0.03] rounded-xl border border-white/10 transition-all hover:bg-white/5 hover:border-white/20">
+              <span className="text-white/60 text-[11px] tracking-widest font-mono uppercase">
                 [ VISUAL_SOURCE ]
               </span>
-              <span className={`text-xs ${imageFile ? 'text-[#ECEEDF]' : 'text-[#ECEEDF]/20'}`}>
-                {imageFile ? imageFile.name : 'SELECT FILE'}
-              </span>
+              <button
+                onClick={() => imageInputRef.current?.click()}
+                className="px-6 py-3 bg-transparent border border-white/30 rounded-lg text-white/70 cursor-pointer font-mono text-[11px] tracking-widest transition-all hover:bg-white/[0.08] hover:border-white/50 hover:text-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Select visual file"
+              >
+                {imageFile ? (
+                  <span className="text-[#ECEEDF]">{imageFile.name}</span>
+                ) : (
+                  'SELECT FILE'
+                )}
+              </button>
               <input
                 type="file"
                 ref={imageInputRef}
                 className="hidden"
                 onChange={(e) => e.target.files?.[0] && handleVisualSelect(e.target.files[0])}
                 accept="image/*"
+                aria-hidden="true"
               />
             </div>
-
           </div>
 
-          {/* Preview Button */}
-          <div className="flex justify-center pt-8">
-            <button
-              onClick={handlePreview}
-              className={`
-                 font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase transition-all duration-300 px-8 py-2 border border-transparent hover:border-[#ECEEDF]/20
-                 ${(!artist || !title || !audioFile || !imageFile)
-                  ? `opacity-20 cursor-not-allowed`
-                  : `opacity-100 hover:tracking-[0.3em]`
-                }
-                 ${errorTarget === 'generic' ? 'text-[#cc0000]' : ''}
-               `}
-            >
-              {status === STATE.ERROR ? 'RETRY' : 'PREVIEW TILE'}
-            </button>
+          {/* SECTION 4: ACTION (Spacing 48px from content) */}
+          <div className="pt-12 pb-12 flex items-center gap-6">
+            {status === STATE.UPLOADING ? (
+              <span className="font-mono text-[#ECEEDF]/40 text-xs tracking-[0.4em] uppercase animate-pulse">
+                SYNCING_DATA... {progress}%
+              </span>
+            ) : (
+              <button
+                onClick={handlePostToArchive}
+                disabled={!artist || !title || !audioFile || !imageFile}
+                aria-label="Upload"
+                className={`
+                    w-full md:w-auto font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase border border-[#ECEEDF]/20 px-12 py-4 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-[#ECEEDF]
+                    ${(!artist || !title || !audioFile || !imageFile)
+                    ? 'opacity-40 cursor-not-allowed'
+                    : 'opacity-100 hover:bg-[#ECEEDF] hover:text-black hover:-translate-y-[1px] active:translate-y-0'
+                  }
+                  `}
+              >
+                UPLOAD
+              </button>
+            )}
+            {status === STATE.ERROR && (
+              <span role="alert" className="font-mono text-[#cc0000] text-xs uppercase tracking-widest animate-pulse">
+                UPLOAD FAILED
+              </span>
+            )}
+
+            {/* Screen Reader Status Region */}
+            <div role="status" aria-live="polite" className="sr-only">
+              {audioFile && `Audio file selected: ${audioFile.name}`}
+              {imageFile && `Image file selected: ${imageFile.name}`}
+              {status === STATE.UPLOADING && 'Uploading files...'}
+            </div>
           </div>
 
         </div>
-      )}
+
+        {/* RIGHT COLUMN: PREVIEW (40%) */}
+        <div className="w-full lg:col-span-5 flex flex-col items-center lg:items-end justify-start relative sticky top-32">
+
+          {/* Preview Container */}
+          <div className="w-full max-w-[500px] flex flex-col items-center gap-8 p-8 border border-[#ECEEDF]/5 bg-white/[0.02] rounded-2xl backdrop-blur-sm">
+            <h2 className="font-mono text-[#ECEEDF]/40 text-sm tracking-[0.2em] uppercase">
+              LIVE PREVIEW
+            </h2>
+
+            {/* TILE PREVIEW CARD */}
+            <div className="relative w-[300px] h-[300px] bg-black border border-[#ECEEDF]/10 group overflow-hidden transition-all duration-500 shadow-2xl shadow-black/80">
+              {/* Image */}
+              <div className="absolute inset-0 w-full h-full bg-[#ECEEDF]/5">
+                {previewUrl && (
+                  <Image
+                    src={previewUrl}
+                    alt="Preview"
+                    fill
+                    className="object-cover opacity-80"
+                  />
+                )}
+              </div>
+
+              {/* Overlay Text */}
+              {/* Exact Overlay Layout from Tile.tsx */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 z-10 pointer-events-none" />
+
+              {/* Metadata */}
+              <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none">
+                <span className="text-[15px] font-mono text-[#ECEEDF] lowercase leading-none tracking-normal text-left">
+                  {artist || '—'}
+                </span>
+                <span className="text-[20px] md:text-[28px] uppercase leading-none tracking-tighter mt-1 text-[#ECEEDF] text-left">
+                  {title || '—'}
+                </span>
+              </div>
+            </div>
+
+            <div className="text-[#ECEEDF]/20 text-[10px] font-mono text-center max-w-[280px]">
+              PREVIEW MODE // REALTIME RENDER
+            </div>
+          </div>
+
+        </div>
+
+      </div>
     </main>
   );
 }
