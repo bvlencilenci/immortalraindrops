@@ -5,6 +5,8 @@ import { useAudioStore } from '../store/useAudioStore';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 const Header = () => {
   const {
@@ -28,6 +30,43 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const prevVolumeRef = useRef(1.0);
+
+  // Auth State
+  const [user, setUser] = useState<User | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async (userId: string) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single();
+
+      if (data?.username) {
+        setUsername(data.username);
+      }
+    };
+
+    // Check active session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      if (user) fetchProfile(user.id);
+    });
+
+    // Listen for changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setUsername(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     // 1. Initial Fetch of Live State
@@ -299,9 +338,62 @@ const Header = () => {
           </div>
 
           {/* BLOCK 3: Right - Volume Controls (Flex-1, End) */}
-          <div className="flex-1 flex items-center justify-end z-40 min-w-0">
+          <div className="flex-1 flex items-center justify-end z-40 min-w-0 gap-6">
+
+            {/* AUTH BUTTON (Desktop) */}
+            <div className="relative">
+              {!user ? (
+                <Link
+                  href="/login"
+                  className="hidden md:flex items-center justify-center font-mono text-[13px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase"
+                >
+                  [ SIGN_IN ]
+                </Link>
+              ) : (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="hidden md:flex items-center justify-center font-mono text-[13px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase"
+                  >
+                    [ {username ? username.toUpperCase() : (user.email?.split('@')[0].toUpperCase().slice(0, 8) || 'USER')} ]
+                  </button>
+
+                  <AnimatePresence>
+                    {showUserMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute right-0 top-full mt-4 w-48 bg-[#0F0E0E] border border-[#ECEEDF]/20 p-2 flex flex-col gap-1 z-[100]"
+                      >
+                        {/* Menu Items */}
+                        <Link href="/upload" className="px-4 py-3 text-left font-mono text-[11px] text-[#ECEEDF] hover:bg-[#ECEEDF]/10 tracking-widest uppercase transition-colors">
+                          UPLOAD
+                        </Link>
+                        <Link href="/my-uploads" className="px-4 py-3 text-left font-mono text-[11px] text-[#ECEEDF] hover:bg-[#ECEEDF]/10 tracking-widest uppercase transition-colors">
+                          MY UPLOADS
+                        </Link>
+                        <Link href="/settings" className="px-4 py-3 text-left font-mono text-[11px] text-[#ECEEDF] hover:bg-[#ECEEDF]/10 tracking-widest uppercase transition-colors">
+                          SETTINGS
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            await supabase.auth.signOut();
+                            setShowUserMenu(false);
+                          }}
+                          className="px-4 py-3 text-left font-mono text-[11px] text-red-400 hover:bg-red-900/20 tracking-widest uppercase transition-colors border-t border-[#ECEEDF]/10 mt-1"
+                        >
+                          LOGOUT
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
+
             {isPlayerActive && (
-              <div className="flex flex-col items-end gap-1">
+              <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <div className="flex items-center gap-4">
                   <button
                     className="flex items-center justify-center"

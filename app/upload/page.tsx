@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { finalizeUpload, verifyUploadAccess } from './actions';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 // Explicit State Constants
 const STATE = {
@@ -19,11 +21,13 @@ type UploadState = typeof STATE[keyof typeof STATE];
 type ErrorTarget = 'artist' | 'title' | 'audio' | 'image' | 'generic' | null;
 
 export default function UploadPage() {
-  // LOCK STATE
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [password, setPassword] = useState('');
-  const [unlockError, setUnlockError] = useState(false);
+  const router = useRouter();
 
+  // Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Form State
   const [status, setStatus] = useState<UploadState>(STATE.IDLE);
   const [progress, setProgress] = useState(0);
   const [mediaType, setMediaType] = useState<'song' | 'dj set' | 'video' | 'image'>('song');
@@ -42,16 +46,25 @@ export default function UploadPage() {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  // LOAD PREFERENCES ON MOUNT (Once Unlocked, or just check local storage safely)
-  // Since lock state is ephemeral (no sesssion), we can just load prefs on mount.
-  // Although waiting for unlock is UX cleaner so we don't flash content.
+  // 1. Check Auth on Mount
   useEffect(() => {
-    if (isUnlocked) {
-      const prefs = loadPreferences();
-      setMediaType(prefs.defaultType);
-      if (prefs.lastArtist) setArtist(prefs.lastArtist);
-    }
-  }, [isUnlocked]);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Redirect to Login
+        router.push('/login');
+      } else {
+        setIsAuthenticated(true);
+        setAuthLoading(false);
+
+        // Load prefs once authenticated
+        const prefs = loadPreferences();
+        setMediaType(prefs.defaultType);
+        if (prefs.lastArtist) setArtist(prefs.lastArtist);
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   // CLEANUP
   useEffect(() => {
@@ -66,19 +79,6 @@ export default function UploadPage() {
     return new File([file], `${newBaseName}.${ext}`, { type: file.type });
   };
 
-  // --- HANDLERS ---
-  const handleUnlock = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await verifyUploadAccess(password);
-    if (res.success) {
-      setIsUnlocked(true);
-      setUnlockError(false);
-    } else {
-      setUnlockError(true);
-      setPassword('');
-    }
-  };
-
   const handleAudioSelect = (file: File) => {
     setAudioFile(renameFile(file, 'audio'));
     if (errorTarget === 'audio') setErrorTarget(null);
@@ -91,10 +91,6 @@ export default function UploadPage() {
     setPreviewUrl(URL.createObjectURL(renamed));
     if (errorTarget === 'image') setErrorTarget(null);
   };
-
-  // --- FILE INPUT TRIGGERS ---
-  const onAudioClick = () => audioInputRef.current?.click();
-  const onVisualClick = () => imageInputRef.current?.click();
 
   // --- ACTIONS ---
   const handlePreview = () => {
@@ -139,37 +135,29 @@ export default function UploadPage() {
       setProgress(20);
 
       // 2. Upload to R2 (Parallel)
-      // Convert to Blob to strip "filename" metadata that might trigger complex preflight
       const audioBlob = audioFile.slice(0, audioFile.size, audioFile.type);
       const imageBlob = imageFile.slice(0, imageFile.size, imageFile.type);
 
       const uploadAudio = fetch(audioUrl, {
         method: 'PUT',
         body: audioBlob,
-        headers: {
-          'Content-Type': audioFile.type
-        }
+        headers: { 'Content-Type': audioFile.type }
       });
       const uploadImage = fetch(visualUrl, {
         method: 'PUT',
         body: imageBlob,
-        headers: {
-          'Content-Type': imageFile.type
-        }
+        headers: { 'Content-Type': imageFile.type }
       });
 
       const [audioRes, imageRes] = await Promise.all([uploadAudio, uploadImage]);
 
-      // CRITICAL: Prevent Ghost Tiles by ensuring R2 upload succeeded BEFORE DB Sync
       if (!audioRes.ok || !imageRes.ok) {
         throw new Error(`R2 Upload Failed: Audio(${audioRes.status}) Image(${imageRes.status})`);
       }
 
       setProgress(80);
 
-      // 3. Finalize Metadata in DB (ONLY after successful R2 upload)
-      // Use process.env.NEXT_PUBLIC_R2_URL logic implicitly by storing relative paths if needed, 
-      // but here we just pass metadata. URL construction happens in Tile.tsx.
+      // 3. Finalize Metadata
       const finalizeRes = await finalizeUpload({
         title,
         artist,
@@ -200,14 +188,6 @@ export default function UploadPage() {
         setImageFile(null);
         setPreviewUrl(null);
         setTitle('');
-        // Do NOT reset Artist if preference dictates, but for now we follow simple reset logic
-        // However, user story says "Clear artist field if user manually deletes it" implies it should persist across sessions.
-        // We will keep the artist name in the input if we just saved it? 
-        // Actually, UX convention is usually to clear form for next upload. 
-        // But since we pre-fill on mount, let's allow it to clear here but it will re-fill next refresh.
-        // Or better: keep it if they are doing batch uploads.
-        // Let's NOT clear artist here to facilitate batch upload flow for same artist.
-        // setArtist(''); // DISABLED to support batch flow
         setResultTileId(null);
       }, 4000);
 
@@ -215,41 +195,25 @@ export default function UploadPage() {
       console.error('Upload Flow Error:', error);
       setStatus(STATE.ERROR);
       setErrorTarget('generic');
-
       setTimeout(() => setStatus(STATE.IDLE), 3000);
     }
   };
 
   // --- DROPDOWN STATE ---
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const getShelfStyle = (target: ErrorTarget, current: ErrorTarget) => {
-    // 1px Bottom Border (Shelf), no side borders
     const isError = current === target;
-    // IMPROVEMENT 2 & 4: Visible focus state and subtle background
-    return `w-full bg-[#ECEEDF]/5 p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none focus:ring-1 focus:ring-[#ECEEDF]/80 transition-all border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/20 placeholder-[#ECEEDF]/50 hover:border-[#ECEEDF]/40'
-      }`;
+    return `w-full bg-[#ECEEDF]/5 p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none focus:ring-1 focus:ring-[#ECEEDF]/80 transition-all border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/20 placeholder-[#ECEEDF]/50 hover:border-[#ECEEDF]/40'}`;
   };
 
-  if (!isUnlocked) {
+  if (authLoading || !isAuthenticated) {
     return (
       <main className="flex-1 w-full min-h-screen bg-[#000000] flex items-center justify-center">
-        <form onSubmit={handleUnlock} className="flex flex-col gap-4 items-center">
-          <span className="font-mono text-[#ECEEDF] tracking-widest text-xs uppercase mb-2 animate-pulse">
-            lmao good luck
-          </span>
-          <input
-            type="password"
-            autoFocus
-            placeholder="ACCESS_KEY"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`
-              bg-transparent border-b ${unlockError ? 'border-red-500 text-red-500' : 'border-[#ECEEDF]/20 text-[#ECEEDF]'} 
-              px-4 py-2 font-mono text-center tracking-[0.5em] focus:outline-none focus:border-[#ECEEDF] w-[200px] text-sm
-            `}
-          />
-        </form>
+        <div className="font-mono text-[#ECEEDF] animate-pulse text-xs tracking-widest uppercase">
+          AUTHENTICATING...
+        </div>
       </main>
     );
   }
