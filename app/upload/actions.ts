@@ -2,16 +2,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { UPLOAD_PASSWORD } from '../../config/admins';
 import { revalidatePath } from 'next/cache';
-
-export async function verifyUploadAccess(password: string) {
-  // Simple equality check
-  if (password === UPLOAD_PASSWORD) {
-    return { success: true };
-  }
-  return { success: false, error: 'Incorrect Password' };
-}
 
 interface UploadMetadata {
   title: string;
@@ -21,77 +12,72 @@ interface UploadMetadata {
   audioExt: string;
   imageExt: string;
   mediaType: 'song' | 'dj set' | 'video' | 'image';
-  release_date?: string;
 }
 
-export async function finalizeUpload(metadata: UploadMetadata) {
-  try {
-    const cookieStore = await cookies();
+export async function finalizeUpload(data: UploadMetadata) {
+  const cookieStore = await cookies();
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // Ignore if called from Server Component
-            }
-          },
+  // 1. Create Supabase Client
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
         },
-      }
-    );
-
-    // 1. Get the authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      throw new Error("Unauthorized: Please sign in to upload.");
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
     }
+  );
 
-    const {
-      title,
-      artist,
-      tileIndex,
-      tileId,
-      audioExt,
-      imageExt,
-      mediaType,
-    } = metadata;
+  // 2. Authenticate User
+  const { data: { session }, error: authError } = await supabase.auth.getSession();
 
-    console.log('[FINALIZE] Inserting into DB:', tileId, 'User:', user.id);
+  if (authError || !session) {
+    return { success: false, error: 'Unauthorized: No active session found.' };
+  }
 
+  const userId = session.user.id;
+
+  // 3. Insert into Database
+  try {
     const { error } = await supabase
       .from('tracks')
       .insert({
-        title,
-        artist,
-        tile_index: tileIndex,
-        tile_id: tileId,
-        audio_ext: audioExt,
-        image_ext: imageExt,
-        media_type: mediaType,
+        tile_id: data.tileId,
+        tile_index: data.tileIndex,
+        title: data.title,
+        artist: data.artist,
+        audio_url: `${data.tileId}/audio.${data.audioExt}`,
+        visual_url: `${data.tileId}/visual.${data.imageExt}`,
+        media_type: data.mediaType,
+        created_at: new Date().toISOString(),
         release_date: new Date().toISOString(),
-        duration: null,
-        user_id: user.id // Link to user
+        duration: 0, // Placeholder, eventually could be parsed
+        user_id: userId // Link to the authenticated user
       });
 
     if (error) {
-      throw new Error(error.message);
+      console.error('Supabase Insert Error:', error);
+      return { success: false, error: error.message };
     }
 
-    revalidatePath('/');
+    // 4. Revalidate
     revalidatePath('/archive');
+    revalidatePath('/'); // Home might show latest
 
-    return { success: true, tileId };
-  } catch (error) {
-    console.error('Finalize Upload Error:', error);
-    return { success: false, error: (error as Error).message };
+    return { success: true, tileId: data.tileId };
+  } catch (err) {
+    console.error('Finalize Upload Error:', err);
+    return { success: false, error: 'Internal Server Error' };
   }
 }

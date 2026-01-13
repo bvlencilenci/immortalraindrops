@@ -305,7 +305,7 @@ const Header = () => {
           </div>
 
           {/* BLOCK 2: Center - Player Buttons (Flex-None, Centered) */}
-          <div className="flex-none flex items-center justify-center gap-8 z-40">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-8 z-40">
             {isPlayerActive && (
               <>
                 <button
@@ -338,7 +338,7 @@ const Header = () => {
           </div>
 
           {/* BLOCK 3: Right - Volume Controls (Flex-1, End) */}
-          <div className="flex-1 flex items-center justify-end z-40 min-w-0 gap-6">
+          <div className="flex-1 flex items-center justify-end z-40 min-w-[200px] gap-6">
 
             {/* AUTH BUTTON (Desktop) */}
             <div className="relative">

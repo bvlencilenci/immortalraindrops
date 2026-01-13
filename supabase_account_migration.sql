@@ -12,9 +12,40 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 -- Enable RLS on Profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- TRIGGER: Handle New User Creation
+-- Drop trigger first to ensure idempotency
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+
+-- Create Function
+CREATE OR REPLACE FUNCTION public.handle_new_user() 
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, username, role, avatar_url)
+  VALUES (
+    new.id, 
+    new.raw_user_meta_data->>'username', 
+    'user', -- default role
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create Trigger
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
+CREATE POLICY "Users can insert their own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- 3. Create Votes Table
 CREATE TABLE IF NOT EXISTS public.votes (
@@ -27,9 +58,17 @@ CREATE TABLE IF NOT EXISTS public.votes (
 );
 
 ALTER TABLE public.votes ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public votes are viewable by everyone" ON public.votes;
 CREATE POLICY "Public votes are viewable by everyone" ON public.votes FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can insert their own votes" ON public.votes;
 CREATE POLICY "Users can insert their own votes" ON public.votes FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own votes" ON public.votes;
 CREATE POLICY "Users can update their own votes" ON public.votes FOR UPDATE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete their own votes" ON public.votes;
 CREATE POLICY "Users can delete their own votes" ON public.votes FOR DELETE USING (auth.uid() = user_id);
 
 -- 4. Update Tracks RLS (Godmode Transition)
@@ -38,16 +77,30 @@ DROP POLICY IF EXISTS "godmode_delete" ON public.tracks;
 DROP POLICY IF EXISTS "public_upload" ON public.tracks; -- Replaced by authenticated upload
 
 -- New Policies
+DROP POLICY IF EXISTS "Owners can delete their own tracks" ON public.tracks;
 CREATE POLICY "Owners can delete their own tracks" ON public.tracks FOR DELETE USING (auth.uid() = user_id);
 
 -- Admin Policy (Check profiles for role='admin')
+DROP POLICY IF EXISTS "Admins can delete anything" ON public.tracks;
 CREATE POLICY "Admins can delete anything" ON public.tracks FOR DELETE USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
 );
 
 -- Authenticated Upload Policy
+DROP POLICY IF EXISTS "Authenticated users can upload" ON public.tracks;
 CREATE POLICY "Authenticated users can upload" ON public.tracks FOR INSERT TO authenticated 
 WITH CHECK (auth.uid() = user_id);
 
+-- 5. Views (for easy frontend usage)
+DROP VIEW IF EXISTS public.tracks_with_votes;
+CREATE VIEW public.tracks_with_votes AS
+SELECT 
+  t.*,
+  COALESCE(SUM(v.vote_type), 0) as vote_count
+FROM public.tracks t
+LEFT JOIN public.votes v ON t.tile_id = v.track_id
+GROUP BY t.id;
+
 -- Allow updates by owner
+DROP POLICY IF EXISTS "Owners can update their own tracks" ON public.tracks;
 CREATE POLICY "Owners can update their own tracks" ON public.tracks FOR UPDATE USING (auth.uid() = user_id);

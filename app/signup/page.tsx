@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { ensureProfile } from '@/app/auth/actions';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -17,11 +18,19 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    // 1. Sign Up
+    // 1. Sign Up (Trigger will create Profile)
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username: username,
+        },
+      },
     });
+
+    console.log('Signup Attempt:', { email, username });
+    console.log('Signup Result:', { authData, authError });
 
     if (authError) {
       setError(authError.message);
@@ -30,26 +39,12 @@ export default function SignupPage() {
     }
 
     if (authData.user) {
-      // 2. Create Profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          username: username,
-          role: 'user', // Default role
-        });
+      // Success - Trigger HANDLES creation, but...
+      // IF trigger failed (e.g. user already existed), FORCE ensure profile now.
+      await ensureProfile(username);
 
-      if (profileError) {
-        console.error('Profile creation failed:', profileError);
-        // We don't rollback auth here, but user might exist without profile.
-        // Ideally handled via Postgres Trigger, but client-side is okay for MVP.
-        setError('Account created but profile setup failed. Please contact support.');
-        setLoading(false);
-      } else {
-        // Success
-        router.push('/');
-        router.refresh();
-      }
+      router.push('/');
+      router.refresh();
     }
   };
 

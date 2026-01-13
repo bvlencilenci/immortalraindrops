@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { verifyLogin, deleteTile, updateTile } from './actions';
+import { deleteTile, updateTile } from './actions';
 import ArchiveGrid from '../../components/ArchiveGrid';
 import { Track } from '../../types';
+import { useRouter } from 'next/navigation';
 
 export default function GodModePage() {
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -26,8 +26,22 @@ export default function GodModePage() {
 
   // Load tracks when authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      const fetchTracks = async () => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.role === 'admin') {
+        setIsAuthenticated(true);
+        // Fetch Tracks
         const { data } = await supabase
           .from('tracks')
           .select('*')
@@ -37,22 +51,14 @@ export default function GodModePage() {
           setTracks(data as Track[]);
         }
         setLoading(false);
-      };
+      } else {
+        setError('ACCESS DENIED: ADMIN ROLE REQUIRED');
+        setLoading(false);
+      }
+    };
 
-      fetchTracks();
-    }
-  }, [isAuthenticated]);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = await verifyLogin(username, password);
-    if (result.success) {
-      setIsAuthenticated(true);
-      setError(null);
-    } else {
-      setError(result.error || 'Login failed');
-    }
-  };
+    checkAdmin();
+  }, [router]);
 
   const handleDelete = async (tileId: string, index: number, audioExt: string, imageExt: string) => {
     const res = await deleteTile(tileId, index, audioExt, imageExt);
@@ -95,42 +101,22 @@ export default function GodModePage() {
     }
   };
 
-  if (!isAuthenticated) {
+  if (loading) {
     return (
       <main className="min-h-screen bg-black flex items-center justify-center p-4">
-        <form onSubmit={handleLogin} className="flex flex-col gap-4 w-full max-w-sm p-8 border border-white/10 rounded-lg bg-white/[0.02]">
-          <h1 className="text-[#ECEEDF] font-mono tracking-widest text-center mb-4 uppercase text-sm">
-            [ SYSTEM ADMIN ]
-          </h1>
+        <div className="text-[#ECEEDF] font-mono animate-pulse tracking-widest uppercase text-xs">
+          SYSTEM_CHECK...
+        </div>
+      </main>
+    );
+  }
 
-          <input
-            type="text"
-            placeholder="USER_ID"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="bg-transparent border border-white/20 rounded px-4 py-2 font-mono text-[#ECEEDF] focus:outline-none focus:border-[#ECEEDF]"
-          />
-          <input
-            type="password"
-            placeholder="ACCESS_KEY"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="bg-transparent border border-white/20 rounded px-4 py-2 font-mono text-[#ECEEDF] focus:outline-none focus:border-[#ECEEDF]"
-          />
-
-          {error && (
-            <div className="text-red-500 font-mono text-xs text-center">
-              {error.toUpperCase()}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="mt-4 bg-[#ECEEDF]/10 hover:bg-[#ECEEDF]/20 text-[#ECEEDF] font-mono py-2 rounded uppercase tracking-widest text-xs transition-colors"
-          >
-            Authenticate
-          </button>
-        </form>
+  if (error) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="text-red-500 font-mono tracking-widest uppercase text-xs border border-red-900/50 p-4 bg-red-900/10">
+          {error}
+        </div>
       </main>
     );
   }

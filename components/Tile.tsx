@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import { Howler } from 'howler';
 import { Track } from '../types';
+import VoteButtons from './VoteButtons';
 
 interface TileProps extends Track {
   isAdmin?: boolean;
@@ -24,7 +25,8 @@ const Tile = (props: TileProps) => {
     image_ext,
     isAdmin,
     onDelete,
-    onEdit
+    onEdit,
+    vote_count
   } = props;
 
   const {
@@ -226,7 +228,11 @@ const Tile = (props: TileProps) => {
         </span>
       </div>
 
-      {/* 4. ADMIN CONTROLS */}
+      {/* 5. VOTING CONTROLS */}
+      <div className="absolute bottom-3 right-3 z-40 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+        <VoteButtons trackId={tile_id} initialCount={vote_count || 0} />
+      </div>
+
       {isAdmin && (
         <div className="absolute top-4 right-4 z-50 flex gap-2">
           <button
