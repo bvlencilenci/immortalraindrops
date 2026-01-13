@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { finalizeUpload } from './actions';
+import { requestUploadAccess } from '@/app/godmode/actions';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -25,6 +26,8 @@ export default function UploadPage() {
 
   // Auth State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [accessRequested, setAccessRequested] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
   // Form State
@@ -46,18 +49,27 @@ export default function UploadPage() {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. Check Auth on Mount
+  // 1. Check Auth & Authorization on Mount
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // Redirect to Login
         router.push('/login');
-      } else {
-        setIsAuthenticated(true);
-        setAuthLoading(false);
+        return;
+      }
 
-        // Load prefs once authenticated
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_authorized, access_requested')
+        .eq('id', session.user.id)
+        .single();
+
+      setIsAuthenticated(true);
+      setIsAuthorized(profile?.is_authorized || false);
+      setAccessRequested(profile?.access_requested || false);
+      setAuthLoading(false);
+
+      if (profile?.is_authorized) {
         const prefs = loadPreferences();
         setMediaType(prefs.defaultType);
         if (prefs.lastArtist) setArtist(prefs.lastArtist);
@@ -65,6 +77,15 @@ export default function UploadPage() {
     };
     checkAuth();
   }, [router]);
+
+  const handleRequestAccess = async () => {
+    const res = await requestUploadAccess();
+    if (res.success) {
+      setAccessRequested(true);
+    } else {
+      alert('Request failed: ' + res.error);
+    }
+  };
 
   // CLEANUP
   useEffect(() => {
@@ -213,6 +234,42 @@ export default function UploadPage() {
       <main className="flex-1 w-full min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="font-mono text-[#ECEEDF] animate-pulse text-xs tracking-widest uppercase">
           AUTHENTICATING...
+        </div>
+      </main>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <main className="flex-1 w-full min-h-screen bg-[#000000] flex flex-col items-center justify-center p-8">
+        <div className="max-w-md w-full flex flex-col items-center gap-12 text-center animate-in fade-in zoom-in duration-700">
+          <div className="flex flex-col gap-4">
+            <h1 className="text-[#ECEEDF] font-mono text-xl tracking-[0.2em] uppercase">AUTHORIZED ACCOUNT REQUIRED</h1>
+            <p className="text-[#ECEEDF]/40 font-mono text-[11px] uppercase tracking-widest leading-relaxed">
+              Authorized account required for uploads. Request access.
+            </p>
+          </div>
+
+          {accessRequested ? (
+            <div className="flex flex-col gap-4 items-center">
+              <span className="font-mono text-[#ECEEDF] text-xs tracking-[0.4em] uppercase animate-pulse">REQUEST_PENDING_APPROVAL</span>
+              <span className="font-mono text-[#ECEEDF]/20 text-[9px] uppercase tracking-widest">Our system will verify your identity shortly.</span>
+            </div>
+          ) : (
+            <button
+              onClick={handleRequestAccess}
+              className="px-12 py-5 border border-[#ECEEDF] text-[#ECEEDF] font-mono tracking-[0.4em] uppercase hover:bg-[#ECEEDF] hover:text-black transition-all text-sm active:translate-y-1"
+            >
+              [ REQUEST ACCESS ]
+            </button>
+          )}
+
+          <button
+            onClick={() => router.push('/')}
+            className="font-mono text-[10px] text-[#ECEEDF]/20 hover:text-[#ECEEDF] uppercase tracking-widest transition-colors"
+          >
+            ← BACK_TO_HOME
+          </button>
         </div>
       </main>
     );

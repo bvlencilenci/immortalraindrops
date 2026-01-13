@@ -46,14 +46,15 @@ async function verifyAdmin() {
   if (error || !user) throw new Error('Unauthorized');
 
   // Check Profile Role
+  // Check Profile Godmode Status
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('is_godmode')
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin') {
-    throw new Error('Forbidden: Admin Access Required');
+  if (!profile?.is_godmode) {
+    throw new Error('Forbidden: Godmode Access Required');
   }
 }
 
@@ -129,6 +130,151 @@ export async function updateTile(tileId: string, updates: Record<string, any>) {
     console.log(`[GODMODE] Updated DB: ${tileId}`);
     return { success: true };
   } catch (error) {
+    return { success: false, error: (error as Error).message };
+  }
+}
+export async function deleteUser(userId: string) {
+  try {
+    await verifyAdmin();
+
+    // Prevent self-deletion
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+            } catch { }
+          },
+        },
+      }
+    );
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (currentUser?.id === userId) {
+      throw new Error('Self-deletion is prohibited.');
+    }
+
+    console.log(`[GODMODE] Deleting User ${userId}...`);
+
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    if (error) throw error;
+
+    revalidatePath('/godmode');
+    return { success: true };
+  } catch (error) {
+    console.error('[GODMODE] User Deletion Error:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+export async function finalizeAssetUpdate(tileId: string, updates: { audio_url?: string, visual_url?: string }) {
+  try {
+    await verifyAdmin();
+    console.log(`[GODMODE] Finalizing asset update for ${tileId}...`, updates);
+
+    // 1. Get current track to check for old files
+    const { data: currentTrack } = await supabaseAdmin
+      .from('tracks')
+      .select('audio_url, visual_url')
+      .eq('tile_id', tileId)
+      .single();
+
+    // 2. Update Database
+    const { error: dbError } = await supabaseAdmin
+      .from('tracks')
+      .update(updates)
+      .eq('tile_id', tileId);
+
+    if (dbError) throw new Error(`DB Update Failed: ${dbError.message}`);
+
+    // 3. Cleanup old files from R2 if paths changed
+    if (currentTrack) {
+      if (updates.audio_url && currentTrack.audio_url !== updates.audio_url) {
+        try {
+          await s3.send(new DeleteObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME!,
+            Key: currentTrack.audio_url,
+          }));
+        } catch (e) {
+          console.warn(`[GODMODE] Failed to delete old audio:`, e);
+        }
+      }
+      if (updates.visual_url && currentTrack.visual_url !== updates.visual_url) {
+        try {
+          await s3.send(new DeleteObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME!,
+            Key: currentTrack.visual_url,
+          }));
+        } catch (e) {
+          console.warn(`[GODMODE] Failed to delete old visual:`, e);
+        }
+      }
+    }
+
+    revalidatePath('/archive');
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('[GODMODE] Asset Finalization Error:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+export async function requestUploadAccess() {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+            } catch { }
+          },
+        },
+      }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Authentication required.');
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ access_requested: true })
+      .eq('id', user.id);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('[AUTH] Access Request Error:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+export async function toggleAuthorization(userId: string, currentStatus: boolean) {
+  try {
+    await verifyAdmin();
+
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .update({
+        is_authorized: !currentStatus,
+        access_requested: false // Clear request on change
+      })
+      .eq('id', userId);
+
+    if (error) throw error;
+
+    revalidatePath('/godmode');
+    return { success: true };
+  } catch (error) {
+    console.error('[GODMODE] Authorization Toggle Error:', error);
     return { success: false, error: (error as Error).message };
   }
 }

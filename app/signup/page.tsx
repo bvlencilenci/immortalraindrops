@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { ensureProfile } from '@/app/auth/actions';
+
 
 export default function SignupPage() {
   const router = useRouter();
@@ -15,9 +15,6 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
     // 1. Sign Up (Trigger will create Profile)
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
@@ -30,7 +27,6 @@ export default function SignupPage() {
     });
 
     console.log('Signup Attempt:', { email, username });
-    console.log('Signup Result:', { authData, authError });
 
     if (authError) {
       setError(authError.message);
@@ -38,14 +34,11 @@ export default function SignupPage() {
       return;
     }
 
-    if (authData.user) {
-      // Success - Trigger HANDLES creation, but...
-      // IF trigger failed (e.g. user already existed), FORCE ensure profile now.
-      await ensureProfile(username);
-
-      router.push('/');
-      router.refresh();
-    }
+    // Success - Redirect to Verification
+    router.push(`/verify?email=${encodeURIComponent(email)}`);
+    router.refresh();
+    // Force redirect if router fails
+    // window.location.href = '/verify';
   };
 
   return (

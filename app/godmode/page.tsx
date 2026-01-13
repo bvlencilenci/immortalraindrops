@@ -2,27 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { deleteTile, updateTile } from './actions';
-import ArchiveGrid from '../../components/ArchiveGrid';
-import { Track } from '../../types';
 import { useRouter } from 'next/navigation';
+import TrackList from '@/components/admin/TrackList';
+import UserList from '@/components/admin/UserList';
+import SystemSettings from '@/components/admin/SystemSettings';
 
 export default function GodModePage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Edit State
-  const [editingTrack, setEditingTrack] = useState<Track | null>(null);
-  const [editForm, setEditForm] = useState({
-    artist: '',
-    title: '',
-    genre: '',
-    release_date: '',
-  });
+  const [activeTab, setActiveTab] = useState<'tracks' | 'users' | 'system'>('tracks');
 
   // Load tracks when authenticated
   useEffect(() => {
@@ -35,71 +26,21 @@ export default function GodModePage() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('is_godmode')
         .eq('id', user.id)
         .single();
 
-      if (profile?.role === 'admin') {
+      if (profile?.is_godmode) {
         setIsAuthenticated(true);
-        // Fetch Tracks
-        const { data } = await supabase
-          .from('tracks')
-          .select('*')
-          .order('tile_index', { ascending: true });
-
-        if (data) {
-          setTracks(data as Track[]);
-        }
         setLoading(false);
       } else {
-        setError('ACCESS DENIED: ADMIN ROLE REQUIRED');
+        setError('ACCESS DENIED: GODMODE REQUIRED');
         setLoading(false);
       }
     };
 
     checkAdmin();
   }, [router]);
-
-  const handleDelete = async (tileId: string, index: number, audioExt: string, imageExt: string) => {
-    const res = await deleteTile(tileId, index, audioExt, imageExt);
-    if (res.success) {
-      setTracks(prev => prev.filter(t => t.tile_id !== tileId));
-    } else {
-      alert(`Failed to delete: ${res.error}`);
-    }
-  };
-
-  const handleEdit = (track: Track) => {
-    setEditingTrack(track);
-    setEditForm({
-      artist: track.artist || '',
-      title: track.title || '',
-      genre: track.genre || '',
-      release_date: track.release_date || '',
-    });
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingTrack) return;
-
-    const res = await updateTile(editingTrack.tile_id, {
-      artist: editForm.artist,
-      title: editForm.title,
-      genre: editForm.genre,
-      release_date: editForm.release_date,
-    });
-
-    if (res.success) {
-      setTracks(prev => prev.map(t =>
-        t.tile_id === editingTrack.tile_id
-          ? { ...t, ...editForm }
-          : t
-      ));
-      setEditingTrack(null);
-    } else {
-      alert(`Failed to update: ${res.error}`);
-    }
-  };
 
   if (loading) {
     return (
@@ -121,98 +62,59 @@ export default function GodModePage() {
     );
   }
 
+  const tabs = [
+    { id: 'tracks', label: 'TRACKS' },
+    { id: 'users', label: 'USERS' },
+    { id: 'system', label: 'SETTINGS' },
+  ];
+
   return (
-    <main className="min-h-screen bg-black flex flex-col pt-32 px-4 md:px-12 pb-12">
-      <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-        <h1 className="text-[#ECEEDF] font-mono tracking-[0.2em] uppercase text-xl">
-          [ ADMIN_GRID ]
-        </h1>
-        <button
-          onClick={() => setIsAuthenticated(false)}
-          className="text-[#ECEEDF]/50 hover:text-[#ECEEDF] font-mono text-xs uppercase"
-        >
-          LOGOUT
-        </button>
+    <main className="min-h-screen bg-black flex flex-col pt-32 px-4 md:px-12 pb-12 overflow-x-hidden">
+
+      {/* Admin Header */}
+      <div className="flex flex-col gap-8 mb-12">
+        <div className="flex flex-col gap-2">
+          <span className="font-mono text-red-500 tracking-[0.4em] text-xs uppercase animate-pulse">
+            ● GOD_MODE_ACTIVE
+          </span>
+          <h1 className="text-[#ECEEDF] font-mono tracking-[0.2em] uppercase text-3xl font-bold">
+            ADMIN PANEL
+          </h1>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-4 pb-8 border-b border-[#ECEEDF]/10">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`font-mono text-[10px] uppercase tracking-[0.3em] px-6 py-3 transition-all border ${activeTab === tab.id
+                ? 'bg-[#ECEEDF] text-black border-[#ECEEDF]'
+                : 'text-[#ECEEDF]/40 border-[#ECEEDF]/10 hover:border-[#ECEEDF]/40 hover:text-[#ECEEDF]'
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {loading ? (
-        <div className="text-[#ECEEDF] font-mono animate-pulse">LOADING_ASSETS...</div>
-      ) : (
-        <ArchiveGrid
-          tracks={tracks}
-          isAdmin={true}
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-        />
-      )}
+      {/* Content Area */}
+      <div className="flex-1">
+        {activeTab === 'tracks' && <TrackList />}
+        {activeTab === 'users' && <UserList />}
+        {activeTab === 'system' && <SystemSettings />}
+      </div>
 
-      {/* EDIT MODAL */}
-      {editingTrack && (
-        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditingTrack(null)}>
-          <div className="bg-neutral-900 border border-white/10 p-8 rounded-lg w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <h2 className="text-[#ECEEDF] font-mono uppercase tracking-widest mb-6 border-b border-white/10 pb-2">
-              EDIT TILE: {editingTrack.tile_id}
-            </h2>
-
-            <div className="flex flex-col gap-4">
-              <div>
-                <label className="text-xs font-mono text-[#ECEEDF]/50 uppercase mb-1 block">Artist Name</label>
-                <input
-                  type="text"
-                  value={editForm.artist}
-                  onChange={e => setEditForm(prev => ({ ...prev, artist: e.target.value }))}
-                  className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-[#ECEEDF] text-sm focus:border-[#ECEEDF] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-mono text-[#ECEEDF]/50 uppercase mb-1 block">Track Title</label>
-                <input
-                  type="text"
-                  value={editForm.title}
-                  onChange={e => setEditForm(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-[#ECEEDF] text-sm focus:border-[#ECEEDF] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-mono text-[#ECEEDF]/50 uppercase mb-1 block">Genre</label>
-                <input
-                  type="text"
-                  value={editForm.genre}
-                  onChange={e => setEditForm(prev => ({ ...prev, genre: e.target.value }))}
-                  className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-[#ECEEDF] text-sm focus:border-[#ECEEDF] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-mono text-[#ECEEDF]/50 uppercase mb-1 block">Release Date</label>
-                <input
-                  type="text"
-                  value={editForm.release_date}
-                  onChange={e => setEditForm(prev => ({ ...prev, release_date: e.target.value }))}
-                  className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-[#ECEEDF] text-sm focus:border-[#ECEEDF] outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-4 mt-8">
-              <button
-                onClick={() => setEditingTrack(null)}
-                className="flex-1 bg-white/5 hover:bg-white/10 text-[#ECEEDF] font-mono text-xs uppercase py-3 rounded transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                className="flex-1 bg-[#ECEEDF] hover:bg-white text-black font-mono text-xs uppercase py-3 rounded transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          onClick={() => router.push('/')}
+          className="bg-red-500 text-black font-mono text-[10px] uppercase tracking-widest px-6 py-3 hover:bg-black hover:text-red-500 border border-red-500 transition-all shadow-[0_0_20px_rgba(239,44,44,0.3)]"
+        >
+          EXIT_GODMODE
+        </button>
+      </div>
     </main>
   );
 }
+

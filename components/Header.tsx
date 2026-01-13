@@ -34,18 +34,19 @@ const Header = () => {
   // Auth State
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState<string | null>(null);
-  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isGodmode, setIsGodmode] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('username')
+        .select('username, is_godmode')
         .eq('id', userId)
         .single();
 
-      if (data?.username) {
+      if (data) {
         setUsername(data.username);
+        setIsGodmode(data.is_godmode || false);
       }
     };
 
@@ -62,6 +63,7 @@ const Header = () => {
         fetchProfile(session.user.id);
       } else {
         setUsername(null);
+        setIsGodmode(false);
       }
     });
 
@@ -224,38 +226,38 @@ const Header = () => {
       </motion.nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
-      <header className={`hidden lg:flex sticky top-0 left-0 right-0 w-full h-[10vh] min-h-[60px] z-50 transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
-        ? "bg-[#ECEEDF]/5 border-b border-[#ECEEDF]/10 bg-gradient-to-b from-[#ECEEDF]/10 to-transparent"
-        : "bg-[#0F0E0E]"
+      <header className={`hidden lg:flex sticky top-0 z-50 w-full h-[10vh] bg-black px-[4vw] transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
+        ? "bg-black/90 border-b border-[#ECEEDF]/10"
+        : "bg-black"
         }`}>
 
-        {/* Constraints Wrapper (Max Width: 1400px) */}
-        {/* Constraints Wrapper (Max Width: 1400px) */}
-        <div className="w-full h-full max-w-[1400px] mx-auto px-8 flex items-center justify-between relative">
+        {/* Side Elements (Flex) */}
+        <div className="w-full h-full flex items-center justify-between">
 
-          {/* BLOCK 1: Left - Station Identity (Flex-1) */}
-          <div className="flex-1 flex items-center justify-start min-w-0 gap-8 z-50 group h-full"
+          {/* BLOCK 1: Left - Station Identity */}
+          <div
+            className="flex items-center justify-start min-w-0 gap-8 overflow-hidden z-30"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             {/* Center: LOGO (Text) */}
             <Link
               href="/"
-              className="ml-20 shrink-0 flex flex-col items-start justify-center group leading-none whitespace-nowrap"
+              className="shrink-0 flex flex-col items-start justify-center group leading-none whitespace-nowrap font-mono"
             >
-              <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 IMMORTAL
               </span>
-              <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 RAINDROPS
               </span>
             </Link>
 
             <div className="flex items-center gap-4">
               <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
-                <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
-                <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
-                <div className="w-[1px] h-[2vh] bg-[#ECEEDF] font-thin"></div>
+                <div className="w-[1px] h-5 bg-[#ECEEDF] font-thin"></div>
+                <div className="w-[1px] h-5 bg-[#ECEEDF] font-thin"></div>
+                <div className="w-[1px] h-5 bg-[#ECEEDF] font-thin"></div>
               </div>
 
               <AnimatePresence>
@@ -266,36 +268,36 @@ const Header = () => {
                     animate={{ width: "auto", opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex items-center gap-x-6 lg:gap-x-12 overflow-hidden whitespace-nowrap pl-2"
+                    className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap pl-2"
                   >
-                    <Link href="/archive" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
-                    <Link href="/live" className="text-[#ECEEDF] text-[13px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
+                    <Link href="/archive" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
+                    <Link href="/live" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
             {isPlayerActive && (
-              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[20vw] md:max-w-[15vw] whitespace-nowrap">
+              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden">
                 {pathname === '/upload' ? (
-                  <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest whitespace-nowrap">
+                  <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest whitespace-nowrap">
                     UPLOAD MODE
                   </span>
                 ) : useAudioStore.getState().isLive ? (
                   <>
-                    <span className="font-mono text-[2vh] text-[#FF0000] lowercase leading-tight truncate animate-pulse whitespace-nowrap">
+                    <span className="font-mono text-[15px] text-[#FF0000] lowercase leading-tight truncate animate-pulse whitespace-nowrap">
                       ● live
                     </span>
-                    <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
+                    <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
                       DJ SET
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="font-mono text-[2vh] text-[#ECEEDF] lowercase leading-tight truncate whitespace-nowrap">
+                    <span className="font-mono text-[15px] text-[#ECEEDF] lowercase leading-tight truncate whitespace-nowrap">
                       {trackArtist || 'Unknown Artist'}
                     </span>
-                    <span className="font-mono text-[2vh] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
+                    <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
                       {trackTitle || 'Unknown Track'}
                     </span>
                   </>
@@ -304,94 +306,40 @@ const Header = () => {
             )}
           </div>
 
-          {/* BLOCK 2: Center - Player Buttons (Flex-None, Centered) */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-8 z-40">
-            {isPlayerActive && (
-              <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                  className="hover:opacity-50 transition-opacity flex items-center justify-center"
-                  title="Previous / Restart"
-                >
-                  <img src="/skip-back.svg" alt="Back" className="w-[3vh] h-[3vh] min-w-[20px] min-h-[20px] invert" />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className="hover:opacity-50 transition-opacity flex items-center justify-center"
-                  title={isPlaying ? "Pause" : "Play"}
-                >
-                  <img
-                    src={isPlaying ? "/pause.svg" : "/play.svg"}
-                    alt={isPlaying ? "Pause" : "Play"}
-                    className="w-[3.5vh] h-[3.5vh] min-w-[24px] min-h-[24px] invert"
-                  />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                  className="hover:opacity-50 transition-opacity flex items-center justify-center"
-                  title="Skip"
-                >
-                  <img src="/skip-forward.svg" alt="Skip" className="w-[3vh] h-[3vh] min-w-[20px] min-h-[20px] invert" />
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* BLOCK 3: Right - Volume Controls (Flex-1, End) */}
-          <div className="flex-1 flex items-center justify-end z-40 min-w-[200px] gap-6">
+          {/* BLOCK 3: Right - Volume Controls */}
+          <div className="flex items-center justify-end z-40 gap-8">
 
             {/* AUTH BUTTON (Desktop) */}
             <div className="relative">
               {!user ? (
                 <Link
                   href="/login"
-                  className="hidden md:flex items-center justify-center font-mono text-[13px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase"
+                  className="hidden md:flex items-center justify-center font-mono text-[15px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase whitespace-nowrap"
                 >
                   [ SIGN_IN ]
                 </Link>
               ) : (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="hidden md:flex items-center justify-center font-mono text-[13px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase"
-                  >
-                    [ {username ? username.toUpperCase() : (user.email?.split('@')[0].toUpperCase().slice(0, 8) || 'USER')} ]
-                  </button>
+                <>
+                  {isGodmode && (
+                    <Link
+                      href="/godmode"
+                      className="hidden md:flex items-center justify-center font-mono text-[15px] text-red-500 tracking-[0.2em] hover:text-red-400 transition-colors uppercase whitespace-nowrap mr-6"
+                    >
+                      [ GODMODE ]
+                    </Link>
+                  )}
 
-                  <AnimatePresence>
-                    {showUserMenu && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 top-full mt-4 w-48 bg-[#0F0E0E] border border-[#ECEEDF]/20 p-2 flex flex-col gap-1 z-[100]"
-                      >
-                        {/* Menu Items */}
-                        <Link href="/upload" className="px-4 py-3 text-left font-mono text-[11px] text-[#ECEEDF] hover:bg-[#ECEEDF]/10 tracking-widest uppercase transition-colors">
-                          UPLOAD
-                        </Link>
-                        <Link href="/my-uploads" className="px-4 py-3 text-left font-mono text-[11px] text-[#ECEEDF] hover:bg-[#ECEEDF]/10 tracking-widest uppercase transition-colors">
-                          MY UPLOADS
-                        </Link>
-                        <Link href="/settings" className="px-4 py-3 text-left font-mono text-[11px] text-[#ECEEDF] hover:bg-[#ECEEDF]/10 tracking-widest uppercase transition-colors">
-                          SETTINGS
-                        </Link>
-                        <button
-                          onClick={async () => {
-                            await supabase.auth.signOut();
-                            setShowUserMenu(false);
-                          }}
-                          className="px-4 py-3 text-left font-mono text-[11px] text-red-400 hover:bg-red-900/20 tracking-widest uppercase transition-colors border-t border-[#ECEEDF]/10 mt-1"
-                        >
-                          LOGOUT
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                  <Link
+                    href="/account"
+                    className="hidden md:flex items-center justify-center font-mono text-[15px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase whitespace-nowrap"
+                  >
+                    [ {username ? username.toUpperCase() : (user?.email?.split('@')[0].toUpperCase().slice(0, 8) || 'USER')} ]
+                  </Link>
+                </>
               )}
             </div>
 
+            {/* VOLUME CONTROLS */}
             {isPlayerActive && (
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <div className="flex items-center gap-4">
@@ -405,7 +353,7 @@ const Header = () => {
                     <img
                       src={getVolumeIcon()}
                       alt="Volume"
-                      className="w-[2vh] h-[2vh] invert opacity-80"
+                      className="w-5 h-5 invert opacity-80"
                     />
                   </button>
                   <input
@@ -418,19 +366,59 @@ const Header = () => {
                       e.stopPropagation();
                       adjustVolume(parseFloat(e.target.value));
                     }}
-                    className="w-[10vw] max-w-[120px] min-w-[80px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[12px] [&::-webkit-slider-thumb]:w-[12px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
+                    className="w-[120px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[10px] [&::-webkit-slider-thumb]:w-[10px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
                     style={{
                       background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
                     }}
                   />
                 </div>
-                <span className="w-[10vw] max-w-[120px] min-w-[80px] text-center font-mono text-[1.5vh] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
+                {/* Time Display */}
+                <span className="w-[120px] text-center font-mono text-[12px] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
                   {formatTime(seek)} / {formatTime(duration)}
                 </span>
               </div>
             )}
           </div>
-        </div >
+        </div>
+
+        {/* BLOCK 2: Center - Player Buttons (Absolute Center Pivot) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-50">
+          {isPlayerActive && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); skipBack(); }}
+                className="absolute right-full mr-[15rem] hover:opacity-50 transition-opacity flex items-center justify-center whitespace-nowrap"
+                title="Previous / Restart"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-8 h-8" fill="#ECEEDF">
+                  <path d="M199.81,34a16,16,0,0,0-16.24.43L64,109.23V40a8,8,0,0,0-16,0V216a8,8,0,0,0,16,0V146.77l119.57,74.78A15.95,15.95,0,0,0,208,208.12V47.88A15.86,15.86,0,0,0,199.81,34ZM192,208,64.16,128,192,48.07Z" />
+                </svg>
+              </button>
+              <div className="relative"> {/* Pivot Point */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                  className="hover:opacity-50 transition-opacity flex items-center justify-center whitespace-nowrap"
+                  title={isPlaying ? "Pause" : "Play"}
+                >
+                  <img
+                    src={isPlaying ? "/pause.svg" : "/play.svg"}
+                    alt={isPlaying ? "Pause" : "Play"}
+                    className="w-10 h-10 invert"
+                  />
+                </button>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); skipTrack(); }}
+                className="absolute left-full ml-[15rem] hover:opacity-50 transition-opacity flex items-center justify-center whitespace-nowrap"
+                title="Skip"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-8 h-8" fill="#ECEEDF">
+                  <path d="M200,32a8,8,0,0,0-8,8v69.23L72.43,34.45A15.95,15.95,0,0,0,48,47.88V208.12a16,16,0,0,0,24.43,13.43L192,146.77V216a8,8,0,0,0,16,0V40A8,8,0,0,0,200,32ZM64,207.93V48.05l127.84,80Z" />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
 
         {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
         {
@@ -476,7 +464,7 @@ const Header = () => {
             </div>
           )
         }
-      </header >
+      </header>
     </>
   );
 };

@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { resolveEmailFromUsername } from '@/app/auth/actions';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [usernameInput, setUsernameInput] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,17 +17,50 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    console.log('Login Attempt for:', usernameInput);
 
-    if (error) {
-      setError(error.message);
+    try {
+      // 1. Resolve Username -> Email
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response: any = await resolveEmailFromUsername(usernameInput);
+      console.log('Resolution Response:', response);
+
+      if (!response.success || !response.email) {
+        console.warn('Resolution failed or no email found');
+        setError('Invalid credentials');
+        setLoading(false);
+        return;
+      }
+
+      const email = response.email;
+      const isVerified = response.isVerified;
+      console.log('Resolved Email:', email, 'Verified:', isVerified);
+
+      if (!isVerified) {
+        setError('Email not verified. Please check your inbox.');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Sign In with Resolved Email
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        console.error('Supabase Auth Error:', authError);
+        setError(authError.message);
+        setLoading(false);
+      } else {
+        console.log('Login Success:', data);
+        router.push('/');
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Login Exception:', err);
+      setError('An unexpected error occurred.');
       setLoading(false);
-    } else {
-      router.push('/');
-      router.refresh();
     }
   };
 
@@ -44,10 +78,10 @@ export default function LoginPage() {
 
         <div className="flex flex-col gap-4">
           <input
-            type="email"
-            placeholder="EMAIL"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="USERNAME"
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
             className="bg-transparent border-b border-[#ECEEDF]/20 text-[#ECEEDF] px-0 py-2 font-mono text-sm focus:outline-none focus:border-[#ECEEDF] placeholder-[#ECEEDF]/30"
           />
           <input
@@ -73,7 +107,14 @@ export default function LoginPage() {
           {loading ? 'AUTHENTICATING...' : 'ENTER'}
         </button>
 
-        <div className="text-center">
+        <div className="text-center flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => router.push('/forgot-password')}
+            className="text-[#ECEEDF]/30 text-[10px] font-mono hover:text-[#ECEEDF] transition-colors uppercase tracking-widest"
+          >
+            [ FORGOT_PASSWORD? ]
+          </button>
           <button
             type="button"
             onClick={() => router.push('/signup')}
