@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { finalizeUpload } from './actions';
+import { finalizeUpload, verifyUploadAccess } from './actions';
 import Image from 'next/image';
 
 // Explicit State Constants
@@ -17,6 +17,11 @@ type UploadState = typeof STATE[keyof typeof STATE];
 type ErrorTarget = 'artist' | 'title' | 'audio' | 'image' | 'generic' | null;
 
 export default function UploadPage() {
+  // LOCK STATE
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [password, setPassword] = useState('');
+  const [unlockError, setUnlockError] = useState(false);
+
   const [status, setStatus] = useState<UploadState>(STATE.IDLE);
   const [progress, setProgress] = useState(0);
   const [mediaType, setMediaType] = useState<'song' | 'dj set' | 'video' | 'image'>('song');
@@ -49,6 +54,18 @@ export default function UploadPage() {
   };
 
   // --- HANDLERS ---
+  const handleUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await verifyUploadAccess(password);
+    if (res.success) {
+      setIsUnlocked(true);
+      setUnlockError(false);
+    } else {
+      setUnlockError(true);
+      setPassword('');
+    }
+  };
+
   const handleAudioSelect = (file: File) => {
     setAudioFile(renameFile(file, 'audio'));
     if (errorTarget === 'audio') setErrorTarget(null);
@@ -187,6 +204,29 @@ export default function UploadPage() {
     return `w-full bg-[#ECEEDF]/5 p-4 font-mono text-[#ECEEDF] uppercase tracking-wider text-center focus:outline-none focus:ring-1 focus:ring-[#ECEEDF]/80 transition-all border-b ${isError ? 'border-[#cc0000]/50 placeholder-[#cc0000]/50' : 'border-[#ECEEDF]/20 placeholder-[#ECEEDF]/50 hover:border-[#ECEEDF]/40'
       }`;
   };
+
+  if (!isUnlocked) {
+    return (
+      <main className="flex-1 w-full min-h-screen bg-[#000000] flex items-center justify-center">
+        <form onSubmit={handleUnlock} className="flex flex-col gap-4 items-center">
+          <span className="font-mono text-[#ECEEDF] tracking-widest text-xs uppercase mb-2 animate-pulse">
+            lmao good luck
+          </span>
+          <input
+            type="password"
+            autoFocus
+            placeholder="ACCESS_KEY"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={`
+              bg-transparent border-b ${unlockError ? 'border-red-500 text-red-500' : 'border-[#ECEEDF]/20 text-[#ECEEDF]'} 
+              px-4 py-2 font-mono text-center tracking-[0.5em] focus:outline-none focus:border-[#ECEEDF] w-[200px] text-sm
+            `}
+          />
+        </form>
+      </main>
+    );
+  }
 
   if (status === STATE.SUCCESS) {
     return (

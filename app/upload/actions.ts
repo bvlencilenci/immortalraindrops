@@ -1,16 +1,18 @@
 'use server';
 
 import { supabase } from '@/lib/supabase';
-import { createClient } from '@supabase/supabase-js';
+import { UPLOAD_PASSWORD } from '../../config/admins';
+import { revalidatePath } from 'next/cache';
 
-// Initialize Service Role Client to bypass Row Level Security (RLS)
-// Use SUPABASE_SERVICE_ROLE_KEY from env.local
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export async function verifyUploadAccess(password: string) {
+  // Simple equality check
+  if (password === UPLOAD_PASSWORD) {
+    return { success: true };
+  }
+  return { success: false, error: 'Incorrect Password' };
+}
 
-interface FinalizeUploadParams {
+interface UploadMetadata {
   title: string;
   artist: string;
   tileIndex: number;
@@ -18,25 +20,23 @@ interface FinalizeUploadParams {
   audioExt: string;
   imageExt: string;
   mediaType: 'song' | 'dj set' | 'video' | 'image';
-  duration?: string;
 }
 
-export async function finalizeUpload(params: FinalizeUploadParams) {
+export async function finalizeUpload(metadata: UploadMetadata) {
   try {
-    const { title, artist, tileIndex, tileId, audioExt, imageExt, mediaType } = params;
+    const {
+      title,
+      artist,
+      tileIndex,
+      tileId,
+      audioExt,
+      imageExt,
+      mediaType,
+    } = metadata;
 
-    if (!title || !artist || !tileId) {
-      return { success: false, error: 'Missing metadata for finalization' };
-    }
+    console.log('[FINALIZE] Inserting into DB:', tileId);
 
-    console.log(`Finalizing Upload: "${title}" [${tileId}] (${mediaType})`);
-
-    // Insert into Supabase
-    // Note: We use the index/id provided because the files are already physically at this location in R2.
-    // If a race condition occurred and this index is taken, the upload might fail or we double-up.
-    // We could check uniqueness here, but for now we proceed with insertion.
-
-    const { error: insertError } = await supabaseAdmin
+    const { error } = await supabase
       .from('tracks')
       .insert({
         title,
@@ -45,32 +45,21 @@ export async function finalizeUpload(params: FinalizeUploadParams) {
         tile_id: tileId,
         audio_ext: audioExt,
         image_ext: imageExt,
-        // REQUIRED: Set media_type from selection
         media_type: mediaType,
-        release_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
+        release_date: new Date().getFullYear().toString(), // Default to current year
+        duration: null, // Let client calculate or blank
       });
 
-    if (insertError) {
-      console.error('Supabase Finalize Error:', insertError);
-      // Return specific error details to client for debugging
-      return {
-        success: false,
-        error: `DB Sync Failed: ${insertError.message} (Code: ${insertError.code}) - ${insertError.details || 'No details'}`
-      };
+    if (error) {
+      throw new Error(error.message);
     }
 
-    console.log('Track Registered Successfully.');
-
-    // SUCCESS: Revalidate cache so new tile appears immediately
-    const { revalidatePath } = await import('next/cache');
-    revalidatePath('/archive');
     revalidatePath('/');
+    revalidatePath('/archive');
 
     return { success: true, tileId };
-
-  } catch (err) {
-    console.error('Finalize Action Exception:', err);
-    return { success: false, error: `Internal Server Error: ${(err as Error).message}` };
+  } catch (error) {
+    console.error('Finalize Upload Error:', error);
+    return { success: false, error: (error as Error).message };
   }
 }
