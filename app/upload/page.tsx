@@ -284,7 +284,7 @@ export default function UploadPage() {
 
             <div className="w-full flex flex-col gap-4">
               <div className="text-[#ECEEDF]/40 text-[11px] tracking-widest pl-3 mb-1 font-mono uppercase">[ TYPE ]</div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 w-[280px]">
                 {['song', 'dj set', 'video'].map((type) => (
                   <button
                     key={type}

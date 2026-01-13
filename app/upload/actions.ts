@@ -46,7 +46,7 @@ export async function finalizeUpload(metadata: UploadMetadata) {
         audio_ext: audioExt,
         image_ext: imageExt,
         media_type: mediaType,
-        release_date: new Date().getFullYear().toString(), // Default to current year
+        release_date: new Date().toISOString(), // Valid DATE format
         duration: null, // Let client calculate or blank
       });
 

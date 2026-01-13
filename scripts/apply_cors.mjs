@@ -35,18 +35,15 @@ const s3 = new S3Client({
     accessKeyId,
     secretAccessKey,
   },
-  requestChecksumCalculation: 'WHEN_REQUIRED',
-  responseChecksumValidation: 'WHEN_REQUIRED',
 });
 
 const corsRules = [
   {
-    AllowedHeaders: ['Range', 'Content-Type', '*'],
-    AllowedMethods: ['GET', 'PUT', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
     AllowedOrigins: ['*'],
-    ExposeHeaders: ['Content-Length', 'Content-Range', 'ETag'],
-    MaxAgeSeconds: 3600,
-  },
+    AllowedMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
+    AllowedHeaders: ['*'],
+    MaxAgeSeconds: 3000,
+  }
 ];
 
 console.log(`Applying CORS policy to bucket: ${bucketName}...`);
