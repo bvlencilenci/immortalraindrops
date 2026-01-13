@@ -61,6 +61,12 @@ export async function finalizeUpload(params: FinalizeUploadParams) {
     }
 
     console.log('Track Registered Successfully.');
+
+    // SUCCESS: Revalidate cache so new tile appears immediately
+    const { revalidatePath } = await import('next/cache');
+    revalidatePath('/archive');
+    revalidatePath('/');
+
     return { success: true, tileId };
 
   } catch (err) {
