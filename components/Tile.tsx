@@ -6,7 +6,9 @@ import { Howler } from 'howler';
 import { Track } from '../types';
 
 interface TileProps extends Track {
-  // Add any extra props if needed, otherwise this is just Track
+  isAdmin?: boolean;
+  onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 const Tile = (props: TileProps) => {
@@ -19,8 +21,12 @@ const Tile = (props: TileProps) => {
     tile_index,
     tile_id,
     audio_ext,
-    image_ext
+    image_ext,
+    isAdmin,
+    onDelete,
+    onEdit
   } = props;
+
   const {
     playTrack,
     currentlyPlayingId,
@@ -38,7 +44,7 @@ const Tile = (props: TileProps) => {
   const audioUrl = `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
   const imageUrl = `${r2BaseUrl}/${tile_id}/visual.${extImage}`;
 
-  console.log('Tile constructed:', { tile_id, audioUrl, imageUrl });
+  // console.log('Tile constructed:', { tile_id, audioUrl, imageUrl });
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -210,7 +216,6 @@ const Tile = (props: TileProps) => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
       {/* 3. Metadata */}
-      {/* 3. Metadata */}
       <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none">
         <span className="text-[15px] font-mono text-[#ECEEDF] lowercase leading-none tracking-normal">
           {artist || '—'}
@@ -219,6 +224,32 @@ const Tile = (props: TileProps) => {
           {title || '—'}
         </span>
       </div>
+
+      {/* 4. ADMIN CONTROLS */}
+      {isAdmin && (
+        <div className="absolute top-4 right-4 z-50 flex gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit?.();
+            }}
+            className="bg-[#ECEEDF]/10 hover:bg-[#ECEEDF]/20 text-[#ECEEDF] text-[10px] font-mono px-3 py-1 rounded-sm backdrop-blur-md transition-all border border-[#ECEEDF]/20"
+          >
+            [ EDIT ]
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (confirm(`DELETE TILE ${tile_id}? This is permanent.`)) {
+                onDelete?.();
+              }
+            }}
+            className="bg-red-600/80 hover:bg-red-600 text-white text-[10px] font-mono px-3 py-1 rounded-sm backdrop-blur-md transition-all border border-red-400/50"
+          >
+            [ REMOVE ]
+          </button>
+        </div>
+      )}
     </div>
   );
 };

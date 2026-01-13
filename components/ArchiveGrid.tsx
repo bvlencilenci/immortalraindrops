@@ -7,9 +7,12 @@ import { Track } from '../types';
 
 interface ArchiveGridProps {
   tracks: Track[];
+  isAdmin?: boolean;
+  onDelete?: (tileId: string, index: number, audioExt: string, imageExt: string) => void;
+  onEdit?: (track: Track) => void;
 }
 
-const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
+const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit }: ArchiveGridProps) => {
   const setPlaylist = useAudioStore((state) => state.setPlaylist);
 
   useEffect(() => {
@@ -29,10 +32,13 @@ const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
           tile_id={track.tile_id}
           audio_ext={track.audio_ext}
           image_ext={track.image_ext}
+          isAdmin={isAdmin}
+          onDelete={() => onDelete?.(track.tile_id, track.tile_index, track.audio_ext || 'wav', track.image_ext || 'jpg')}
+          onEdit={() => onEdit?.(track)}
+          genre={track.genre}
           release_date={track.release_date}
-          genre={track.genre || null}
-          duration={track.duration || null}
-          created_at={track.created_at || new Date().toISOString()} // Fallback for strict type satisfaction
+          duration={track.duration}
+          created_at={track.created_at || new Date().toISOString()}
         />
       ))}
     </div>
@@ -40,5 +46,3 @@ const ArchiveGrid = ({ tracks }: ArchiveGridProps) => {
 };
 
 export default ArchiveGrid;
-
-

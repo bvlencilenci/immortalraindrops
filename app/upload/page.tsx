@@ -204,9 +204,9 @@ export default function UploadPage() {
   }
 
   return (
-    <main className="flex-1 w-full min-h-screen bg-[#000000] pt-[110px] pb-12 px-6 md:px-12 lg:px-20">
+    <main className="flex-1 w-full min-h-screen bg-[#000000] pt-[110px] pb-12 px-8 lg:px-16 flex justify-center">
 
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
 
         {/* LEFT COLUMN: FORM (60%) */}
         <div className="w-full lg:col-span-7 flex flex-col gap-8">
@@ -360,13 +360,13 @@ export default function UploadPage() {
         <div className="w-full lg:col-span-5 flex flex-col items-center lg:items-end justify-start relative sticky top-32">
 
           {/* Preview Container */}
-          <div className="w-full max-w-[500px] flex flex-col items-center gap-8 p-8 border border-[#ECEEDF]/5 bg-white/[0.02] rounded-2xl backdrop-blur-sm">
+          <div className="w-full max-w-[500px] flex flex-col items-center gap-8 p-8">
             <h2 className="font-mono text-[#ECEEDF]/40 text-sm tracking-[0.2em] uppercase">
               LIVE PREVIEW
             </h2>
 
             {/* TILE PREVIEW CARD */}
-            <div className="relative w-[300px] h-[300px] bg-black border border-[#ECEEDF]/10 group overflow-hidden transition-all duration-500 shadow-2xl shadow-black/80">
+            <div className="relative w-full aspect-square bg-black border border-[#ECEEDF]/10 group overflow-hidden transition-all duration-500 shadow-2xl shadow-black/80">
               {/* Image */}
               <div className="absolute inset-0 w-full h-full bg-[#ECEEDF]/5">
                 {previewUrl && (

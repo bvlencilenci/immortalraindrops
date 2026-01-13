@@ -35,14 +35,15 @@ const s3 = new S3Client({
     accessKeyId,
     secretAccessKey,
   },
+  requestChecksumCalculation: 'WHEN_REQUIRED',
+  responseChecksumValidation: 'WHEN_REQUIRED',
 });
 
 const corsRules = [
   {
     AllowedHeaders: ['*'],
-    AllowedMethods: ['GET', 'PUT', 'HEAD', 'POST', 'DELETE'],
-    AllowedOrigins: ['*'], // For development/production ease. Can be restricted to Vercel domain later.
-    ExposeHeaders: ['ETag'],
+    AllowedMethods: ['GET', 'PUT', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
+    AllowedOrigins: ['*'],
     MaxAgeSeconds: 3000,
   },
 ];
