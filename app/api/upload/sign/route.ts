@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
   try {
     const { audioExt, imageExt, audioType, imageType } = await request.json();
 
-    if (!audioExt || !imageExt || !audioType || !imageType) {
-      return NextResponse.json({ error: 'Missing file metadata' }, { status: 400 });
+    if (!imageExt || !imageType) {
+      return NextResponse.json({ error: 'Missing image/video metadata' }, { status: 400 });
     }
 
     // 1. Determine Next Index
@@ -44,16 +44,18 @@ export async function POST(request: NextRequest) {
     const tileId = `tile-${nextIndex}`;
 
     // 2. Generate Keys
-    const audioKey = `${tileId}/audio.${audioExt}`;
+    const audioKey = audioExt ? `${tileId}/audio.${audioExt}` : null;
     const visualKey = `${tileId}/visual.${imageExt}`;
 
     // 3. Generate Presigned URLs
-    // Using explicit Bucket name for Account ID endpoint
-    const audioUrl = await getSignedUrl(s3Client, new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: audioKey,
-      ContentType: audioType,
-    }), { expiresIn: 3600 });
+    let audioUrl = null;
+    if (audioKey && audioType) {
+      audioUrl = await getSignedUrl(s3Client, new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: audioKey,
+        ContentType: audioType,
+      }), { expiresIn: 3600 });
+    }
 
     const visualUrl = await getSignedUrl(s3Client, new PutObjectCommand({
       Bucket: BUCKET_NAME,

@@ -4,6 +4,9 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { revalidatePath } from 'next/cache';
+import { Resend } from 'resend';
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Initialize Service Role Client for Deletion (Bypasses RLS)
 // We only use this AFTER verifying the user is an admin.
@@ -250,6 +253,55 @@ export async function requestUploadAccess() {
       .eq('id', user.id);
 
     if (error) throw error;
+
+    // 2. Trigger Notification Webhook if configured
+    try {
+      const { data: settings } = await supabaseAdmin
+        .from('site_settings')
+        .select('notification_webhook_url')
+        .eq('id', 1)
+        .single();
+
+      if (settings?.notification_webhook_url) {
+        await fetch(settings.notification_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: `📡 **UNAUTHORIZED TRANSMISSION REQUEST**\nUser **${user.email}** is requesting upload authorization.\nApprove here: ${process.env.NEXT_PUBLIC_SITE_URL || 'https://immortalraindrops.art'}/godmode`,
+            username: 'IMMORTAL_ALERTS',
+          }),
+        });
+      }
+    } catch (e) {
+      console.warn('[AUTH] Webhook notification failed:', e);
+    }
+
+    // 3. Trigger Email Notification via Resend
+    if (resend) {
+      try {
+        await resend.emails.send({
+          from: 'Immortal Alerts <onboarding@resend.dev>',
+          to: 'immortalraindrops@gmail.com',
+          subject: '📡 TRANSMISSION_REQUEST: AUTHORIZATION_REQUIRED',
+          html: `
+            <div style="font-family: monospace; background: #000; color: #ECEEDF; padding: 40px; border: 1px solid #ECEEDF33;">
+              <h1 style="border-bottom: 1px solid #ECEEDF33; padding-bottom: 20px; font-size: 20px; letter-spacing: 0.2em;">SYSTEM_ALERT: ACCESS_REQUEST</h1>
+              <p style="margin-top: 30px; letter-spacing: 0.1em;">Operator at <strong>${user.email}</strong> is requesting upload authorization.</p>
+              <div style="margin-top: 40px;">
+                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://immortalraindrops.art'}/godmode" 
+                   style="display: inline-block; background: #ECEEDF; color: #000; padding: 15px 30px; text-decoration: none; font-weight: bold; font-size: 12px; letter-spacing: 0.2em;">
+                  [ ENTER_COMMAND_CENTER ]
+                </a>
+              </div>
+              <p style="margin-top: 40px; color: #ECEEDF55; font-size: 10px; letter-spacing: 0.1em;">ID: ${user.id} // TS: ${new Date().toISOString()}</p>
+            </div>
+          `
+        });
+      } catch (e) {
+        console.warn('[AUTH] Email notification failed:', e);
+      }
+    }
+
     return { success: true };
   } catch (error) {
     console.error('[AUTH] Access Request Error:', error);

@@ -45,6 +45,22 @@ export default function UploadPage() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
+  // Adaptive Fit State
+  const [isNearlySquare, setIsNearlySquare] = useState(false);
+
+  // Cropping State
+  const [isCropping, setIsCropping] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [rawImageUrl, setRawImageUrl] = useState<string | null>(null);
+
+  const logDebug = (msg: string) => {
+    console.log(`[UPLOAD_DEBUG] ${msg}`);
+    setDebugLogs(prev => [...prev.slice(-4), `> ${msg}`]);
+  };
 
   const audioInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -113,12 +129,29 @@ export default function UploadPage() {
     if (errorTarget === 'image') setErrorTarget(null);
   };
 
+  const handleMediaLoad = (e: any) => {
+    let ratio = 1;
+    if (e.target.videoWidth) {
+      ratio = e.target.videoWidth / e.target.videoHeight;
+    } else if (e.target.naturalWidth) {
+      ratio = e.target.naturalWidth / e.target.naturalHeight;
+    }
+    // Threshold: 0.95 to 1.05 is "close enough" to square to force fill
+    setIsNearlySquare(ratio > 0.95 && ratio < 1.05);
+  };
+
   // --- ACTIONS ---
   const handlePreview = () => {
     let hasError = false;
     if (!artist.trim()) { setErrorTarget('artist'); hasError = true; }
     if (!title.trim()) { setErrorTarget('title'); hasError = true; }
-    if (!audioFile) { setErrorTarget('audio'); hasError = true; }
+
+    // Only require audio for non-video types
+    if (mediaType !== 'video' && !audioFile) {
+      setErrorTarget('audio');
+      hasError = true;
+    }
+
     if (!imageFile) { setErrorTarget('image'); hasError = true; }
 
     if (hasError) return;
@@ -133,50 +166,85 @@ export default function UploadPage() {
 
   // --- CLIENT-SIDE UPLOAD ---
   const handlePostToArchive = async () => {
-    if (!audioFile || !imageFile) return;
+    const isVideo = mediaType === 'video';
+    const hasArtist = !!artist.trim();
+    const hasTitle = !!title.trim();
+    const hasImage = !!imageFile;
+    const hasAudio = !!audioFile;
+
+    // Strict Validation
+    if (!hasArtist || !hasTitle || !hasImage || (!isVideo && !hasAudio)) {
+      logDebug('VALIDATION_FAILED: MISSING_REQUIRED_FIELDS');
+      setErrorTarget(!hasArtist ? 'artist' : !hasTitle ? 'title' : !hasImage ? 'image' : 'audio');
+      return;
+    }
 
     setStatus(STATE.UPLOADING);
     setProgress(5);
+    logDebug('STARTING_UPLOAD_PROTOCOL...');
 
     try {
       // 1. Get Presigned URLs
+      logDebug('FETCHING_PRESIGNED_URLS...');
       const presignRes = await fetch('/api/upload/sign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          audioExt: audioFile.name.split('.').pop() || 'mp3',
+          audioExt: audioFile?.name.split('.').pop(),
           imageExt: imageFile.name.split('.').pop() || 'jpg',
-          audioType: audioFile.type,
-          imageType: imageFile.type,
+          audioType: audioFile?.type || 'audio/mpeg',
+          imageType: imageFile.type || 'image/jpeg',
         }),
       });
-      if (!presignRes.ok) throw new Error('Failed to get upload authorization');
+
+      if (!presignRes.ok) {
+        const errData = await presignRes.json();
+        throw new Error(`SIGN_ERROR: ${errData.error || presignRes.statusText}`);
+      }
 
       const { tileId, nextIndex, audioUrl, visualUrl } = await presignRes.json();
       setProgress(20);
+      logDebug(`CHANNELS_OPEN: ${tileId}`);
 
       // 2. Upload to R2 (Parallel)
-      const audioBlob = audioFile.slice(0, audioFile.size, audioFile.type);
-      const imageBlob = imageFile.slice(0, imageFile.size, imageFile.type);
+      logDebug('INITIATING_R2_TRANSMISSION...');
+      const uploadTasks = [];
 
-      const uploadAudio = fetch(audioUrl, {
-        method: 'PUT',
-        body: audioBlob,
-        headers: { 'Content-Type': audioFile.type }
-      });
-      const uploadImage = fetch(visualUrl, {
-        method: 'PUT',
-        body: imageBlob,
-        headers: { 'Content-Type': imageFile.type }
-      });
-
-      const [audioRes, imageRes] = await Promise.all([uploadAudio, uploadImage]);
-
-      if (!audioRes.ok || !imageRes.ok) {
-        throw new Error(`R2 Upload Failed: Audio(${audioRes.status}) Image(${imageRes.status})`);
+      // Audio Upload (if exists)
+      if (audioUrl && audioFile) {
+        logDebug('PREPPING_AUDIO_CHANNEL...');
+        const audioBlob = audioFile.slice(0, audioFile.size, audioFile.type);
+        uploadTasks.push(
+          fetch(audioUrl, {
+            method: 'PUT',
+            body: audioBlob,
+            headers: { 'Content-Type': audioFile.type || 'audio/mpeg' }
+          }).then(r => {
+            if (!r.ok) throw new Error(`AUDIO_UPLOAD_FAILED: ${r.status}`);
+            logDebug(`AUDIO_BYTES_SENT: ${r.status}`);
+            return r;
+          })
+        );
       }
 
+      // Visual/Video Upload (Mandatory)
+      logDebug('PREPPING_VISUAL_CHANNEL...');
+      const visualBlob = imageFile.slice(0, imageFile.size, imageFile.type);
+      uploadTasks.push(
+        fetch(visualUrl, {
+          method: 'PUT',
+          body: visualBlob,
+          headers: { 'Content-Type': imageFile.type || (isVideo ? 'video/mp4' : 'image/jpeg') }
+        }).then(r => {
+          if (!r.ok) throw new Error(`VISUAL_UPLOAD_FAILED: ${r.status}`);
+          logDebug(`VISUAL_BYTES_SENT: ${r.status}`);
+          return r;
+        })
+      );
+
+      await Promise.all(uploadTasks);
       setProgress(80);
+      logDebug('METADATA_FINALIZATION...');
 
       // 3. Finalize Metadata
       const finalizeRes = await finalizeUpload({
@@ -184,21 +252,17 @@ export default function UploadPage() {
         artist,
         tileIndex: nextIndex,
         tileId,
-        audioExt: audioFile.name.split('.').pop() || 'mp3',
+        audioExt: audioFile?.name.split('.').pop(),
         imageExt: imageFile.name.split('.').pop() || 'jpg',
         mediaType: mediaType,
       });
 
-      if (!finalizeRes.success) throw new Error(finalizeRes.error);
+      if (!finalizeRes.success) throw new Error(`FINALIZE_ERROR: ${finalizeRes.error}`);
 
-      // SAVE PREFERENCES
-      savePreferences({
-        defaultType: mediaType,
-        lastArtist: artist,
-      });
-
-      // Success!
+      // SUCCESS PROTOCOL
+      savePreferences({ defaultType: mediaType, lastArtist: artist });
       setProgress(100);
+      logDebug('TRANSMISSION_COMPLETE');
       setResultTileId(finalizeRes.tileId || tileId);
       setStatus(STATE.SUCCESS);
 
@@ -210,13 +274,15 @@ export default function UploadPage() {
         setPreviewUrl(null);
         setTitle('');
         setResultTileId(null);
+        setDebugLogs([]);
       }, 4000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload Flow Error:', error);
+      logDebug(`CRITICAL_FAILURE: ${error.message}`);
       setStatus(STATE.ERROR);
       setErrorTarget('generic');
-      setTimeout(() => setStatus(STATE.IDLE), 3000);
+      // No auto-clear for error logs to allow reading
     }
   };
 
@@ -352,36 +418,38 @@ export default function UploadPage() {
 
           {/* SECTION 3: FILES */}
           <div className="flex flex-col gap-6">
-            {/* AUDIO INPUT */}
-            <div className="flex justify-between items-center p-6 bg-white/[0.03] rounded-xl border border-white/10 transition-all hover:bg-white/5 hover:border-white/20">
-              <span className="text-white/60 text-[11px] tracking-widest font-mono uppercase">
-                [ AUDIO_SOURCE ]
-              </span>
-              <button
-                onClick={() => audioInputRef.current?.click()}
-                className="px-6 py-3 bg-transparent border border-white/30 rounded-lg text-white/70 cursor-pointer font-mono text-[11px] tracking-widest transition-all hover:bg-white/[0.08] hover:border-white/50 hover:text-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Select audio file"
-              >
-                {audioFile ? (
-                  <span className="text-[#ECEEDF]">{audioFile.name}</span>
-                ) : (
-                  'SELECT FILE'
-                )}
-              </button>
-              <input
-                type="file"
-                ref={audioInputRef}
-                className="hidden"
-                onChange={(e) => e.target.files?.[0] && handleAudioSelect(e.target.files[0])}
-                accept="audio/*"
-                aria-hidden="true"
-              />
-            </div>
+            {/* AUDIO INPUT - Hidden for Videos */}
+            {mediaType !== 'video' && (
+              <div className="flex justify-between items-center p-6 bg-white/[0.03] rounded-xl border border-white/10 transition-all hover:bg-white/5 hover:border-white/20">
+                <span className="text-white/60 text-[11px] tracking-widest font-mono uppercase">
+                  [ AUDIO_SOURCE ]
+                </span>
+                <button
+                  onClick={() => audioInputRef.current?.click()}
+                  className="px-6 py-3 bg-transparent border border-white/30 rounded-lg text-white/70 cursor-pointer font-mono text-[11px] tracking-widest transition-all hover:bg-white/[0.08] hover:border-white/50 hover:text-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Select audio file"
+                >
+                  {audioFile ? (
+                    <span className="text-[#ECEEDF]">{audioFile.name}</span>
+                  ) : (
+                    'SELECT FILE'
+                  )}
+                </button>
+                <input
+                  type="file"
+                  ref={audioInputRef}
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleAudioSelect(e.target.files[0])}
+                  accept="audio/*"
+                  aria-hidden="true"
+                />
+              </div>
+            )}
 
             {/* VISUAL INPUT */}
             <div className="flex justify-between items-center p-6 bg-white/[0.03] rounded-xl border border-white/10 transition-all hover:bg-white/5 hover:border-white/20">
               <span className="text-white/60 text-[11px] tracking-widest font-mono uppercase">
-                [ VISUAL_SOURCE ]
+                {mediaType === 'video' ? '[ VIDEO_SOURCE ]' : '[ VISUAL_SOURCE ]'}
               </span>
               <button
                 onClick={() => imageInputRef.current?.click()}
@@ -399,7 +467,7 @@ export default function UploadPage() {
                 ref={imageInputRef}
                 className="hidden"
                 onChange={(e) => e.target.files?.[0] && handleVisualSelect(e.target.files[0])}
-                accept="image/*"
+                accept={mediaType === 'video' ? 'video/*' : 'image/*'}
                 aria-hidden="true"
               />
             </div>
@@ -414,11 +482,11 @@ export default function UploadPage() {
             ) : (
               <button
                 onClick={handlePostToArchive}
-                disabled={!artist || !title || !audioFile || !imageFile}
+                disabled={!artist || !title || !imageFile || (mediaType !== 'video' && !audioFile)}
                 aria-label="Upload"
                 className={`
                     w-full md:w-auto font-mono text-[#ECEEDF] text-xl tracking-[0.2em] uppercase border border-[#ECEEDF]/20 px-12 py-4 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-[#ECEEDF]
-                    ${(!artist || !title || !audioFile || !imageFile)
+                    ${(!artist || !title || !imageFile || (mediaType !== 'video' && !audioFile))
                     ? 'opacity-40 cursor-not-allowed'
                     : 'opacity-100 hover:bg-[#ECEEDF] hover:text-black hover:-translate-y-[1px] active:translate-y-0'
                   }
@@ -439,6 +507,15 @@ export default function UploadPage() {
               {imageFile && `Image file selected: ${imageFile.name}`}
               {status === STATE.UPLOADING && 'Uploading files...'}
             </div>
+
+            {/* DEBUG CONSOLE */}
+            {debugLogs.length > 0 && (
+              <div className="w-full mt-4 p-4 bg-[#cc0000]/5 border border-[#cc0000]/20 font-mono text-[10px] text-[#cc0000]/80 lowercase tracking-widest flex flex-col gap-1">
+                {debugLogs.map((log, i) => (
+                  <div key={i}>{log}</div>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>
@@ -454,15 +531,51 @@ export default function UploadPage() {
 
             {/* TILE PREVIEW CARD */}
             <div className="relative w-full aspect-square bg-black border border-[#ECEEDF]/10 group overflow-hidden transition-all duration-500 shadow-2xl shadow-black/80">
-              {/* Image */}
-              <div className="absolute inset-0 w-full h-full bg-[#ECEEDF]/5">
+              <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center overflow-hidden">
                 {previewUrl && (
-                  <Image
-                    src={previewUrl}
-                    alt="Preview"
-                    fill
-                    className="object-cover opacity-80"
-                  />
+                  mediaType === 'video' ? (
+                    <>
+                      {/* Blur Layer (Only if NOT nearly square) */}
+                      {!isNearlySquare && (
+                        <video
+                          src={previewUrl}
+                          className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
+                          muted
+                          autoPlay
+                          loop
+                          preload="metadata"
+                        />
+                      )}
+                      {/* Foreground Layer */}
+                      <video
+                        src={previewUrl}
+                        onLoadedMetadata={handleMediaLoad}
+                        className={`relative z-10 w-full h-full ${isNearlySquare ? 'object-cover' : 'object-contain'}`}
+                        muted
+                        autoPlay
+                        loop
+                        preload="metadata"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {/* Blur Layer (Only if NOT nearly square) */}
+                      {!isNearlySquare && (
+                        <img
+                          src={previewUrl}
+                          className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
+                          alt=""
+                        />
+                      )}
+                      {/* Foreground Layer */}
+                      <img
+                        src={previewUrl}
+                        onLoad={handleMediaLoad}
+                        className={`relative z-10 w-full h-full ${isNearlySquare ? 'object-cover' : 'object-contain'}`}
+                        alt="Preview"
+                      />
+                    </>
+                  )
                 )}
               </div>
 

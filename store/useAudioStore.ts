@@ -24,7 +24,7 @@ interface AudioStore {
   analyser: AnalyserNode | null;
 
   setPlaylist: (tracks: Track[]) => void;
-  playTrack: (id: string, url: string, title: string, artist: string) => Promise<void>;
+  playTrack: (id: string, url: string, title: string, artist: string, mediaType?: string) => Promise<void>;
   togglePlay: () => void;
   restartTrack: () => void;
   skipTrack: () => void;
@@ -36,6 +36,9 @@ interface AudioStore {
   updateSeek: () => void;
   seekTo: (time: number) => void;
   setLiveState: (isLive: boolean, title?: string) => void;
+  activeFullscreenUrl: string | null;
+  activeFullscreenStartTime: number;
+  setActiveFullscreenVideo: (url: string | null, startTime?: number) => void;
 }
 
 export const useAudioStore = create<AudioStore>((set, get) => ({
@@ -54,6 +57,13 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   analyser: null,
 
   hasEntered: false,
+  activeFullscreenUrl: null,
+  activeFullscreenStartTime: 0,
+  setActiveFullscreenVideo: (url, startTime = 0) => set({
+    activeFullscreenUrl: url,
+    activeFullscreenStartTime: startTime,
+    seek: startTime
+  }),
 
   enterApp: async () => {
     if (Howler.ctx) {
@@ -64,7 +74,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
   setPlaylist: (tracks) => set({ playlist: tracks }),
 
-  playTrack: async (id, url, title, artist) => {
+  playTrack: async (id, url, title, artist, mediaType = 'song') => {
     // 0. FORCE RESUME CONTEXT (The Magic Key)
     if (Howler.ctx) {
       await Howler.ctx.resume();
@@ -82,6 +92,32 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     if (hls) {
       hls.destroy();
       set({ hls: null });
+    }
+
+    // IF VIDEO: We don't use Howler for the primary stream
+    if (mediaType === 'video') {
+      const { activeFullscreenUrl, playlist } = get();
+
+      // Update fullscreen URL if already in fullscreen
+      if (activeFullscreenUrl) {
+        const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
+        const vExt = playlist.find(t => t.id === id)?.image_ext || 'jpg';
+        const newVideoUrl = `${r2BaseUrl}/${playlist.find(t => t.id === id)?.tile_id}/visual.${vExt}`;
+        set({ activeFullscreenUrl: newVideoUrl });
+      }
+
+      set({
+        currentlyPlayingId: id,
+        trackTitle: title,
+        trackArtist: artist,
+        howl: null,
+        isPlaying: true,
+        isBuffering: false,
+        isLive: false,
+        seek: 0,
+        duration: 0
+      });
+      return;
     }
 
     // Determine format from URL to prevent guessing behavior
@@ -350,6 +386,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       } else {
         howl.play();
       }
+    } else {
+      // For Videos or HLS without Howl
+      set({ isPlaying: !isPlaying });
     }
   },
 
@@ -371,7 +410,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const ext = nextTrack.audio_ext || 'wav';
     const audioUrl = `${r2BaseUrl}/${nextTrack.tile_id}/audio.${ext}`;
 
-    playTrack(nextTrack.id, audioUrl, nextTrack.title, nextTrack.artist);
+    playTrack(nextTrack.id, audioUrl, nextTrack.title, nextTrack.artist, nextTrack.media_type);
   },
 
   previousTrack: () => {
@@ -385,7 +424,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const ext = prevTrack.audio_ext || 'wav';
     const audioUrl = `${r2BaseUrl}/${prevTrack.tile_id}/audio.${ext}`;
 
-    playTrack(prevTrack.id, audioUrl, prevTrack.title, prevTrack.artist);
+    playTrack(prevTrack.id, audioUrl, prevTrack.title, prevTrack.artist, prevTrack.media_type);
   },
 
   skipBack: () => {
@@ -423,8 +462,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const { howl } = get();
     if (howl) {
       howl.seek(time);
-      set({ seek: time });
     }
+    set({ seek: time });
   },
 
   setLiveState: (isLive: boolean, title?: string) => {

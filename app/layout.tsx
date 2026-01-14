@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '../components/Header';
 import SplashGate from '../components/SplashGate';
+import FullScreenVideoOverlay from '../components/FullScreenVideoOverlay';
 
 export const metadata: Metadata = {
   title: 'Immortal Raindrops',
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body className="antialiased min-h-screen flex flex-col bg-black selection:bg-[#ECEEDF] selection:text-black">
         <SplashGate />
         <div className="flex-1 w-full flex flex-col bg-black relative">
+          <FullScreenVideoOverlay />
           <Header />
           <div className="flex-1 w-full flex flex-col">
             {children}

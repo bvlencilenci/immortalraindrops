@@ -7,6 +7,7 @@ interface SiteSettings {
   id: number;
   is_live: boolean;
   stream_title: string;
+  notification_webhook_url: string;
 }
 
 export default function SystemSettings() {
@@ -97,6 +98,34 @@ export default function SystemSettings() {
                 UPDATE
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Webhook Notifications */}
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-[#ECEEDF] font-mono text-sm uppercase tracking-[0.2em]">WEBHOOK_NOTIFICATIONS</h2>
+          <p className="text-[#ECEEDF]/40 font-mono text-[10px] uppercase tracking-widest">Receive alerts for access requests (Discord/Slack hook).</p>
+        </div>
+
+        <div className="border border-[#ECEEDF]/10 bg-[#ECEEDF]/5 p-8 rounded-sm flex flex-col gap-2">
+          <label className="text-[10px] font-mono text-[#ECEEDF]/40 uppercase tracking-widest">WEBHOOK_URL</label>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              value={settings?.notification_webhook_url || ''}
+              onChange={(e) => setSettings(s => s ? { ...s, notification_webhook_url: e.target.value } : null)}
+              className="flex-1 bg-black border-b border-[#ECEEDF]/20 text-[#ECEEDF] px-0 py-2 font-mono text-xs focus:outline-none focus:border-[#ECEEDF] placeholder-[#ECEEDF]/10"
+              placeholder="HTTPS://DISCORD.COM/API/WEBHOOKS/..."
+            />
+            <button
+              onClick={() => updateSettings({ notification_webhook_url: settings?.notification_webhook_url })}
+              disabled={saving}
+              className="font-mono text-[10px] uppercase tracking-widest bg-[#ECEEDF] text-black px-6 py-2 hover:bg-white transition-all disabled:opacity-50"
+            >
+              SAVE_HOOK
+            </button>
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ interface UploadMetadata {
   artist: string;
   tileIndex: number;
   tileId: string;
-  audioExt: string;
+  audioExt?: string;
   imageExt: string;
   mediaType: 'song' | 'dj set' | 'video' | 'image';
 }
@@ -57,8 +57,8 @@ export async function finalizeUpload(data: UploadMetadata) {
         tile_index: data.tileIndex,
         title: data.title,
         artist: data.artist,
-        audio_url: `${data.tileId}/audio.${data.audioExt}`,
-        visual_url: `${data.tileId}/visual.${data.imageExt}`,
+        audio_ext: data.audioExt || null,
+        image_ext: data.imageExt,
         media_type: data.mediaType,
         created_at: new Date().toISOString(),
         release_date: new Date().toISOString(),

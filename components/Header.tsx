@@ -174,7 +174,7 @@ const Header = () => {
       {/* --- MOBILE DYNAMIC ISLAND HEADER (< lg) --- */}
       <motion.nav
         layout
-        className="sticky top-0 z-50 lg:hidden flex items-center justify-center overflow-hidden self-center"
+        className="sticky top-0 z-[100] lg:hidden flex items-center justify-between overflow-hidden self-center whitespace-nowrap"
         initial={{
           top: 0,
           width: "100%",
@@ -183,51 +183,55 @@ const Header = () => {
           backgroundColor: "#0F0E0E",
           border: "none",
           borderBottom: "1px solid rgba(255,255,255,0.1)",
-          padding: "1.75rem 2rem", // py-7 px-8
-          gap: "1rem"
+          padding: "1rem 1rem",
+          gap: "0.5rem"
         }}
         animate={{
-          top: isScrolled ? 20 : 0,
+          top: isScrolled ? 12 : 0,
           width: isScrolled ? "auto" : "100%",
-          maxWidth: isScrolled ? "calc(100% - 24px)" : "100%",
+          maxWidth: isScrolled ? "calc(100% - 32px)" : "100%",
           borderRadius: isScrolled ? 100 : 0,
-          backgroundColor: isScrolled ? "rgba(0,0,0,0.35)" : "#0F0E0E",
-          border: isScrolled ? "1px solid rgba(255,255,255,0.08)" : "none",
+          backgroundColor: isScrolled ? "rgba(0,0,0,0.6)" : "#0F0E0E",
+          border: isScrolled ? "1px solid rgba(255,255,255,0.1)" : "none",
           borderBottom: isScrolled ? "none" : "1px solid rgba(255,255,255,0.1)",
           boxShadow: isScrolled ? "0 8px 32px rgba(0, 0, 0, 0.4)" : "none",
-          backdropFilter: isScrolled ? "blur(32px) saturate(180%)" : "none",
-          padding: isScrolled ? "1.5rem 2.5rem" : "1.75rem 2rem",
-          gap: isScrolled ? "2rem" : "1rem"
+          backdropFilter: isScrolled ? "blur(20px) saturate(180%)" : "none",
+          padding: isScrolled ? "0.75rem 1rem" : "1.25rem 1rem",
+          gap: isScrolled ? "0.5rem" : "0.5rem"
         }}
-        transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }} // Smooth fluid ease
+        transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
       >
         {/* Left: LIVE */}
-        <Link href="/live" className={`shrink-0 w-[110px] flex justify-center items-center font-mono text-sm uppercase tracking-widest transition-colors duration-200 border border-transparent py-5 rounded-xl ${pathname === '/live' ? 'text-white border-white/20 bg-white/10' : 'text-[#ECEEDF] hover:text-white'}`}>
-          [ LIVE ]
+        <Link href="/live" className="shrink-0 flex justify-center items-center font-mono text-[11px] xs:text-xs uppercase tracking-widest transition-colors duration-200 border border-transparent px-3 py-3 rounded-xl text-[#ECEEDF] hover:text-white">
+          <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>[</span>
+          <span className={`mx-2 ${pathname === '/live' ? 'text-white' : ''} transition-colors duration-200`}>LIVE</span>
+          <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>]</span>
         </Link>
 
         {/* Center: LOGO */}
         <Link
           href="/"
-          className="shrink-0 flex flex-col items-center justify-center group leading-none mx-2 gap-0.5"
+          className="shrink-0 flex flex-col items-center justify-center group leading-none mx-1 gap-0.5"
         >
-          <span className="font-mono text-base font-bold text-[#ECEEDF] uppercase tracking-tighter">
+          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
             IMMORTAL
           </span>
-          <span className="font-mono text-base font-bold text-[#ECEEDF] uppercase tracking-tighter">
+          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
             RAINDROPS
           </span>
         </Link>
 
         {/* Right: ARCHIVE */}
-        <Link href="/archive" className={`shrink-0 w-[110px] flex justify-center items-center font-mono text-sm uppercase tracking-widest transition-colors duration-200 border border-transparent py-5 rounded-xl ${pathname === '/archive' ? 'text-white border-white/20 bg-white/10' : 'text-[#ECEEDF] hover:text-white'}`}>
-          [ ARCHIVE ]
+        <Link href="/archive" className="shrink-0 flex justify-center items-center font-mono text-[11px] xs:text-xs uppercase tracking-widest transition-colors duration-200 border border-transparent px-3 py-3 rounded-xl text-[#ECEEDF] hover:text-white">
+          <span className={`${pathname === '/archive' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>[</span>
+          <span className={`mx-2 ${pathname === '/archive' ? 'text-white' : ''} transition-colors duration-200`}>ARCHIVE</span>
+          <span className={`${pathname === '/archive' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>]</span>
         </Link>
       </motion.nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
-      <header className={`hidden lg:flex sticky top-0 z-50 w-full h-[10vh] bg-black px-[4vw] transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
-        ? "bg-black/90 border-b border-[#ECEEDF]/10"
+      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-[11.1vh] px-[4vw] transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
+        ? "bg-black/40 border-b border-[#ECEEDF]/10"
         : "bg-black"
         }`}>
 

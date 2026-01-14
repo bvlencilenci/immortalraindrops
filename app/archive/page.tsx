@@ -5,7 +5,7 @@ export default async function Archive() {
   const tracks = await getTracks();
 
   return (
-    <main className="flex-1 w-full flex flex-col bg-black px-8 pt-[90px]">
+    <main className="flex-1 w-full flex flex-col bg-black pt-[11.1vh]">
       <ArchiveGrid tracks={tracks} />
     </main>
   );

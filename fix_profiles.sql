@@ -13,6 +13,15 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Create Site Settings table
+CREATE TABLE IF NOT EXISTS public.site_settings (
+  id BIGINT PRIMARY KEY DEFAULT 1,
+  is_live BOOLEAN DEFAULT FALSE,
+  stream_title TEXT DEFAULT 'IMMORTAL RAINDROPS',
+  notification_webhook_url TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Ensure columns exist
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username TEXT UNIQUE;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email TEXT;
