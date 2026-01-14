@@ -39,11 +39,20 @@ export async function updateSystemSettings(formData: FormData) {
 
   const updates = {
     site_title: formData.get('site_title') as string,
-    width_maintenance_mode: formData.get('maintenance_mode') === 'on', // Checkbox handling
     maintenance_mode: formData.get('maintenance_mode') === 'on',
     global_announcement: formData.get('global_announcement') as string,
     allow_registrations: formData.get('allow_registrations') === 'on',
     accent_color: formData.get('accent_color') as string,
+
+    // Expanded Fields
+    footer_text: formData.get('footer_text') as string,
+    contact_email: formData.get('contact_email') as string,
+    twitter_url: formData.get('twitter_url') as string,
+    instagram_url: formData.get('instagram_url') as string,
+    youtube_url: formData.get('youtube_url') as string,
+    meta_description: formData.get('meta_description') as string,
+    keywords: formData.get('keywords') as string,
+
     updated_at: new Date().toISOString(),
   };
 

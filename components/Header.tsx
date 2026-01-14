@@ -227,7 +227,10 @@ const Header = () => {
           className="shrink-0 flex flex-col items-center justify-center group leading-none mx-1 gap-0.5"
         >
           <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
-            {siteTitle}
+            IMMORTAL
+          </span>
+          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
+            RAINDROPS
           </span>
         </Link>
 
@@ -260,6 +263,7 @@ const Header = () => {
               className="shrink-0 flex flex-col items-start justify-center group leading-none whitespace-nowrap font-mono"
             >
               <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                IMMORTAL
               </span>
               <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 RAINDROPS
