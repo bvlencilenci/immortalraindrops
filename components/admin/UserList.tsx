@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { deleteUser, toggleAuthorization } from '@/app/godmode/actions';
+import { deleteUser, toggleAuthorization, toggleGodmode } from '@/app/godmode/actions';
 
 interface Profile {
   id: string;
@@ -46,13 +46,10 @@ export default function UserList() {
       return;
     }
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ is_godmode: !currentStatus })
-      .eq('id', userId);
+    const res = await toggleGodmode(userId, currentStatus);
 
-    if (error) {
-      alert(error.message);
+    if (!res.success) {
+      alert(res.error);
     } else {
       setUsers(users.map(u => u.id === userId ? { ...u, is_godmode: !currentStatus } : u));
     }
@@ -116,15 +113,20 @@ export default function UserList() {
 
                     <button
                       onClick={() => handleToggleGodmode(user.id, user.is_godmode)}
-                      className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 border transition-all ${user.is_godmode
-                        ? 'bg-[#ECEEDF]/20 text-[#ECEEDF] border-[#ECEEDF]/20 hover:bg-[#ECEEDF]/30'
-                        : 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
+                      disabled={user.username === 'immortalraindropsceo'}
+                      className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 border transition-all 
+                        ${user.username === 'immortalraindropsceo' ? 'opacity-50 cursor-not-allowed border-[#ECEEDF]/20 text-[#ECEEDF]' : ''}
+                        ${!user.username.includes('immortalraindropsceo') && user.is_godmode
+                          ? 'bg-[#ECEEDF]/20 text-[#ECEEDF] border-[#ECEEDF]/20 hover:bg-[#ECEEDF]/30'
+                          : user.username !== 'immortalraindropsceo'
+                            ? 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
+                            : ''
                         }`}
                     >
-                      {user.is_godmode ? 'GODMODE' : 'USER'}
+                      {user.username === 'immortalraindropsceo' ? 'LOCKED' : (user.is_godmode ? 'GODMODE' : 'USER')}
                     </button>
 
-                    {user.id !== currentUserId && (
+                    {user.id !== currentUserId && user.username !== 'immortalraindropsceo' && (
                       <button
                         onClick={() => handleDeleteUser(user.id)}
                         className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-red-900/30 text-red-900/60 hover:text-red-500 hover:border-red-500 hover:bg-red-500/10 transition-all"

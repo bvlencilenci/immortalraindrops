@@ -330,3 +330,34 @@ export async function toggleAuthorization(userId: string, currentStatus: boolean
     return { success: false, error: (error as Error).message };
   }
 }
+
+export async function toggleGodmode(userId: string, currentStatus: boolean) {
+  try {
+    await verifyAdmin();
+
+    // 1. Check if target is the CEO
+    const { data: targetUser } = await supabaseAdmin
+      .from('profiles')
+      .select('username')
+      .eq('id', userId)
+      .single();
+
+    if (targetUser?.username === 'immortalraindropsceo') {
+      return { success: false, error: 'IMMORTAL CEO CANNOT BE DEMOTED.' };
+    }
+
+    // 2. Perform Toggle
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .update({ is_godmode: !currentStatus })
+      .eq('id', userId);
+
+    if (error) throw error;
+
+    revalidatePath('/godmode');
+    return { success: true };
+  } catch (error) {
+    console.error('[GODMODE] Godmode Toggle Error:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
