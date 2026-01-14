@@ -65,7 +65,7 @@ export default function GodModePage() {
   const tabs = [
     { id: 'tracks', label: 'TRACKS' },
     { id: 'users', label: 'USERS' },
-    { id: 'system', label: 'SETTINGS' },
+    { id: 'system', label: 'PREFERENCES' },
   ];
 
   return (
@@ -75,7 +75,7 @@ export default function GodModePage() {
       <div className="flex flex-col gap-8 mb-12">
         <div className="flex flex-col gap-2">
           <span className="font-mono text-red-500 tracking-[0.4em] text-xs uppercase animate-pulse">
-            ● GOD_MODE_ACTIVE
+
           </span>
           <h1 className="text-[#ECEEDF] font-mono tracking-[0.2em] uppercase text-3xl font-bold">
             ADMIN PANEL
