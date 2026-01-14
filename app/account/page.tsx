@@ -95,8 +95,8 @@ export default function AccountPage() {
           </div>
 
           {isGodmode && (
-            <div className="mt-2 border border-red-500/20 bg-red-500/10 p-2 text-center">
-              <span className="text-[10px] font-mono text-red-400 uppercase tracking-[0.2em]">
+            <div className="mt-2 border border-[#ECEEDF]/20 bg-[#ECEEDF]/5 p-2 text-center">
+              <span className="text-[10px] font-mono text-[#ECEEDF]/70 uppercase tracking-[0.2em]">
                 {t.godmode_active}
               </span>
             </div>

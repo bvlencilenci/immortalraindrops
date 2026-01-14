@@ -109,7 +109,7 @@ export default function GodModePage() {
       <div className="fixed bottom-8 right-8 z-50">
         <button
           onClick={() => router.push('/')}
-          className="bg-red-500 text-black font-mono text-[10px] uppercase tracking-widest px-6 py-3 hover:bg-black hover:text-red-500 border border-red-500 transition-all shadow-[0_0_20px_rgba(239,44,44,0.3)]"
+          className="bg-black text-red-500 font-mono text-[10px] uppercase tracking-widest px-6 py-3 hover:bg-red-900/20 border border-red-900/50 transition-all"
         >
           EXIT_GODMODE
         </button>

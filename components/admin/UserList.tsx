@@ -106,39 +106,30 @@ export default function UserList() {
 
                     <button
                       onClick={() => toggleAuthorization(user.id, user.is_authorized)}
-                      className={`font-mono text-[10px] uppercase tracking-widest px-4 py-2 border transition-all ${user.is_authorized
-                          ? 'bg-[#ECEEDF] text-black border-[#ECEEDF] hover:bg-white'
-                          : 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
+                      className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 border transition-all ${user.is_authorized
+                        ? 'bg-[#ECEEDF] text-black border-[#ECEEDF] hover:bg-white'
+                        : 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
                         }`}
                     >
-                      {user.is_authorized ? '[ AUTHORIZED ]' : '[ AUTHORIZE ]'}
+                      {user.is_authorized ? 'AUTHORIZED' : 'AUTHORIZE'}
                     </button>
 
                     <button
                       onClick={() => handleToggleGodmode(user.id, user.is_godmode)}
-                      className={`font-mono text-[10px] uppercase tracking-widest px-4 py-2 border transition-all ${user.is_godmode
-                          ? 'bg-red-500 text-black border-red-500 hover:bg-red-400 hover:border-red-400'
-                          : 'border-[#ECEEDF]/20 text-[#ECEEDF]/60 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
+                      className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 border transition-all ${user.is_godmode
+                        ? 'bg-[#ECEEDF]/20 text-[#ECEEDF] border-[#ECEEDF]/20 hover:bg-[#ECEEDF]/30'
+                        : 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
                         }`}
                     >
-                      {user.is_godmode ? '[ GODMODE ]' : 'USER_LEVEL'}
+                      {user.is_godmode ? 'GODMODE' : 'USER'}
                     </button>
 
                     {user.id !== currentUserId && (
                       <button
                         onClick={() => handleDeleteUser(user.id)}
-                        className="font-mono text-[10px] uppercase tracking-widest px-4 py-2 border border-red-900 text-red-900 hover:bg-red-900 hover:text-white transition-all"
+                        className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-red-900/30 text-red-900/60 hover:text-red-500 hover:border-red-500 hover:bg-red-500/10 transition-all"
                       >
-                        [ DELETE ]
-                      </button>
-                    )}
-
-                    {user.id !== currentUserId && (
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="font-mono text-[10px] uppercase tracking-widest px-3 py-1 border border-red-900/50 text-red-900 hover:text-red-500 hover:border-red-500 transition-all bg-red-900/5"
-                      >
-                        [ DELETE ]
+                        REMOVE
                       </button>
                     )}
                   </div>

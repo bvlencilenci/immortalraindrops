@@ -35,6 +35,7 @@ const Header = () => {
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [isGodmode, setIsGodmode] = useState(false);
+  const [siteTitle, setSiteTitle] = useState('IMMORTAL RAINDROPS');
 
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
@@ -71,17 +72,29 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    // 1. Initial Fetch of Live State
+    // 1. Initial Fetch of Live State & System Settings
     const fetchSettings = async () => {
-      const { supabase } = await import('../lib/supabase'); // Dynamic import to avoid SSR issues if used there
-      const { data } = await supabase
+      const { supabase } = await import('../lib/supabase');
+      // Live State
+      const { data: liveData } = await supabase
         .from('site_settings')
         .select('is_live, stream_title')
         .eq('id', 1)
         .single();
 
-      if (data) {
-        useAudioStore.getState().setLiveState(data.is_live, data.stream_title);
+      if (liveData) {
+        useAudioStore.getState().setLiveState(liveData.is_live, liveData.stream_title);
+      }
+
+      // System Settings (Title)
+      const { data: systemData } = await supabase
+        .from('system_settings')
+        .select('site_title')
+        .eq('id', 1)
+        .single();
+
+      if (systemData?.site_title) {
+        setSiteTitle(systemData.site_title);
       }
     };
 
@@ -214,10 +227,7 @@ const Header = () => {
           className="shrink-0 flex flex-col items-center justify-center group leading-none mx-1 gap-0.5"
         >
           <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
-            IMMORTAL
-          </span>
-          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
-            RAINDROPS
+            {siteTitle}
           </span>
         </Link>
 
@@ -250,7 +260,6 @@ const Header = () => {
               className="shrink-0 flex flex-col items-start justify-center group leading-none whitespace-nowrap font-mono"
             >
               <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                IMMORTAL
               </span>
               <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 RAINDROPS
