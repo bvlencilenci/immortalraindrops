@@ -11,7 +11,7 @@ export function HomeLivePanel({ isLive, streamTitle }: { isLive: boolean, stream
       {/* The Tile Hover Gradient Effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
-      <div className="relative z-20 w-full h-full p-8 md:p-12 pl-12 md:pl-20 flex flex-col justify-center">
+      <div className="relative z-20 w-full h-full p-8 md:p-12 flex flex-col justify-center">
         <div className="flex flex-col gap-4">
           {isLive && (
             <div className="flex items-center gap-3">
