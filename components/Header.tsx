@@ -235,7 +235,7 @@ const Header = () => {
 
           {/* BLOCK 1: Left - Station Identity */}
           <div
-            className="flex items-center justify-start min-w-0 gap-8 overflow-hidden z-30"
+            className="flex items-center justify-start shrink-0 gap-8 z-30"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -277,7 +277,7 @@ const Header = () => {
             </div>
 
             {isPlayerActive && (
-              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden">
+              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
                 {pathname === '/upload' ? (
                   <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest whitespace-nowrap">
                     UPLOAD MODE
