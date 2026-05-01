@@ -7,7 +7,7 @@ import { Track } from '../types';
 
 export function HomeLivePanel({ isLive, streamTitle }: { isLive: boolean, streamTitle: string }) {
   return (
-    <Link href="/live" className="w-full h-full relative group overflow-hidden outline-none block bg-black">
+    <Link href="/live" className="w-full h-full relative group overflow-hidden outline-none block bg-white/[0.02]">
       {/* The Tile Hover Gradient Effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
