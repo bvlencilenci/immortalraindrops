@@ -24,10 +24,10 @@ export function NewsFeed({ posts }: { posts: NewsItem[] }) {
             key={post.id}
             variants={{
               hidden: { opacity: 0, y: 30 },
-              visible: { 
-                opacity: 1, 
-                y: 0, 
-                transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } 
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
               }
             }}
           >
@@ -35,14 +35,14 @@ export function NewsFeed({ posts }: { posts: NewsItem[] }) {
           </motion.div>
         ))}
         {posts.length === 0 && (
-          <motion.div 
+          <motion.div
             variants={{
               hidden: { opacity: 0 },
               visible: { opacity: 1, transition: { duration: 1 } }
             }}
-            className="font-mono text-[#ECEEDF] text-[12px] uppercase tracking-[0.3em] opacity-50 text-center py-12"
+            className="font-mono text-[#ECEEDF] text-[12px] uppercase tracking-[0.3em] opacity-50 text-center py-12 mt-24"
           >
-            NO SIGNALS DETECTED
+            NO UPDATES ATM LOL
           </motion.div>
         )}
       </motion.div>

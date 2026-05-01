@@ -23,7 +23,7 @@ export default async function Home() {
       .single(),
     supabase
       .from('tracks')
-      .select('title')
+      .select('*')
       .order('release_date', { ascending: false })
       .limit(3)
   ]);
