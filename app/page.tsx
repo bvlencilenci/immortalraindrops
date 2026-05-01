@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase-server';
 import { NewsFeed } from '@/components/NewsFeed';
 import { NewsItem } from '@/components/NewsEntry';
-import { HomeRightPanels } from '@/components/HomeRightPanels';
+import { HomeLivePanel, HomeArchivePanel } from '@/components/HomeSidePanels';
 
 export const revalidate = 0;
 
@@ -33,17 +33,23 @@ export default async function Home() {
   const recentTracks = tracksRes.data || [];
 
   return (
-    <main className="flex-1 w-full h-[calc(100vh-11.1vh)] flex flex-row overflow-hidden bg-black text-[#ECEEDF] font-mono">
-      {/* Left Panel: News Feed (60%) */}
-      <section className="w-[60%] h-full border-r border-[#ECEEDF]/15 overflow-y-auto custom-scrollbar">
+    <main className="w-full h-[calc(100vh-11.1vh)] flex flex-row overflow-hidden bg-black text-[#ECEEDF] font-mono">
+      {/* Left Panel: Live Preview (20%) */}
+      <section className="w-[20%] h-full border-r border-[#ECEEDF]/10">
+        <HomeLivePanel 
+          isLive={settings.is_live} 
+          streamTitle={settings.stream_title} 
+        />
+      </section>
+
+      {/* Center Panel: News Feed (60%) */}
+      <section className="w-[60%] h-full overflow-y-auto custom-scrollbar">
         <NewsFeed posts={news} />
       </section>
 
-      {/* Right Panel: Live & Archive Previews (40%) */}
-      <section className="w-[40%] h-full flex flex-col">
-        <HomeRightPanels 
-          isLive={settings.is_live} 
-          streamTitle={settings.stream_title} 
+      {/* Right Panel: Archive Preview (20%) */}
+      <section className="w-[20%] h-full border-l border-[#ECEEDF]/10">
+        <HomeArchivePanel 
           recentTracks={recentTracks} 
         />
       </section>
