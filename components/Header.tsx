@@ -162,8 +162,8 @@ const Header = () => {
     };
   }, [togglePlay, adjustVolume]);
 
-  // Hide header on root landing page OR if SplashGate is active (!hasEntered)
-  if (pathname === '/' || !hasEntered) return null;
+  // Hide header if SplashGate is active (!hasEntered)
+  if (!hasEntered) return null;
 
   const isPlayerActive = !!currentlyPlayingId;
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;

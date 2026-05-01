@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 export function HomeLivePanel({ isLive, streamTitle }: { isLive: boolean, streamTitle: string }) {
+  const pathname = usePathname();
+  const isActive = pathname === '/live';
   return (
     <Link href="/live" className="w-full h-full relative group overflow-hidden outline-none block">
       <motion.div 
@@ -11,23 +14,23 @@ export function HomeLivePanel({ isLive, streamTitle }: { isLive: boolean, stream
         whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
         className="w-full h-full p-8 md:p-12 flex flex-col justify-center transition-colors duration-500"
       >
-        <motion.div 
-          initial={{ opacity: 0.4 }}
-          whileHover={{ opacity: 1, x: 5 }}
-          className="absolute top-8 left-8 text-[10px] md:text-[11px] font-bold tracking-[0.5em] text-[#ECEEDF] uppercase"
-        >
-          [ LIVE ]
-        </motion.div>
+        <div className="absolute top-8 left-8 text-[10px] md:text-[11px] tracking-[0.5em] uppercase flex items-center">
+          <span className={`${isActive ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70 group-hover:font-bold group-hover:text-white'} transition-all duration-200`}>[</span>
+          <span className={`mx-2 ${isActive ? 'text-white' : 'text-[#ECEEDF]/70 group-hover:text-white'} transition-colors duration-200`}>LIVE</span>
+          <span className={`${isActive ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70 group-hover:font-bold group-hover:text-white'} transition-all duration-200`}>]</span>
+        </div>
         
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <div className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-[#ECEEDF]/20'}`} />
-            <span className="text-[10px] md:text-[12px] tracking-[0.3em] font-bold opacity-50 uppercase">
-              {isLive ? 'TRANSMITTING' : 'STANDBY'}
-            </span>
-          </div>
+          {isLive && (
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+              <span className="text-[10px] md:text-[12px] tracking-[0.3em] font-bold opacity-50 uppercase">
+                TRANSMITTING
+              </span>
+            </div>
+          )}
           <h3 className="text-xl md:text-3xl font-bold tracking-[0.05em] uppercase leading-[0.9] max-w-md">
-            {isLive ? streamTitle : 'SIGNAL LOST'}
+            {isLive ? streamTitle : '—'}
           </h3>
         </div>
       </motion.div>
@@ -36,6 +39,9 @@ export function HomeLivePanel({ isLive, streamTitle }: { isLive: boolean, stream
 }
 
 export function HomeArchivePanel({ recentTracks }: { recentTracks: { title: string }[] }) {
+  const pathname = usePathname();
+  const isActive = pathname === '/archive';
+
   return (
     <Link href="/archive" className="w-full h-full relative group overflow-hidden outline-none block">
       <motion.div 
@@ -43,17 +49,15 @@ export function HomeArchivePanel({ recentTracks }: { recentTracks: { title: stri
         whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
         className="w-full h-full p-8 md:p-12 flex flex-col justify-center transition-colors duration-500"
       >
-        <motion.div 
-          initial={{ opacity: 0.4 }}
-          whileHover={{ opacity: 1, x: 5 }}
-          className="absolute top-8 left-8 text-[10px] md:text-[11px] font-bold tracking-[0.5em] text-[#ECEEDF] uppercase"
-        >
-          [ ARCHIVE ]
-        </motion.div>
+        <div className="absolute top-8 left-8 text-[10px] md:text-[11px] tracking-[0.5em] uppercase flex items-center">
+          <span className={`${isActive ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70 group-hover:font-bold group-hover:text-white'} transition-all duration-200`}>[</span>
+          <span className={`mx-2 ${isActive ? 'text-white' : 'text-[#ECEEDF]/70 group-hover:text-white'} transition-colors duration-200`}>ARCHIVE</span>
+          <span className={`${isActive ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70 group-hover:font-bold group-hover:text-white'} transition-all duration-200`}>]</span>
+        </div>
         
         <div className="flex flex-col gap-6 mt-4">
           <div className="flex flex-col gap-3">
-            {recentTracks.length > 0 ? recentTracks.map((track, i) => (
+            {recentTracks.map((track, i) => (
               <motion.div 
                 key={i} 
                 initial={{ opacity: 0.6 }}
@@ -62,14 +66,7 @@ export function HomeArchivePanel({ recentTracks }: { recentTracks: { title: stri
               >
                 {track.title}
               </motion.div>
-            )) : (
-              <div className="text-[11px] tracking-widest opacity-30 italic uppercase pl-4">
-                NO DATA RECOVERED
-              </div>
-            )}
-          </div>
-          <div className="text-[9px] tracking-[0.4em] opacity-30 group-hover:opacity-60 transition-opacity uppercase font-bold">
-            + EXPLORE_DATABASE
+            ))}
           </div>
         </div>
       </motion.div>
