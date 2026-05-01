@@ -11,7 +11,11 @@ export function HomeLivePanel({ isLive, streamTitle }: { isLive: boolean, stream
       {/* The Tile Hover Gradient Effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
 
-      <div className="relative z-20 w-full h-full p-8 md:p-12 flex flex-col justify-center">
+      <div className="absolute top-8 left-8 md:left-12 text-[10px] tracking-[0.5em] uppercase font-bold text-[#ECEEDF]/40 z-30">
+        [ LIVE ]
+      </div>
+
+      <div className="relative z-20 w-full h-full px-8 md:px-12 py-8 flex flex-col justify-center">
         <div className="flex flex-col gap-4">
           {isLive && (
             <div className="flex items-center gap-3">
@@ -40,6 +44,12 @@ export function HomeArchivePanel({ recentTracks }: { recentTracks: Track[] }) {
             <Tile {...track} />
           </div>
         ))}
+      </div>
+
+      <div className="relative z-20 w-full h-full px-8 md:px-12 py-8 flex flex-col justify-center pointer-events-none">
+        <div className="absolute top-8 left-8 md:left-12 text-[10px] tracking-[0.5em] uppercase font-bold text-[#ECEEDF]/40 z-30">
+          [ ARCHIVE ]
+        </div>
       </div>
 
       {/* The Tile Hover Gradient Effect */}
