@@ -29,7 +29,6 @@ const Header = () => {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Mobile Menu State
   const prevVolumeRef = useRef(1.0);
 
   // Auth State
@@ -39,13 +38,143 @@ const Header = () => {
   const [siteTitle, setSiteTitle] = useState('IMMORTAL RAINDROPS');
 
   useEffect(() => {
-    // Close menu on route change
-    setIsMenuOpen(false);
-  }, [pathname]);
+    const fetchProfile = async (userId: string) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, is_godmode')
+        .eq('id', userId)
+        .single();
+
+      if (data) {
+        setUsername(data.username);
+        setIsGodmode(data.is_godmode || false);
+      }
+    };
+
+    // Check active session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      if (user) fetchProfile(user.id);
+    });
+
+    // Listen for changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setUsername(null);
+        setIsGodmode(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
-    const fetchProfile = async (userId: string) => {
-// ... lines 42-184
+    // 1. Initial Fetch of Live State & System Settings
+    const fetchSettings = async () => {
+      const { supabase } = await import('../lib/supabase');
+      // Live State
+      const { data: liveData } = await supabase
+        .from('site_settings')
+        .select('is_live, stream_title')
+        .eq('id', 1)
+        .single();
+
+      if (liveData) {
+        useAudioStore.getState().setLiveState(liveData.is_live, liveData.stream_title);
+      }
+
+      // System Settings (Title)
+      const { data: systemData } = await supabase
+        .from('system_settings')
+        .select('site_title')
+        .eq('id', 1)
+        .single();
+
+      if (systemData?.site_title) {
+        setSiteTitle(systemData.site_title);
+      }
+    };
+
+    fetchSettings();
+
+    // 2. Realtime Listener
+    const setupListener = async () => {
+      const { supabase } = await import('../lib/supabase');
+      const channel = supabase
+        .channel('site_settings_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'site_settings',
+            filter: 'id=eq.1'
+          },
+          (payload) => {
+            const newData = payload.new as { is_live: boolean; stream_title: string };
+            useAudioStore.getState().setLiveState(newData.is_live, newData.stream_title);
+
+            // Optional: If going live, pause any archive playback so user can switch? 
+            // Or let them stay on archive until they click LIVE. 
+            // User requested: "Store Sync: When is_live becomes true, trigger a 'pause' on the useAudioStore"
+            if (newData.is_live) {
+              useAudioStore.getState().howl?.pause();
+              // Note: We don't force them to /live, but we pause archive so they notice.
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    const cleanupPromise = setupListener();
+
+    // 3. Keep existing scroll/key handlers
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      /* existing handler logic */
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+      if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+      if (e.key === 'm' || e.key === 'M') {
+        if (useAudioStore.getState().volume > 0) {
+          prevVolumeRef.current = useAudioStore.getState().volume;
+          adjustVolume(0);
+        } else {
+          adjustVolume(prevVolumeRef.current || 0.5);
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+      cleanupPromise.then(cleanup => cleanup());
+    };
+  }, [togglePlay, adjustVolume]);
+
+  // Hide header on root landing page OR if SplashGate is active (!hasEntered)
+  if (pathname === '/' || !hasEntered) return null;
+
+  const isPlayerActive = !!currentlyPlayingId;
+  const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
+
+  const formatTime = (time: number) => {
+    if (isNaN(time) || time === 0) return "--:--";
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const getVolumeIcon = () => {
     if (volume === 0) return "/speaker-simple-slash.svg"; // Mute (0%)
     if (volume <= 0.33) return "/speaker-simple-none.svg"; // Low/No wave (1-33%)
@@ -85,144 +214,33 @@ const Header = () => {
         }}
         transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
       >
-        {/* Left: LOGO */}
-        <Link
-          href="/"
-          className="shrink-0 flex items-center group leading-none gap-2"
-        >
-          <div className="flex flex-col items-start">
-            <span className="font-mono text-[11px] xs:text-[12px] font-bold text-[#ECEEDF] uppercase tracking-tighter leading-[0.9]">
-              IMMORTAL
-            </span>
-            <span className="font-mono text-[11px] xs:text-[12px] font-bold text-[#ECEEDF] uppercase tracking-tighter leading-[0.9]">
-              RAINDROPS
-            </span>
-          </div>
+        {/* Left: LIVE */}
+        <Link href="/live" className="shrink-0 flex justify-center items-center font-mono text-[11px] xs:text-xs uppercase tracking-widest transition-colors duration-200 border border-transparent px-3 py-3 rounded-xl text-[#ECEEDF] hover:text-white">
+          <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>[</span>
+          <span className={`mx-2 ${pathname === '/live' ? 'text-white' : ''} transition-colors duration-200`}>LIVE</span>
+          <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>]</span>
         </Link>
 
-        {/* Center: NAV DOTS or Indicators (Optional) */}
-        {!isScrolled && (
-          <div className="flex items-center gap-4">
-            <Link href="/live" className={`font-mono text-[10px] uppercase tracking-widest ${pathname === '/live' ? 'text-white font-bold' : 'text-[#ECEEDF]/50'}`}>[ LIVE ]</Link>
-            <Link href="/archive" className={`font-mono text-[10px] uppercase tracking-widest ${pathname === '/archive' ? 'text-white font-bold' : 'text-[#ECEEDF]/50'}`}>[ ARCHIVE ]</Link>
-          </div>
-        )}
-
-        {/* Right: HAMBURGER */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="w-10 h-10 flex flex-col items-center justify-center gap-1.5 focus:outline-none z-[110]"
-          aria-label="Toggle Menu"
+        {/* Center: LOGO */}
+        <Link
+          href="/"
+          className="shrink-0 flex flex-col items-center justify-center group leading-none mx-1 gap-0.5"
         >
-          <motion.span
-            animate={isMenuOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-            className="w-6 h-[1.5px] bg-[#ECEEDF]"
-          />
-          <motion.span
-            animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-            className="w-6 h-[1.5px] bg-[#ECEEDF]"
-          />
-          <motion.span
-            animate={isMenuOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-            className="w-6 h-[1.5px] bg-[#ECEEDF]"
-          />
-        </button>
+          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
+            IMMORTAL
+          </span>
+          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
+            RAINDROPS
+          </span>
+        </Link>
+
+        {/* Right: ARCHIVE */}
+        <Link href="/archive" className="shrink-0 flex justify-center items-center font-mono text-[11px] xs:text-xs uppercase tracking-widest transition-colors duration-200 border border-transparent px-3 py-3 rounded-xl text-[#ECEEDF] hover:text-white">
+          <span className={`${pathname === '/archive' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>[</span>
+          <span className={`mx-2 ${pathname === '/archive' ? 'text-white' : ''} transition-colors duration-200`}>ARCHIVE</span>
+          <span className={`${pathname === '/archive' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>]</span>
+        </Link>
       </motion.nav>
-
-      {/* --- MOBILE NAVIGATION DRAWER --- */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[105] bg-black/95 backdrop-blur-xl lg:hidden flex flex-col p-12 pt-32"
-          >
-            <div className="flex flex-col gap-8">
-              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-4xl font-mono text-[#ECEEDF] uppercase tracking-tighter font-bold border-b border-[#ECEEDF]/10 pb-4">HOME</Link>
-              <Link href="/archive" onClick={() => setIsMenuOpen(false)} className="text-4xl font-mono text-[#ECEEDF] uppercase tracking-tighter font-bold border-b border-[#ECEEDF]/10 pb-4">ARCHIVE</Link>
-              <Link href="/live" onClick={() => setIsMenuOpen(false)} className="text-4xl font-mono text-[#ECEEDF] uppercase tracking-tighter font-bold border-b border-[#ECEEDF]/10 pb-4 flex items-center gap-4">
-                LIVE <span className="text-red-500 animate-pulse text-xl">●</span>
-              </Link>
-
-              {user ? (
-                <>
-                  <Link href="/account" onClick={() => setIsMenuOpen(false)} className="text-2xl font-mono text-[#ECEEDF]/70 uppercase tracking-widest pt-4">ACCOUNT</Link>
-                  {isGodmode && (
-                    <Link href="/godmode" onClick={() => setIsMenuOpen(false)} className="text-2xl font-mono text-red-500 uppercase tracking-widest font-bold">GODMODE</Link>
-                  )}
-                  <button
-                    onClick={async () => {
-                      await supabase.auth.signOut();
-                      window.location.href = '/';
-                    }}
-                    className="text-left text-xl font-mono text-red-900/40 uppercase tracking-widest mt-8"
-                  >
-                    [ LOGOUT ]
-                  </button>
-                </>
-              ) : (
-                <Link href="/login" onClick={() => setIsMenuOpen(false)} className="text-2xl font-mono text-[#ECEEDF]/70 uppercase tracking-widest pt-4">[ SIGN IN ]</Link>
-              )}
-            </div>
-
-            {/* Visual Decor */}
-            <div className="absolute bottom-12 left-12 flex flex-col gap-2 opacity-20 pointer-events-none font-mono text-[10px] tracking-[0.5em] uppercase">
-              <span>SYSTEM_v2.0.4</span>
-              <span>EST_04_2026</span>
-              <span>IMMORTAL_RAINDROPS</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* --- MOBILE MINI PLAYER (Sticky Bottom) --- */}
-      <AnimatePresence>
-        {isPlayerActive && (
-          <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            className="fixed bottom-0 left-0 right-0 z-[90] lg:hidden bg-black/80 backdrop-blur-xl border-t border-[#ECEEDF]/10 px-6 py-4 pb-8 flex flex-col gap-3"
-          >
-            {/* Scrubber */}
-            <div className="w-full h-[2px] bg-[#ECEEDF]/10 relative">
-              <motion.div
-                className="absolute top-0 left-0 h-full bg-[#ECEEDF]"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest truncate">{trackArtist || 'Unknown Artist'}</span>
-                <span className="font-mono text-xs text-[#ECEEDF] uppercase font-bold tracking-tighter truncate leading-none">{trackTitle || 'Unknown Track'}</span>
-              </div>
-
-              <div className="flex items-center gap-6 pl-4">
-                <button onClick={(e) => { e.stopPropagation(); skipBack(); }} className="active:scale-95 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-6 h-6" fill="#ECEEDF">
-                    <path d="M199.81,34a16,16,0,0,0-16.24.43L64,109.23V40a8,8,0,0,0-16,0V216a8,8,0,0,0,16,0V146.77l119.57,74.78A15.95,15.95,0,0,0,208,208.12V47.88A15.86,15.86,0,0,0,199.81,34ZM192,208,64.16,128,192,48.07Z" />
-                  </svg>
-                </button>
-                <button onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="w-12 h-12 flex items-center justify-center bg-[#ECEEDF] rounded-full active:scale-90 transition-transform">
-                  <img
-                    src={isPlaying ? "/pause.svg" : "/play.svg"}
-                    alt={isPlaying ? "Pause" : "Play"}
-                    className="w-6 h-6 invert"
-                  />
-                </button>
-                <button onClick={(e) => { e.stopPropagation(); skipTrack(); }} className="active:scale-95 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-6 h-6" fill="#ECEEDF">
-                    <path d="M200,32a8,8,0,0,0-8,8v69.23L72.43,34.45A15.95,15.95,0,0,0,48,47.88V208.12a16,16,0,0,0,24.43,13.43L192,146.77V216a8,8,0,0,0,16,0V40A8,8,0,0,0,200,32ZM64,207.93V48.05l127.84,80Z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
       <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-[11.1vh] px-[4vw] transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
