@@ -65,8 +65,8 @@ export default function AccountPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-md flex flex-col gap-12 animate-in fade-in duration-500">
+    <main className="min-h-screen bg-black flex items-center justify-center p-6 py-24 md:p-8">
+      <div className="w-full max-w-md flex flex-col gap-10 md:gap-12 animate-in fade-in duration-500">
 
         {/* Header */}
         <div className="flex flex-col items-center gap-2 text-center">
@@ -106,21 +106,21 @@ export default function AccountPage() {
         {/* Navigation Menu */}
         <div className="flex flex-col gap-4">
           <Link href="/upload" className="group">
-            <div className="border border-[#ECEEDF]/20 p-4 flex items-center justify-between hover:bg-[#ECEEDF]/10 transition-colors">
+            <div className="border border-[#ECEEDF]/20 p-5 flex items-center justify-between hover:bg-[#ECEEDF]/10 active:bg-[#ECEEDF]/20 transition-all rounded-sm">
               <span className="font-mono text-xs text-[#ECEEDF] uppercase tracking-widest">{t.upload}</span>
               <span className="font-mono text-xs text-[#ECEEDF]/30 group-hover:text-[#ECEEDF] transition-colors">→</span>
             </div>
           </Link>
 
           <Link href="/my-uploads" className="group">
-            <div className="border border-[#ECEEDF]/20 p-4 flex items-center justify-between hover:bg-[#ECEEDF]/10 transition-colors">
+            <div className="border border-[#ECEEDF]/20 p-5 flex items-center justify-between hover:bg-[#ECEEDF]/10 active:bg-[#ECEEDF]/20 transition-all rounded-sm">
               <span className="font-mono text-xs text-[#ECEEDF] uppercase tracking-widest">{t.my_uploads}</span>
               <span className="font-mono text-xs text-[#ECEEDF]/30 group-hover:text-[#ECEEDF] transition-colors">→</span>
             </div>
           </Link>
 
           <Link href="/settings" className="group">
-            <div className="border border-[#ECEEDF]/20 p-4 flex items-center justify-between hover:bg-[#ECEEDF]/10 transition-colors">
+            <div className="border border-[#ECEEDF]/20 p-5 flex items-center justify-between hover:bg-[#ECEEDF]/10 active:bg-[#ECEEDF]/20 transition-all rounded-sm">
               <span className="font-mono text-xs text-[#ECEEDF] uppercase tracking-widest">{t.settings}</span>
               <span className="font-mono text-xs text-[#ECEEDF]/30 group-hover:text-[#ECEEDF] transition-colors">→</span>
             </div>
@@ -128,7 +128,7 @@ export default function AccountPage() {
 
           {isGodmode && (
             <Link href="/godmode" className="group">
-              <div className="border border-red-500/20 p-4 flex items-center justify-between hover:bg-red-900/10 transition-colors">
+              <div className="border border-red-500/20 p-5 flex items-center justify-between hover:bg-red-900/10 active:bg-red-900/20 transition-all rounded-sm">
                 <span className="font-mono text-xs text-red-400 uppercase tracking-widest">{t.godmode_panel}</span>
                 <span className="font-mono text-xs text-red-500/30 group-hover:text-red-400 transition-colors">→</span>
               </div>
@@ -139,7 +139,7 @@ export default function AccountPage() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="text-[#ECEEDF]/30 hover:text-red-400 text-[10px] font-mono uppercase tracking-[0.2em] transition-colors text-center"
+          className="text-red-500/50 hover:text-red-400 font-mono text-[11px] uppercase tracking-[0.3em] transition-all py-6 border border-transparent hover:border-red-500/20 active:scale-95"
         >
           {t.logout}
         </button>

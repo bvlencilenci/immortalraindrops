@@ -72,30 +72,29 @@ export default function GodModePage() {
     <main className="min-h-screen bg-black flex flex-col pt-32 px-4 md:px-12 pb-12 overflow-x-hidden">
 
       {/* Admin Header */}
-      <div className="flex flex-col gap-8 mb-12">
+      <div className="flex flex-col gap-6 mb-8 md:gap-8 md:mb-12">
         <div className="flex flex-col gap-2">
-          <span className="font-mono text-red-500 tracking-[0.4em] text-xs uppercase animate-pulse">
-
-          </span>
-          <h1 className="text-[#ECEEDF] font-mono tracking-[0.2em] uppercase text-3xl font-bold">
+          <h1 className="text-[#ECEEDF] font-mono tracking-[0.2em] uppercase text-2xl md:text-3xl font-bold">
             ADMIN PANEL
           </h1>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-4 pb-8 border-b border-[#ECEEDF]/10">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`font-mono text-[10px] uppercase tracking-[0.3em] px-6 py-3 transition-all border ${activeTab === tab.id
-                ? 'bg-[#ECEEDF] text-black border-[#ECEEDF]'
-                : 'text-[#ECEEDF]/40 border-[#ECEEDF]/10 hover:border-[#ECEEDF]/40 hover:text-[#ECEEDF]'
-                }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Tab Navigation - Scrollable on Mobile */}
+        <div className="flex overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 border-b border-[#ECEEDF]/10">
+          <div className="flex gap-3 md:gap-4 shrink-0">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`font-mono text-[10px] uppercase tracking-[0.3em] px-4 py-3 md:px-6 md:py-3 transition-all border whitespace-nowrap ${activeTab === tab.id
+                  ? 'bg-[#ECEEDF] text-black border-[#ECEEDF]'
+                  : 'text-[#ECEEDF]/40 border-[#ECEEDF]/10 hover:border-[#ECEEDF]/40 hover:text-[#ECEEDF]'
+                  }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -106,10 +105,10 @@ export default function GodModePage() {
         {activeTab === 'system' && <SystemSettings />}
       </div>
 
-      <div className="fixed bottom-8 right-8 z-50">
+      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50">
         <button
           onClick={() => router.push('/')}
-          className="bg-black text-red-500 font-mono text-[10px] uppercase tracking-widest px-6 py-3 hover:bg-red-900/20 border border-red-900/50 transition-all"
+          className="bg-black/80 backdrop-blur-md text-red-500 font-mono text-[10px] uppercase tracking-widest px-5 py-3 md:px-6 md:py-3 hover:bg-red-900/20 border border-red-900/50 transition-all shadow-lg active:scale-95"
         >
           EXIT_GODMODE
         </button>

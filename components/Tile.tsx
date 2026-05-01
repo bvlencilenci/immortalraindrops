@@ -422,18 +422,18 @@ const Tile = (props: TileProps) => {
       {isVideo && (
         <button
           onClick={handleFullscreen}
-          className="absolute bottom-6 right-6 z-50 p-2 rounded-sm invisible group-hover:visible opacity-0 group-hover/grid:opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto duration-0 group-hover:duration-300 transition-all ease-in-out flex items-center justify-center text-white bg-transparent group-hover:bg-white/10 group-hover:backdrop-blur-md group-hover:border group-hover:border-white/20 group-hover:shadow-xl group-hover:shadow-black/50"
+          className="absolute bottom-6 right-6 z-50 p-2 rounded-sm lg:invisible lg:group-hover:visible visible opacity-100 lg:opacity-0 lg:group-hover/grid:opacity-0 lg:group-hover:opacity-100 pointer-events-auto lg:pointer-events-none lg:group-hover:pointer-events-auto duration-0 group-hover:duration-300 transition-all ease-in-out flex items-center justify-center text-white bg-white/10 backdrop-blur-md border border-white/20 shadow-xl shadow-black/50 lg:bg-transparent lg:border-none lg:backdrop-blur-none"
         >
           <img src="/fullscreen.svg" className="w-[32px] h-[32px] invert opacity-90" alt="Fullscreen" />
         </button>
       )}
 
       {/* 3. Metadata */}
-      <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none">
-        <span className="text-[15px] font-mono text-[#ECEEDF] lowercase leading-none tracking-normal">
+      <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none pr-4">
+        <span className="text-[clamp(12px,4vw,15px)] font-mono text-[#ECEEDF] lowercase leading-none tracking-normal">
           {artist || '—'}
         </span>
-        <span className="text-[20px] md:text-[28px] uppercase leading-none tracking-tighter mt-1 text-[#ECEEDF]">
+        <span className="text-[clamp(18px,6vw,28px)] uppercase font-bold leading-none tracking-tighter mt-1 text-[#ECEEDF] drop-shadow-md">
           {title || '—'}
         </span>
       </div>

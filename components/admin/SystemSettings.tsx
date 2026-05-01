@@ -155,7 +155,7 @@ export default function SystemSettings() {
         <h3 className="text-[#ECEEDF] text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 mb-4 pl-1">
           GLOBAL SYSTEMS
         </h3>
-        <div className="grid grid-cols-3 gap-4 border-b border-[#ECEEDF]/10 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 border-b border-[#ECEEDF]/10 pb-8">
           <button
             onClick={() => handleToggle('maintenance_mode', settings.maintenance_mode)}
             type="button"
@@ -172,7 +172,7 @@ export default function SystemSettings() {
             onClick={() => handleToggle('allow_registrations', settings.allow_registrations)}
             type="button"
             className={`flex items-center justify-between px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold border transition-all duration-300 ${settings.allow_registrations
-              ? 'bg-[#ECEEDF]/10 text-[#ECEEDF] border-[#ECEEDF]/50'
+              ? 'bg-[#ECEEDF]/10 text-[#ECEEDF] border-[#ECEEDF]/50 shadow-[inset_0_0_20px_rgba(236,238,223,0.05)]'
               : 'bg-black/40 border-[#ECEEDF]/10 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/30 hover:text-[#ECEEDF]'
               }`}
           >

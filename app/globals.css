@@ -89,6 +89,20 @@ body {
   font-family: monospace;
   /* Brutalist requirement */
   overflow-x: hidden;
+  font-size: 16px; /* Base font size for mobile readability */
+  -webkit-tap-highlight-color: transparent; /* Remove gray highlight on tap */
+}
+
+/* Typography Scaling */
+h1, .text-h1 {
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+h2, .text-h2 {
+  font-size: clamp(1.25rem, 6vw, 2rem);
+  line-height: 1.2;
 }
 
 /* Scanline Overlay */
@@ -217,6 +231,8 @@ body {
   justify-content: center;
   font-family: inherit;
   user-select: none;
+  min-height: 44px; /* Touch target requirement */
+  min-width: 44px;
 }
 
 .hud-btn:hover {
@@ -228,8 +244,10 @@ body {
 }
 
 .hud-btn:active {
-  transform: translate(1px, 1px);
-  /* Mechanical Switch feel */
+  transform: translate(2px, 2px);
+  background: #ECEEDF;
+  color: black;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Custom Volume Slider (Thin Line) */
@@ -245,13 +263,12 @@ input[type=range].retro-range:focus {
 
 input[type=range].retro-range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 12px;
-  width: 6px;
+  height: 24px; /* Increased for mobile touch */
+  width: 12px;
   border: 1px solid #ECEEDF;
   background: black;
   cursor: pointer;
-  margin-top: -6px;
-  /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+  margin-top: -12px;
 }
 
 input[type=range].retro-range::-webkit-slider-runnable-track {
@@ -271,14 +288,13 @@ input[type=range].header-needle-range {
 
 input[type=range].header-needle-range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 4px;
-  /* Exact 4px square specified */
-  width: 4px;
+  height: 12px;
+  width: 12px;
   border-radius: 0;
   /* Square needle handle */
   background: #ECEEDF;
   cursor: pointer;
-  margin-top: -1.5px;
+  margin-top: -6px;
   box-shadow: 0 0 2px rgba(236, 238, 223, 0.3);
 }
 
@@ -298,6 +314,8 @@ input[type=range].header-needle-range::-webkit-slider-runnable-track {
   transition: all 0.1s ease;
   background: transparent;
   cursor: pointer;
+  min-height: 44px;
+  padding: 0 1rem;
 }
 
 .mechanical-btn:hover {
@@ -307,7 +325,8 @@ input[type=range].header-needle-range::-webkit-slider-runnable-track {
 
 .mechanical-btn:active {
   transform: translate(1px, 1px);
-  /* Mechanical Switch feedback */
+  background-color: rgba(236, 238, 223, 0.2);
+  border-color: #ECEEDF;
 }
 
 /* Marquee Animation */
@@ -331,4 +350,30 @@ input[type=range].header-needle-range::-webkit-slider-runnable-track {
 .scrolling-metadata-mask {
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Mobile-specific layout fixes */
+@media (max-width: 768px) {
+  .mobile-padding {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  
+  .mobile-gap {
+    gap: 1.5rem;
+  }
+}
+
+/* Fix for horizontal scroll on some mobile browsers */
+* {
+  box-sizing: border-box;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
