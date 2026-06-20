@@ -77,7 +77,7 @@ const Header = () => {
       const { supabase } = await import('../lib/supabase');
       // Live State
       const { data: liveData } = await supabase
-        .from('site_settings')
+        .from('system_settings')
         .select('is_live, stream_title')
         .eq('id', 1)
         .single();
@@ -110,7 +110,7 @@ const Header = () => {
           {
             event: 'UPDATE',
             schema: 'public',
-            table: 'site_settings',
+            table: 'system_settings',
             filter: 'id=eq.1'
           },
           (payload) => {
@@ -326,35 +326,6 @@ const Header = () => {
           {/* BLOCK 3: Right - Volume Controls */}
           <div className="flex items-center justify-end z-40 gap-8">
 
-            {/* AUTH BUTTON (Desktop) */}
-            <div className="relative">
-              {!user ? (
-                <Link
-                  href="/login"
-                  className="hidden md:flex items-center justify-center font-mono text-[15px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase whitespace-nowrap"
-                >
-                  [ SIGN_IN ]
-                </Link>
-              ) : (
-                <>
-                  {isGodmode && (
-                    <Link
-                      href="/godmode"
-                      className="hidden md:flex items-center justify-center font-mono text-[15px] text-red-500 tracking-[0.2em] hover:text-red-400 transition-colors uppercase whitespace-nowrap mr-6"
-                    >
-                      [ GODMODE ]
-                    </Link>
-                  )}
-
-                  <Link
-                    href="/account"
-                    className="hidden md:flex items-center justify-center font-mono text-[15px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase whitespace-nowrap"
-                  >
-                    [ {username ? username.toUpperCase() : (user?.email?.split('@')[0].toUpperCase().slice(0, 8) || 'USER')} ]
-                  </Link>
-                </>
-              )}
-            </div>
 
             {/* VOLUME CONTROLS */}
             {isPlayerActive && (

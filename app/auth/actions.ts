@@ -43,7 +43,7 @@ export async function ensureProfile(username?: string, accessToken?: string) {
     : await supabase.auth.getUser();
 
   if (userError || !user) {
-    console.error('ensureProfile: User verification failed', userError);
+    if (process.env.NODE_ENV === 'development') console.error('ensureProfile: User verification failed', userError);
     return { success: false, error: 'User verification failed: ' + (userError?.message || 'No session') };
   }
 
@@ -59,11 +59,9 @@ export async function ensureProfile(username?: string, accessToken?: string) {
   }
 
   // 3. Create Profile if Missing (Admin Client)
-  console.log('ensureProfile: Creating missing profile for', user.id);
-  console.log('ensureProfile: Input username:', username);
+  console.log('ensureProfile: Creating missing profile for user_id:', user.id);
 
   const finalUsername = username || user.user_metadata?.username || `user_${user.id.substring(0, 8)}`;
-  console.log('ensureProfile: Final username:', finalUsername);
 
   const { error: insertError } = await supabaseAdmin
     .from('profiles')
@@ -75,7 +73,7 @@ export async function ensureProfile(username?: string, accessToken?: string) {
     });
 
   if (insertError) {
-    console.error('ensureProfile failed:', insertError);
+    if (process.env.NODE_ENV === 'development') console.error('ensureProfile failed:', insertError);
     return { success: false, error: insertError.message };
   }
 
@@ -96,7 +94,7 @@ export async function resolveEmailFromUsername(username: string) {
 
   if (profileError || !profile) {
     // If not found, return null (generic error on frontend)
-    console.warn(`resolveEmailFromUsername: Username '${username}' not found.`);
+    console.warn('resolveEmailFromUsername: Username not found.');
     return { success: false, email: null };
   }
 

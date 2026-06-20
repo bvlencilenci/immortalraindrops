@@ -13,6 +13,18 @@ export async function generateMetadata(): Promise<Metadata> {
     title: data?.site_title || 'Immortal Raindrops',
     description: data?.meta_description || 'IMMORTAL RAINDROPS WORLDWIDE',
     keywords: data?.keywords ? data.keywords.split(',') : ['art', 'music', 'visuals'],
+    openGraph: {
+      title: data?.site_title || 'Immortal Raindrops',
+      description: data?.meta_description || 'IMMORTAL RAINDROPS WORLDWIDE',
+      images: ['/default-share.jpg'],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: data?.site_title || 'Immortal Raindrops',
+      description: data?.meta_description || 'IMMORTAL RAINDROPS WORLDWIDE',
+      images: ['/default-share.jpg'],
+    },
   };
 }
 

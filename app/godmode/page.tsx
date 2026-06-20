@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import TrackList from '@/components/admin/TrackList';
+import SubmissionReview from '@/components/admin/SubmissionReview';
 import UserList from '@/components/admin/UserList';
 import SystemSettings from '@/components/admin/SystemSettings';
 
@@ -13,14 +13,20 @@ export default function GodModePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState<'tracks' | 'users' | 'system'>('tracks');
+  const [activeTab, setActiveTab] = useState<'submissions' | 'users' | 'system'>('submissions');
+
+  const [needsLogin, setNeedsLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Load tracks when authenticated
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.push('/login');
+        setNeedsLogin(true);
+        setLoading(false);
         return;
       }
 
@@ -32,6 +38,7 @@ export default function GodModePage() {
 
       if (profile?.is_godmode) {
         setIsAuthenticated(true);
+        setNeedsLogin(false);
         setLoading(false);
       } else {
         setError('ACCESS DENIED: GODMODE REQUIRED');
@@ -40,7 +47,20 @@ export default function GodModePage() {
     };
 
     checkAdmin();
-  }, [router]);
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setError(null);
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    if (authError) {
+      setError(authError.message);
+      setIsLoggingIn(false);
+    } else {
+      window.location.reload();
+    }
+  };
 
   if (loading) {
     return (
@@ -48,6 +68,46 @@ export default function GodModePage() {
         <div className="text-[#ECEEDF] font-mono animate-pulse tracking-widest uppercase text-xs">
           SYSTEM_CHECK...
         </div>
+      </main>
+    );
+  }
+
+  if (needsLogin) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center p-4 font-mono">
+        <form onSubmit={handleLogin} className="w-full max-w-sm flex flex-col gap-6 p-8 border border-[#ECEEDF]/20 bg-black/50 backdrop-blur-md">
+          <div className="text-center text-[#ECEEDF] tracking-[0.2em] uppercase text-xl font-bold mb-4">
+            SYSTEM_LOGIN
+          </div>
+          {error && (
+            <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 bg-red-500/10 mb-2">
+              {error}
+            </div>
+          )}
+          <input
+            type="email"
+            placeholder="EMAIL_ADDRESS"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-transparent border border-[#ECEEDF]/20 text-[#ECEEDF] p-3 text-sm focus:outline-none focus:border-[#ECEEDF] transition-colors uppercase tracking-widest placeholder:text-[#ECEEDF]/30"
+            required
+          />
+          <input
+            type="password"
+            placeholder="ACCESS_CODE"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-transparent border border-[#ECEEDF]/20 text-[#ECEEDF] p-3 text-sm focus:outline-none focus:border-[#ECEEDF] transition-colors tracking-widest placeholder:text-[#ECEEDF]/30"
+            required
+          />
+          <button
+            type="submit"
+            disabled={isLoggingIn}
+            className="w-full bg-[#ECEEDF] text-black font-bold uppercase tracking-[0.2em] p-3 text-sm hover:bg-white transition-colors disabled:opacity-50 mt-2"
+          >
+            {isLoggingIn ? 'AUTHENTICATING...' : 'ENTER'}
+          </button>
+        </form>
       </main>
     );
   }
@@ -63,7 +123,7 @@ export default function GodModePage() {
   }
 
   const tabs = [
-    { id: 'tracks', label: 'TRACKS' },
+    { id: 'submissions', label: 'SUBMISSIONS' },
     { id: 'users', label: 'USERS' },
     { id: 'system', label: 'PREFERENCES' },
   ];
@@ -99,8 +159,8 @@ export default function GodModePage() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1">
-        {activeTab === 'tracks' && <TrackList />}
+      <div className="flex-1 mt-6">
+        {activeTab === 'submissions' && <SubmissionReview />}
         {activeTab === 'users' && <UserList />}
         {activeTab === 'system' && <SystemSettings />}
       </div>

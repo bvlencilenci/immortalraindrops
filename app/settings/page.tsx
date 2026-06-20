@@ -60,13 +60,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Back Link */}
-        <Link
-          href="/account"
-          className="text-[#ECEEDF]/30 hover:text-[#ECEEDF] text-[10px] font-mono uppercase tracking-[0.2em] transition-colors text-center"
-        >
-          {t.back}
-        </Link>
+
 
       </div>
     </main>

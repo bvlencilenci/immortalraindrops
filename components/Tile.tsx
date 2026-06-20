@@ -5,7 +5,7 @@ import { useAudioStore } from '../store/useAudioStore';
 import { Howler } from 'howler';
 import Hls from 'hls.js';
 import { Track } from '../types';
-import VoteButtons from './VoteButtons';
+
 
 interface TileProps extends Track {
   isAdmin?: boolean;
@@ -55,8 +55,6 @@ const Tile = (props: TileProps) => {
   if (tile_id === 'hls-test-bunny') {
     imageUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
   }
-
-  // console.log('Tile constructed:', { tile_id, audioUrl, imageUrl });
 
   const isActive = currentlyPlayingId === id;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -440,7 +438,6 @@ const Tile = (props: TileProps) => {
 
       {/* 5. VOTING CONTROLS */}
       <div className="absolute bottom-3 right-3 z-40 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-        {/* <VoteButtons trackId={tile_id} initialCount={vote_count || 0} /> */}
       </div>
 
       {isAdmin && (

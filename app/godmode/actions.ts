@@ -64,7 +64,7 @@ async function verifyAdmin() {
 export async function deleteTile(tileId: string, tileIndex: number, audioExt: string, imageExt: string) {
   try {
     await verifyAdmin();
-    console.log(`[GODMODE] Deleting Tile ${tileId}...`);
+    if (process.env.NODE_ENV === 'development') console.log(`[GODMODE] Deleting Tile ${tileId}...`);
 
     // 1. Delete Audio from R2
     try {
@@ -115,7 +115,7 @@ export async function deleteTile(tileId: string, tileIndex: number, audioExt: st
 export async function updateTile(tileId: string, updates: Record<string, any>) {
   try {
     await verifyAdmin();
-    console.log(`[GODMODE] Updating Tile ${tileId}...`, updates);
+    if (process.env.NODE_ENV === 'development') console.log(`[GODMODE] Updating Tile ${tileId}...`, updates);
 
     const supabaseService = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -130,7 +130,7 @@ export async function updateTile(tileId: string, updates: Record<string, any>) {
 
     if (error) throw new Error(`DB Update Failed: ${error.message}`);
 
-    console.log(`[GODMODE] Updated DB: ${tileId}`);
+    if (process.env.NODE_ENV === 'development') console.log(`[GODMODE] Updated DB: ${tileId}`);
     return { success: true };
   } catch (error) {
     return { success: false, error: (error as Error).message };
@@ -161,7 +161,7 @@ export async function deleteUser(userId: string) {
       throw new Error('Self-deletion is prohibited.');
     }
 
-    console.log(`[GODMODE] Deleting User ${userId}...`);
+    if (process.env.NODE_ENV === 'development') console.log(`[GODMODE] Deleting User ${userId}...`);
 
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
     if (error) throw error;
@@ -177,7 +177,7 @@ export async function deleteUser(userId: string) {
 export async function finalizeAssetUpdate(tileId: string, updates: { audio_url?: string, visual_url?: string }) {
   try {
     await verifyAdmin();
-    console.log(`[GODMODE] Finalizing asset update for ${tileId}...`, updates);
+    if (process.env.NODE_ENV === 'development') console.log(`[GODMODE] Finalizing asset update for ${tileId}...`, updates);
 
     // 1. Get current track to check for old files
     const { data: currentTrack } = await supabaseAdmin
@@ -257,7 +257,7 @@ export async function requestUploadAccess() {
     // 2. Trigger Notification Webhook if configured
     try {
       const { data: settings } = await supabaseAdmin
-        .from('site_settings')
+        .from('system_settings')
         .select('notification_webhook_url')
         .eq('id', 1)
         .single();
@@ -359,5 +359,20 @@ export async function toggleGodmode(userId: string, currentStatus: boolean) {
   } catch (error) {
     console.error('[GODMODE] Godmode Toggle Error:', error);
     return { success: false, error: (error as Error).message };
+  }
+}
+
+export async function updateSubmissionStatus(id: string, status: string, admin_notes: string) {
+  try {
+    await verifyAdmin();
+    const { error } = await supabaseAdmin
+      .from('submissions')
+      .update({ status, admin_notes, reviewed_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+    revalidatePath('/godmode');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
   }
 }
