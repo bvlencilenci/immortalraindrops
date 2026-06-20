@@ -338,6 +338,16 @@ const Header = () => {
               </Link>
             </div>
 
+            {/* SUBMIT BUTTON (Desktop) */}
+            <div className="relative">
+              <Link
+                href="/submit"
+                className="hidden md:flex items-center justify-center font-mono text-[15px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase whitespace-nowrap"
+              >
+                [ SUBMIT ]
+              </Link>
+            </div>
+
             {/* VOLUME CONTROLS */}
             {isPlayerActive && (
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
