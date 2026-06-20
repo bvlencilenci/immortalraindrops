@@ -289,6 +289,7 @@ const Header = () => {
                   >
                     <Link href="/archive" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
                     <Link href="/live" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
+                    <Link href="/submit" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">SUBMIT</Link>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -296,9 +297,9 @@ const Header = () => {
 
             {isPlayerActive && (
               <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
-                {pathname === '/upload' ? (
+                {pathname === '/submit' ? (
                   <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest whitespace-nowrap">
-                    UPLOAD MODE
+                    SUBMISSION MODE
                   </span>
                 ) : useAudioStore.getState().isLive ? (
                   <>
@@ -326,6 +327,16 @@ const Header = () => {
           {/* BLOCK 3: Right - Volume Controls */}
           <div className="flex items-center justify-end z-40 gap-8">
 
+
+            {/* SUBMIT BUTTON (Desktop) */}
+            <div className="relative">
+              <Link
+                href="/submit"
+                className="hidden md:flex items-center justify-center font-mono text-[15px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase whitespace-nowrap"
+              >
+                [ SUBMIT ]
+              </Link>
+            </div>
 
             {/* VOLUME CONTROLS */}
             {isPlayerActive && (
