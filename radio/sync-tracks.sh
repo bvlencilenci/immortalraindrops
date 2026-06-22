@@ -30,9 +30,23 @@ TEMP_SUBMISSIONS=$(mktemp)
 # ═══════════════════════════════════════════════════════════════════
 echo "📡 Syncing approved submissions..."
 
-SUBS_RESPONSE=$(curl -s -X GET "${SUPABASE_URL}/rest/v1/submissions?status=eq.approved&select=id,title,audio_url" \
+TEMP_HTTP_CODE_SUB=$(mktemp)
+SUBS_RESPONSE_FILE=$(mktemp)
+
+curl -s -w "%{http_code}" -o "$SUBS_RESPONSE_FILE" -X GET "${SUPABASE_URL}/rest/v1/submissions?status=eq.approved&select=id,title,audio_url" \
   -H "apikey: ${SUPABASE_KEY}" \
-  -H "Authorization: Bearer ${SUPABASE_KEY}")
+  -H "Authorization: Bearer ${SUPABASE_KEY}" > "$TEMP_HTTP_CODE_SUB"
+
+HTTP_CODE_SUB=$(cat "$TEMP_HTTP_CODE_SUB")
+SUBS_RESPONSE=$(cat "$SUBS_RESPONSE_FILE")
+rm -f "$TEMP_HTTP_CODE_SUB" "$SUBS_RESPONSE_FILE"
+
+echo "📡 Submissions API response status: $HTTP_CODE_SUB"
+if [ "$HTTP_CODE_SUB" -ne 200 ]; then
+  echo "❌ ERROR: Submissions API request failed with status $HTTP_CODE_SUB"
+  echo "Response Body: $SUBS_RESPONSE"
+  exit 1
+fi
 
 if echo "$SUBS_RESPONSE" | grep -q '^\['; then
   python3 -c "
@@ -62,6 +76,7 @@ except Exception:
 
       if [ ! -f "$LOCAL_PATH" ]; then
         echo "📥 [submissions] Downloading: $FILE_NAME"
+        echo "🔗 R2 URL: https://${R2_DOMAIN}/${audio_path}"
         if ! curl -s --fail --retry 3 --retry-delay 2 -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"; then
           echo "⚠️ [submissions] Failed to download: $FILE_NAME — skipping"
           rm -f "$LOCAL_PATH"
@@ -70,7 +85,7 @@ except Exception:
     fi
   done
 else
-  echo "⚠️ Submissions fetch returned non-array response (may be empty): $SUBS_RESPONSE"
+  echo "⚠️ Submissions fetch returned non-array response: $SUBS_RESPONSE"
 fi
 
 # ═══════════════════════════════════════════════════════════════════
@@ -78,9 +93,23 @@ fi
 # ═══════════════════════════════════════════════════════════════════
 echo "📡 Syncing admin playlist tracks..."
 
-PLAYLIST_RESPONSE=$(curl -s -X GET "${SUPABASE_URL}/rest/v1/playlist_tracks?active=eq.true&select=id,title,audio_url,featured" \
+TEMP_HTTP_CODE_PLAYLIST=$(mktemp)
+PLAYLIST_RESPONSE_FILE=$(mktemp)
+
+curl -s -w "%{http_code}" -o "$PLAYLIST_RESPONSE_FILE" -X GET "${SUPABASE_URL}/rest/v1/playlist_tracks?active=eq.true&select=id,title,audio_url,featured" \
   -H "apikey: ${SUPABASE_KEY}" \
-  -H "Authorization: Bearer ${SUPABASE_KEY}")
+  -H "Authorization: Bearer ${SUPABASE_KEY}" > "$TEMP_HTTP_CODE_PLAYLIST"
+
+HTTP_CODE_PLAYLIST=$(cat "$TEMP_HTTP_CODE_PLAYLIST")
+PLAYLIST_RESPONSE=$(cat "$PLAYLIST_RESPONSE_FILE")
+rm -f "$TEMP_HTTP_CODE_PLAYLIST" "$PLAYLIST_RESPONSE_FILE"
+
+echo "📡 Playlist tracks API response status: $HTTP_CODE_PLAYLIST"
+if [ "$HTTP_CODE_PLAYLIST" -ne 200 ]; then
+  echo "❌ ERROR: Playlist tracks API request failed with status $HTTP_CODE_PLAYLIST"
+  echo "Response Body: $PLAYLIST_RESPONSE"
+  exit 1
+fi
 
 if echo "$PLAYLIST_RESPONSE" | grep -q '^\['; then
   python3 -c "
@@ -110,6 +139,7 @@ except Exception:
 
       if [ ! -f "$LOCAL_PATH" ]; then
         echo "📥 [playlist] Downloading: $FILE_NAME"
+        echo "🔗 R2 URL: https://${R2_DOMAIN}/${audio_path}"
         if ! curl -s --fail --retry 3 --retry-delay 2 -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"; then
           echo "⚠️ [playlist] Failed to download: $FILE_NAME — skipping"
           rm -f "$LOCAL_PATH"
@@ -118,7 +148,7 @@ except Exception:
     fi
   done
 else
-  echo "⚠️ Playlist tracks fetch returned non-array response (may be empty): $PLAYLIST_RESPONSE"
+  echo "⚠️ Playlist tracks fetch returned non-array response: $PLAYLIST_RESPONSE"
 fi
 
 # ═══════════════════════════════════════════════════════════════════

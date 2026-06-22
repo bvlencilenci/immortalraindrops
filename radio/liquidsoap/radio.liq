@@ -28,7 +28,7 @@ def notify_status(is_live, title) =
     safe_title = string.replace(pattern="\"", (fun (_) -> "\\\""), title)
     payload = '{"is_live":' ^ is_live_str ^ ',"stream_title":"' ^ safe_title ^ '"}'
     
-    ignore(http.post(headers=headers, data=payload, webhook_url))
+    ignore(http.post(webhook_url, headers=headers, data=payload))
   end
 end
 
@@ -42,12 +42,12 @@ live = input.harbor(
   auth=fun(user, password) -> password == harbor_password,
   on_connect=fun(_) -> begin
     log(">>> DJ CONNECTED!")
-    live_active.set(true)
+    live_active := true
     notify_status(true, "LIVE SET")
   end,
   on_disconnect=fun() -> begin
     log(">>> DJ DISCONNECTED!")
-    live_active.set(false)
+    live_active := false
     notify_status(false, "PLAYLIST ROTATION")
   end
 )
@@ -73,16 +73,13 @@ normal = playlist(
 def log_featured(_) = log(">>> DEBUG: Featured source track selected!") end
 def log_normal(_) = log(">>> DEBUG: Normal source track selected!") end
 
-featured = on_track(log_featured, featured)
-normal = on_track(log_normal, normal)
+featured = featured.on_track(log_featured)
+normal = normal.on_track(log_normal)
 
 # PHASE 1C: WEIGHTED ROTATION LOGIC (70/30 split) with fallback silence
 log("Applying 70/30 weighted rotation...")
 silence = blank()
-music = fallback([random.weighted([
-  (70, featured),
-  (30, normal)
-]), silence])
+music = fallback([random(weights=[70, 30], [featured, normal]), silence])
 
 # PHASE 1E: FALLBACK LOGIC (Priority 1: Live, Priority 2: Playlist)
 # Switches instantly via track_sensitive=false
@@ -109,7 +106,7 @@ def handle_metadata(m) =
   notify_status(is_live, display_title)
 end
 
-radio = on_metadata(handle_metadata, radio)
+radio = radio.on_metadata(handle_metadata)
 
 # PHASE 1F: ICECAST OUTPUT CONFIGURATION
 log("Connecting output stream to Icecast on localhost:8000/radio...")
