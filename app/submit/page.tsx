@@ -75,7 +75,7 @@ export default function SubmitPage() {
     <main className="min-h-screen bg-black flex items-center justify-center p-4 pt-[15vh]">
       <div className="w-full max-w-md bg-black/50 border border-[#ECEEDF]/20 p-8">
         <h1 className="text-2xl font-mono text-[#ECEEDF] uppercase tracking-widest mb-6 text-center">
-          SUBMIT_TRANSMISSION
+          SUBMIT_TRACK
         </h1>
         {error && <div className="text-red-500 font-mono text-xs p-3 border border-red-500/50 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 font-mono">
