@@ -40,23 +40,20 @@ const SplashGate = () => {
 
   const handleEnter = async () => {
     setIsWarming(true);
+    
+    // CRITICAL: Must be called synchronously within the onClick handler to bypass browser autoplay policies
+    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+      Howler.ctx.resume();
+    }
+
     const startTime = Date.now();
     const duration = 3500; // 3.5s total target for dual-track sequence
-    const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 'https://archive.org/download';
 
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       let p = (elapsed / duration) * 100;
       if (p > 100) p = 100;
       setProgress(p);
-
-      // --- PHASE 1: 0-20% -> Resume Audio Context & Ensure Fetch ---
-      if (p >= 10 && !didResume.current) {
-        didResume.current = true;
-        if (Howler.ctx && Howler.ctx.state === 'suspended') {
-          Howler.ctx.resume();
-        }
-      }
 
       // --- PHASE 2: 30% -> First Trigger (Wake up R2 connection) ---
       if (p >= 30 && !didPlayFirst.current) {
