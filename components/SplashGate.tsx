@@ -11,6 +11,7 @@ const SplashGate = () => {
   const enterApp = useAudioStore((state) => state.enterApp);
   const setPlaylist = useAudioStore((state) => state.setPlaylist);
   const playTrack = useAudioStore((state) => state.playTrack);
+  const playLiveStream = useAudioStore((state) => state.playLiveStream);
   const [mounted, setMounted] = useState(false);
   const [tracks, setTracks] = useState<any[]>([]); // Keep state for rendering if needed, but use Ref for logic
   const tracksRef = useRef<any[]>([]); // Ref to access tracks inside interval closure
@@ -70,7 +71,10 @@ const SplashGate = () => {
       // --- PHASE 3: 70% -> Second Trigger (Confirm Warm & Active Entry Track) ---
       if (p >= 70 && !didPlaySecond.current) {
         didPlaySecond.current = true;
-        // Auto-play disabled for broadcast testing
+        const streamUrl = process.env.NEXT_PUBLIC_RADIO_STREAM_URL || '';
+        if (streamUrl) {
+          playLiveStream(streamUrl);
+        }
       }
 
       if (p >= 100) {
