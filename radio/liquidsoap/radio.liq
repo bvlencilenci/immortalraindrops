@@ -18,43 +18,6 @@ icecast_password = environment.get("ICECAST_SOURCE_PASSWORD")
 harbor_env_password = environment.get("LIQUIDSOAP_HARBOR_PASSWORD")
 harbor_password = if harbor_env_password != "" then harbor_env_password else icecast_password end
 
-# PHASE 1B & PHASE 2(2/3): PLAYLIST SOURCES & FILE DECODING
-log("Configuring Unified Playlists from /music/unified...")
-
-featured = playlist(
-  mode="random",
-  reload_mode="watch",
-  "/music/unified/featured"
-)
-
-normal = playlist(
-  mode="random",
-  reload_mode="watch",
-  "/music/unified/normal"
-)
-
-# PHASE 2: Temporary debug logging
-def log_featured(_) = log(">>> DEBUG: Featured source track selected!") end
-def log_normal(_) = log(">>> DEBUG: Normal source track selected!") end
-
-featured = on_track(log_featured, featured)
-normal = on_track(log_normal, normal)
-
-# PHASE 1C: WEIGHTED ROTATION LOGIC (70/30 split)
-log("Applying 70/30 weighted rotation...")
-music = random.weighted([
-  (70, featured),
-  (30, normal)
-])
-
-# PHASE 1D: LIVE DJ INPUT (BUTT HARBOUR)
-log("Configuring BUTT Harbor input on port 8005...")
-live = input.harbor(
-  "live",
-  port=8005,
-  auth=fun(user, password) -> password == harbor_password
-)
-
 # Webhook UI Notifications
 def notify_status(is_live, title) =
   if webhook_url != "" and webhook_secret != "" then
@@ -70,20 +33,56 @@ def notify_status(is_live, title) =
 end
 
 live_active = ref(false)
-def on_live_connect() =
-  log(">>> DJ CONNECTED! Initiating Override...")
-  live_active.set(true)
-  notify_status(true, "LIVE SET")
-end
 
-def on_live_disconnect() =
-  log(">>> DJ DISCONNECTED! Falling back to rotation...")
-  live_active.set(false)
-  notify_status(false, "PLAYLIST ROTATION")
-end
+# PHASE 1D: LIVE DJ INPUT (BUTT HARBOUR)
+log("Configuring BUTT Harbor input on port 8005...")
+live = input.harbor(
+  "live",
+  port=8005,
+  auth=fun(user, password) -> password == harbor_password,
+  on_connect=fun(_) -> begin
+    log(">>> DJ CONNECTED!")
+    live_active.set(true)
+    notify_status(true, "LIVE SET")
+  end,
+  on_disconnect=fun() -> begin
+    log(">>> DJ DISCONNECTED!")
+    live_active.set(false)
+    notify_status(false, "PLAYLIST ROTATION")
+  end
+)
 
-live = on_start(on_live_connect, live)
-live = on_stop(on_live_disconnect, live)
+# PHASE 1B & PHASE 2(2/3): PLAYLIST SOURCES & FILE DECODING
+log("Configuring Unified Playlists from /music/unified...")
+
+featured = playlist(
+  mode="random",
+  reload_mode="watch",
+  fallible=true,
+  "/music/unified/featured"
+)
+
+normal = playlist(
+  mode="random",
+  reload_mode="watch",
+  fallible=true,
+  "/music/unified/normal"
+)
+
+# PHASE 2: Temporary debug logging
+def log_featured(_) = log(">>> DEBUG: Featured source track selected!") end
+def log_normal(_) = log(">>> DEBUG: Normal source track selected!") end
+
+featured = on_track(log_featured, featured)
+normal = on_track(log_normal, normal)
+
+# PHASE 1C: WEIGHTED ROTATION LOGIC (70/30 split) with fallback silence
+log("Applying 70/30 weighted rotation...")
+silence = blank()
+music = fallback([random.weighted([
+  (70, featured),
+  (30, normal)
+]), silence])
 
 # PHASE 1E: FALLBACK LOGIC (Priority 1: Live, Priority 2: Playlist)
 # Switches instantly via track_sensitive=false

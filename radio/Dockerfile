@@ -40,8 +40,7 @@ RUN chown -R root:root /etc/nginx/nginx.conf && \
     chown liquidsoap:liquidsoap /etc/liquidsoap/radio.liq
 
 # Create persistent storage directories (Fly volume mounted at /music at runtime)
-# NOTE: No circular symlinks. Liquidsoap reads /music/playlist/featured and /music/playlist/submissions directly.
-RUN mkdir -p /music/playlist/featured /music/playlist/submissions && \
+RUN mkdir -p /music/unified/featured /music/unified/normal && \
     chown -R liquidsoap:liquidsoap /music && \
     chmod -R 775 /music
 
