@@ -30,7 +30,7 @@ TEMP_SUBMISSIONS=$(mktemp)
 # ═══════════════════════════════════════════════════════════════════
 echo "📡 Syncing approved submissions..."
 
-SUBS_RESPONSE=$(curl -s -X GET "${SUPABASE_URL}/rest/v1/submissions?status=eq.approved&select=id,title,audio_url,featured" \
+SUBS_RESPONSE=$(curl -s -X GET "${SUPABASE_URL}/rest/v1/submissions?status=eq.approved&select=id,title,audio_url" \
   -H "apikey: ${SUPABASE_KEY}" \
   -H "Authorization: Bearer ${SUPABASE_KEY}")
 
@@ -41,7 +41,7 @@ try:
     data = json.load(sys.stdin)
     for track in data:
         url = track.get('audio_url')
-        feat = 'true' if track.get('featured') else 'false'
+        feat = 'false'
         if url:
             print(f'{url} {feat}')
 except Exception:
