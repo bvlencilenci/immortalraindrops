@@ -3,7 +3,8 @@ FROM savonet/liquidsoap:v2.2.4
 USER root
 
 # Install dependencies (Nginx, Icecast2, Supervisor, Python3, gettext for envsubst)
-RUN apt-get update && \
+RUN echo "icecast2 icecast2/DEFAULTS_GENERATE boolean false" | debconf-set-selections && \
+    apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     nginx \
     icecast2 \

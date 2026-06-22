@@ -111,7 +111,7 @@ radio = on_metadata(handle_metadata, radio)
 log("Connecting output stream to Icecast on localhost:8000/radio...")
 output.icecast(
   %mp3(bitrate=320),
-  host=icecast_host,
+  host="localhost",
   port=8000,
   password=icecast_password,
   mount="/radio",

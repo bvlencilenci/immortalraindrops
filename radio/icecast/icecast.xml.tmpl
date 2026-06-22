@@ -1,6 +1,6 @@
 <icecast>
-    <location>Worldwide</location>
-    <admin>admin@immortalraindrops.art</admin>
+    <location>Immortal Raindrops</location>
+    <admin>admin@immortalraindrops</admin>
 
     <limits>
         <clients>1000</clients>
@@ -15,9 +15,9 @@
 
     <authentication>
         <source-password>${ICECAST_SOURCE_PASSWORD}</source-password>
-        <relay-password>${ICECAST_SOURCE_PASSWORD}</relay-password>
+        <relay-password>${ICECAST_RELAY_PASSWORD}</relay-password>
         <admin-user>admin</admin-user>
-        <admin-password>${ICECAST_SOURCE_PASSWORD}</admin-password>
+        <admin-password>${ICECAST_ADMIN_PASSWORD}</admin-password>
     </authentication>
 
     <hostname>localhost</hostname>
@@ -44,8 +44,8 @@
     </paths>
 
     <logging>
-        <accesslog>access.log</accesslog>
-        <errorlog>error.log</errorlog>
+        <accesslog>/dev/stdout</accesslog>
+        <errorlog>/dev/stderr</errorlog>
         <loglevel>3</loglevel> <!-- 4 Debug, 3 Info, 2 Warn, 1 Error -->
         <logsize>10000</logsize>
     </logging>
