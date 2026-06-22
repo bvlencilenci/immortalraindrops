@@ -10,11 +10,12 @@ set("log.level", 4) # Debug level for troubleshooting
 log("=== IMMORTAL RAINDROPS RADIO ENGINE STARTING ===")
 
 # Environment variables
-webhook_url = os.getenv("LIVE_STATUS_WEBHOOK_URL")
-webhook_secret = os.getenv("LIVE_STATUS_WEBHOOK_SECRET")
-icecast_host = os.getenv("ICECAST_HOST")
-icecast_password = os.getenv("ICECAST_SOURCE_PASSWORD")
-harbor_env_password = os.getenv("LIQUIDSOAP_HARBOR_PASSWORD")
+webhook_url = environment.get("LIVE_STATUS_WEBHOOK_URL")
+webhook_secret = environment.get("LIVE_STATUS_WEBHOOK_SECRET")
+icecast_host = environment.get("ICECAST_HOST")
+icecast_host = if icecast_host != "" then icecast_host else "localhost" end
+icecast_password = environment.get("ICECAST_SOURCE_PASSWORD")
+harbor_env_password = environment.get("LIQUIDSOAP_HARBOR_PASSWORD")
 harbor_password = if harbor_env_password != "" then harbor_env_password else icecast_password end
 
 # PHASE 1B & PHASE 2(2/3): PLAYLIST SOURCES & FILE DECODING

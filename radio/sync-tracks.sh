@@ -8,10 +8,15 @@ if [ -f .env ]; then
 fi
 
 # Configuration
-SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
-SUPABASE_KEY="${SUPABASE_SERVICE_ROLE_KEY}"
+SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-https://ajbkuiyhpoiuezsittpy.supabase.co}"
+SUPABASE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-$SUPABASE_KEY}"
 R2_DOMAIN="${NEXT_PUBLIC_R2_PUBLIC_DOMAIN:-pub-83e39df2389c4bef95c442c0e0c6a8ad.r2.dev}"
 UNIFIED_DIR="${UNIFIED_DIR:-/music/unified}"
+
+if [ -z "$SUPABASE_KEY" ]; then
+  echo "❌ FATAL: SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY is missing from environment! Sync aborted."
+  exit 1
+fi
 
 # Ensure directories exist
 mkdir -p "${UNIFIED_DIR}/featured"
