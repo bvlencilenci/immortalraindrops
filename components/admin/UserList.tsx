@@ -71,75 +71,88 @@ export default function UserList() {
   if (error) return <div className="text-red-500 font-mono text-xs p-8">ERROR: {error}</div>;
 
   return (
-    <div className="flex flex-col gap-4 animate-in fade-in duration-500">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-[#ECEEDF]/10">
-              <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest">User</th>
-              <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest">Email</th>
-              <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest hidden md:table-cell">Joined</th>
-              <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-b border-[#ECEEDF]/5 hover:bg-[#ECEEDF]/2 transition-colors group">
-                <td className="py-4 px-2">
-                  <div className="flex flex-col">
-                    <span className="font-mono text-sm text-[#ECEEDF] uppercase tracking-wide">{user.username}</span>
-                    <span className="font-mono text-[8px] text-[#ECEEDF]/20 uppercase tracking-tighter md:hidden">{user.email}</span>
-                  </div>
-                </td>
-                <td className="py-4 px-2 font-mono text-xs text-[#ECEEDF]/60 font-light truncate max-w-[150px]">{user.email}</td>
-                <td className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase hidden md:table-cell">
-                  {user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}
-                </td>
-                <td className="py-4 px-2 text-right">
-                  <div className="flex justify-end gap-2 items-center">
-                    {user.access_requested && !user.is_authorized && (
-                      <span className="font-mono text-[8px] bg-[#ECEEDF] text-black px-1.5 py-0.5 animate-pulse tracking-tighter">REQ_PENDING</span>
-                    )}
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500 font-mono">
+      {/* Header Bar */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-[#ECEEDF]/5 p-4 border border-[#ECEEDF]/10">
+        <div className="text-[#ECEEDF]/40 text-[10px] uppercase tracking-widest">
+          {users.length} OPERATORS_INDEXED
+        </div>
+      </div>
 
-                    <button
-                      onClick={() => toggleAuthorization(user.id, user.is_authorized)}
-                      className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 border transition-all ${user.is_authorized
-                        ? 'bg-[#ECEEDF] text-black border-[#ECEEDF] hover:bg-white'
-                        : 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
-                        }`}
-                    >
-                      {user.is_authorized ? 'AUTHORIZED' : 'AUTHORIZE'}
-                    </button>
+      <div className="border border-[#ECEEDF]/10 bg-black/40 p-4 md:p-6 flex flex-col gap-3">
+        <h3 className="text-xs uppercase tracking-widest text-[#ECEEDF]/70 border-b border-[#ECEEDF]/10 pb-3 mb-2">
+          SYSTEM_OPERATORS
+        </h3>
 
-                    <button
-                      onClick={() => handleToggleGodmode(user.id, user.is_godmode)}
-                      disabled={user.username === 'immortalraindropsceo'}
-                      className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 border transition-all 
-                        ${user.username === 'immortalraindropsceo' ? 'opacity-50 cursor-not-allowed border-[#ECEEDF]/20 text-[#ECEEDF]' : ''}
-                        ${!user.username.includes('immortalraindropsceo') && user.is_godmode
-                          ? 'bg-[#ECEEDF]/20 text-[#ECEEDF] border-[#ECEEDF]/20 hover:bg-[#ECEEDF]/30'
-                          : user.username !== 'immortalraindropsceo'
-                            ? 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
-                            : ''
-                        }`}
-                    >
-                      {user.username === 'immortalraindropsceo' ? 'LOCKED' : (user.is_godmode ? 'GODMODE' : 'USER')}
-                    </button>
-
-                    {user.id !== currentUserId && user.username !== 'immortalraindropsceo' && (
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-red-900/30 text-red-900/60 hover:text-red-500 hover:border-red-500 hover:bg-red-500/10 transition-all"
-                      >
-                        REMOVE
-                      </button>
-                    )}
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-[#ECEEDF]/10">
+                <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest">User</th>
+                <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest">Email</th>
+                <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest hidden md:table-cell">Joined</th>
+                <th className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase tracking-widest text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id} className="border-b border-[#ECEEDF]/5 hover:bg-[#ECEEDF]/2 transition-colors group">
+                  <td className="py-4 px-2">
+                    <div className="flex flex-col">
+                      <span className="font-mono text-xs text-[#ECEEDF] uppercase tracking-wider">{user.username}</span>
+                      <span className="font-mono text-[8px] text-[#ECEEDF]/40 uppercase tracking-tighter md:hidden">{user.email}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/60 uppercase tracking-widest truncate max-w-[150px]">{user.email}</td>
+                  <td className="py-4 px-2 font-mono text-[10px] text-[#ECEEDF]/40 uppercase hidden md:table-cell">
+                    {user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}
+                  </td>
+                  <td className="py-4 px-2 text-right">
+                    <div className="flex justify-end gap-2 items-center">
+                      {user.access_requested && !user.is_authorized && (
+                        <span className="font-mono text-[8px] bg-[#ECEEDF] text-black px-1.5 py-0.5 animate-pulse tracking-tighter">REQ_PENDING</span>
+                      )}
+
+                      <button
+                        onClick={() => toggleAuthorization(user.id, user.is_authorized)}
+                        className={`font-mono text-[9px] uppercase tracking-widest px-3 py-2 border transition-all ${user.is_authorized
+                          ? 'bg-[#ECEEDF] text-black border-[#ECEEDF] hover:bg-white'
+                          : 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
+                          }`}
+                      >
+                        {user.is_authorized ? 'AUTHORIZED' : 'AUTHORIZE'}
+                      </button>
+
+                      <button
+                        onClick={() => handleToggleGodmode(user.id, user.is_godmode)}
+                        disabled={user.username === 'immortalraindropsceo'}
+                        className={`font-mono text-[9px] uppercase tracking-widest px-3 py-2 border transition-all 
+                          ${user.username === 'immortalraindropsceo' ? 'opacity-50 cursor-not-allowed border-[#ECEEDF]/20 text-[#ECEEDF]' : ''}
+                          ${!user.username.includes('immortalraindropsceo') && user.is_godmode
+                            ? 'bg-[#ECEEDF]/20 text-[#ECEEDF] border-[#ECEEDF]/20 hover:bg-[#ECEEDF]/30'
+                            : user.username !== 'immortalraindropsceo'
+                              ? 'border-[#ECEEDF]/20 text-[#ECEEDF]/40 hover:border-[#ECEEDF]/60 hover:text-[#ECEEDF]'
+                              : ''
+                          }`}
+                      >
+                        {user.username === 'immortalraindropsceo' ? 'LOCKED' : (user.is_godmode ? 'GODMODE' : 'USER')}
+                      </button>
+
+                      {user.id !== currentUserId && user.username !== 'immortalraindropsceo' && (
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="font-mono text-[9px] uppercase tracking-widest px-3 py-2 border border-red-900/30 text-red-900/60 hover:text-red-500 hover:border-red-500 hover:bg-red-500/10 transition-all"
+                        >
+                          REMOVE
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

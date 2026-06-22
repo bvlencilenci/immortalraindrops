@@ -158,8 +158,9 @@ export default function TrackList() {
   if (loading) return <div className="text-[#ECEEDF] font-mono text-xs animate-pulse p-8">RETRIEVING_ASSETS...</div>;
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-[#ECEEDF]/5 p-4 border border-[#ECEEDF]/10 rounded-sm">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500 font-mono">
+      {/* Header Bar */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-[#ECEEDF]/5 p-4 border border-[#ECEEDF]/10">
         <div className="relative w-full md:w-64">
           <input
             type="text"
@@ -174,12 +175,18 @@ export default function TrackList() {
         </div>
       </div>
 
-      <ArchiveGrid
-        tracks={filteredTracks}
-        isAdmin={true}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-      />
+      <div className="border border-[#ECEEDF]/10 bg-black/40 p-4 md:p-6 flex flex-col gap-3">
+        <h3 className="text-xs uppercase tracking-widest text-[#ECEEDF]/70 border-b border-[#ECEEDF]/10 pb-3 mb-4">
+          ARCHIVE_CATALOG
+        </h3>
+        
+        <ArchiveGrid
+          tracks={filteredTracks}
+          isAdmin={true}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+      </div>
 
       {/* EDIT MODAL */}
       {editingTrack && (
