@@ -40,7 +40,7 @@ export function NewsFeed({ posts }: { posts: NewsPostItem[] }) {
               hidden: { opacity: 0 },
               visible: { opacity: 1, transition: { duration: 1 } }
             }}
-            className="font-mono text-[#ECEEDF] text-[12px] uppercase tracking-[0.3em] opacity-50 text-center py-12 mt-24"
+            className="font-mono text-[#ECEEDF] text-[12px] uppercase tracking-[0.3em] opacity-50 text-center py-12 mt-[101px]"
           >
             NO UPDATES ATM LOL
           </motion.div>
