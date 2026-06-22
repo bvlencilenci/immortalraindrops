@@ -1,9 +1,10 @@
 #!/bin/bash
-set -e
+# sync-tracks.sh — Downloads active tracks from Supabase/R2 into /music/playlist
+# NOTE: No 'set -e' — individual failures should not abort the entire sync.
 
-# Load environment variables
+# Load environment variables from .env if present (local dev only)
 if [ -f .env ]; then
-  export $(cat .env | xargs)
+  set -a; source .env; set +a
 fi
 
 # Configuration
@@ -56,7 +57,10 @@ except Exception:
 
       if [ ! -f "$LOCAL_PATH" ]; then
         echo "📥 [submissions] Downloading: $FILE_NAME"
-        curl -s -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"
+        if ! curl -s --fail --retry 3 --retry-delay 2 -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"; then
+          echo "⚠️ [submissions] Failed to download: $FILE_NAME — skipping"
+          rm -f "$LOCAL_PATH"
+        fi
       fi
     fi
   done
@@ -101,7 +105,10 @@ except Exception:
 
       if [ ! -f "$LOCAL_PATH" ]; then
         echo "📥 [playlist] Downloading: $FILE_NAME"
-        curl -s -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"
+        if ! curl -s --fail --retry 3 --retry-delay 2 -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"; then
+          echo "⚠️ [playlist] Failed to download: $FILE_NAME — skipping"
+          rm -f "$LOCAL_PATH"
+        fi
       fi
     fi
   done

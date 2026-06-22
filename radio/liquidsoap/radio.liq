@@ -14,9 +14,9 @@ icecast_password = os.getenv("ICECAST_SOURCE_PASSWORD")
 featured_weight = 60
 general_weight = 40
 
-# Playlist sources (monitoring subdirectories independently)
-featured_playlist = playlist(reload_mode="watch", "/music/playlist/featured")
-general_playlist = playlist(reload_mode="watch", "/music/playlist/submissions")
+# Playlist sources — reload every 5 minutes to pick up newly synced files
+featured_playlist = playlist(reload_mode="seconds", reload=300, "/music/playlist/featured")
+general_playlist = playlist(reload_mode="seconds", reload=300, "/music/playlist/submissions")
 
 # Combine via random.weighted
 playlist_source = random.weighted([
