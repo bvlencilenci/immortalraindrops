@@ -58,8 +58,12 @@ live = input.harbor(
 def notify_status(is_live, title) =
   if webhook_url != "" and webhook_secret != "" then
     headers = [("Content-Type", "application/json"), ("X-Webhook-Secret", webhook_secret)]
-    escaped_title = string.escape(title)
-    payload = '{"is_live":' ^ string_of(is_live) ^ ',"stream_title":"' ^ escaped_title ^ '"}'
+    is_live_str = if is_live then "true" else "false" end
+    
+    # Safely escape title for JSON (basic quote escaping)
+    safe_title = string.replace(pattern="\"", (fun (_) -> "\\\""), title)
+    payload = '{"is_live":' ^ is_live_str ^ ',"stream_title":"' ^ safe_title ^ '"}'
+    
     ignore(http.post(headers=headers, data=payload, webhook_url))
   end
 end
@@ -101,7 +105,7 @@ def handle_metadata(m) =
     "IMMORTAL RADIO"
   end
 
-  is_live = !live_active
+  is_live = live_active()
   notify_status(is_live, display_title)
 end
 
