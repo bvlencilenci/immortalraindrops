@@ -56,7 +56,7 @@ export default async function Home() {
       />
       <main className="w-full h-[calc(100vh-11.1vh)] flex flex-row overflow-hidden bg-black text-[#ECEEDF] font-mono">
         {/* Left Panel: Live Preview (20%) */}
-        <section className="w-[20%] h-full border-r border-[#ECEEDF]/20">
+        <section className="w-[20%] h-full border-r border-[#ECEEDF]/40">
           <HomeLivePanel 
             isLive={settings.is_live} 
             streamTitle={settings.stream_title} 
@@ -69,7 +69,7 @@ export default async function Home() {
         </section>
 
         {/* Right Panel: Archive Preview (20%) */}
-        <section className="w-[20%] h-full border-l border-[#ECEEDF]/20">
+        <section className="w-[20%] h-full border-l border-[#ECEEDF]/40">
           <HomeArchivePanel 
             recentTracks={recentTracks} 
           />
