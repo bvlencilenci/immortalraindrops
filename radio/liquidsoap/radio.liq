@@ -9,26 +9,28 @@ webhook_url = os.getenv("LIVE_STATUS_WEBHOOK_URL")
 webhook_secret = os.getenv("LIVE_STATUS_WEBHOOK_SECRET")
 icecast_host = os.getenv("ICECAST_HOST")
 icecast_password = os.getenv("ICECAST_SOURCE_PASSWORD")
+harbor_env_password = os.getenv("LIQUIDSOAP_HARBOR_PASSWORD")
+harbor_password = if harbor_env_password != "" then harbor_env_password else icecast_password end
 
 # Configurable ratio: featured-to-general (default 60/40)
 featured_weight = 60
 general_weight = 40
 
-# Playlist sources — reload every 5 minutes to pick up newly synced files
-featured_playlist = playlist(reload_mode="seconds", reload=300, "/music/playlist/featured")
-general_playlist = playlist(reload_mode="seconds", reload=300, "/music/playlist/submissions")
+# Playlist sources — reload via watch to pick up newly synced files instantly
+featured_playlist = playlist(reload_mode="watch", "/music/playlist/featured")
+general_playlist = playlist(reload_mode="watch", "/music/playlist/submissions")
 
-# Combine via random.weighted
-playlist_source = random.weighted([
+# Combine via random.weighted and make safe (prevents crash if empty)
+playlist = mksafe(random.weighted([
   (featured_weight, featured_playlist),
   (general_weight, general_playlist)
-])
+]))
 
 # Harbor live input source
-live_harbor = input.harbor(
+live = input.harbor(
   "live",
   port=8005,
-  auth=fun(user, password) -> user == "dj" and password == icecast_password
+  auth=fun(user, password) -> password == harbor_password
 )
 
 # Webhook notification function
@@ -56,12 +58,12 @@ def on_live_disconnect() =
   notify_status(false, "PLAYLIST ROTATION")
 end
 
-# Register callbacks on live_harbor stream
-live_harbor = on_start(on_live_connect, live_harbor)
-live_harbor = on_stop(on_live_disconnect, live_harbor)
+# Register callbacks on live stream
+live = on_start(on_live_connect, live)
+live = on_stop(on_live_disconnect, live)
 
 # Fallback chain: switch immediately when live harbor is active
-radio = fallback(track_sensitive=false, [live_harbor, playlist_source])
+radio = fallback(track_sensitive=false, [live, playlist])
 
 # Metadata handler for track advancement and live updates
 def handle_metadata(m) =
@@ -91,7 +93,7 @@ radio = on_metadata(handle_metadata, radio)
 
 # Output to local Icecast instance
 output.icecast(
-  %mp3(bitrate=192),
+  %mp3(bitrate=320),
   host=icecast_host,
   port=8000,
   password=icecast_password,

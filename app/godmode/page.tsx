@@ -18,7 +18,7 @@ export default function GodModePage() {
   const [activeTab, setActiveTab] = useState<'submissions' | 'users' | 'system'>('submissions');
 
   const [needsLogin, setNeedsLogin] = useState(false);
-  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -55,7 +55,27 @@ export default function GodModePage() {
     e.preventDefault();
     setIsLoggingIn(true);
     setError(null);
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+
+    let actualEmail = login;
+
+    // If it's not an email, lookup by username
+    if (!login.includes('@')) {
+      const { data, error: lookupError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('username', login)
+        .single();
+
+      if (data?.email) {
+        actualEmail = data.email;
+      } else {
+        setError('OPERATOR NOT FOUND');
+        setIsLoggingIn(false);
+        return;
+      }
+    }
+
+    const { error: authError } = await supabase.auth.signInWithPassword({ email: actualEmail, password });
     if (authError) {
       setError(authError.message);
       setIsLoggingIn(false);
@@ -87,10 +107,10 @@ export default function GodModePage() {
             </div>
           )}
           <input
-            type="email"
-            placeholder="EMAIL_ADDRESS"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="LOGIN_ID"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
             className="w-full bg-transparent border border-[#ECEEDF]/20 text-[#ECEEDF] p-3 text-sm focus:outline-none focus:border-[#ECEEDF] transition-colors uppercase tracking-widest placeholder:text-[#ECEEDF]/30"
             required
           />

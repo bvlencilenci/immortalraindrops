@@ -23,7 +23,7 @@ RUN mkdir -p /var/log/nginx /var/log/icecast /var/log/liquidsoap /var/log/superv
 # Copy configuration files into place
 COPY nginx/nginx_fly.conf /etc/nginx/nginx.conf
 # Store as template — entrypoint will substitute env vars at startup
-COPY icecast/icecast.xml /etc/icecast2/icecast.xml.tmpl
+COPY icecast/icecast.xml.tmpl /etc/icecast2/icecast.xml.tmpl
 COPY liquidsoap/radio.liq /etc/liquidsoap/radio.liq
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
