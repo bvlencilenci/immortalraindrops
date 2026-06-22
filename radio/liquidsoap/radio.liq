@@ -28,7 +28,11 @@ def notify_status(is_live, title) =
     safe_title = string.replace(pattern="\"", (fun (_) -> "\\\""), title)
     payload = '{"is_live":' ^ is_live_str ^ ',"stream_title":"' ^ safe_title ^ '"}'
     
-    ignore(http.post(webhook_url, headers=headers, data=payload))
+    try
+      ignore(http.post(webhook_url, headers=headers, data=payload))
+    catch e do
+      log("Webhook error: #{e}")
+    end
   end
 end
 
@@ -39,17 +43,15 @@ log("Configuring BUTT Harbor input on port 8005...")
 live = input.harbor(
   "live",
   port=8005,
-  auth=fun(~login, ~password) -> password == harbor_password,
-  on_connect=fun(_) -> begin
-    log(">>> DJ CONNECTED!")
-    live_active := true
-    notify_status(true, "LIVE SET")
-  end,
-  on_disconnect=fun() -> begin
-    log(">>> DJ DISCONNECTED!")
-    live_active := false
+  auth=fun(login, password) -> password == harbor_password,
+  on_connect=fun(_) ->
+    let _ = log(">>> DJ CONNECTED!") in
+    let _ = live_active := true in
+    notify_status(true, "LIVE SET"),
+  on_disconnect=fun() ->
+    let _ = log(">>> DJ DISCONNECTED!") in
+    let _ = live_active := false in
     notify_status(false, "PLAYLIST ROTATION")
-  end
 )
 
 # PHASE 1B & PHASE 2(2/3): PLAYLIST SOURCES & FILE DECODING
