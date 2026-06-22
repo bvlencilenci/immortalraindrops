@@ -8,6 +8,8 @@ primary_region = 'lhr'
   UNIFIED_DIR = '/music/unified'
   ICECAST_HOST = '127.0.0.1'
   ICECAST_SOURCE_PASSWORD = '254005945c95e1d40923fc19c57787a2ac36f391a0a38551d3b3c49bdac301aa' # Override this using fly secrets set
+  NEXT_PUBLIC_SUPABASE_URL = 'https://ajbkuiyhpoiuezsittpy.supabase.co'
+  NEXT_PUBLIC_R2_PUBLIC_DOMAIN = 'pub-83e39df2389c4bef95c442c0e0c6a8ad.r2.dev'
 
 [mounts]
   source = 'radio_data'
