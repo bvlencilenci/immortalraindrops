@@ -243,141 +243,93 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     }
     if (hls) {
       hls.destroy();
+      set({ hls: null });
     }
 
-    // --- HLS.JS SUPPORT (Chrome, Firefox, etc.) ---
-    if (Hls.isSupported()) {
-      const hlsInstance = new Hls({
-        debug: true, // Enable debugging to see HLS logs in console
-        xhrSetup: (xhr, url) => {
-          xhr.setRequestHeader('ngrok-skip-browser-warning', 'true');
-        }
-      });
-
-      // Create a hidden audio element
-      const audio = document.createElement('audio');
-      audio.id = 'hls-audio-stream';
-      audio.crossOrigin = 'anonymous'; // Essential for Visualizer & CORS
-      // audio.style.display = 'none'; // Optional, elements created this way are hidden by default unless appended
-
-      hlsInstance.loadSource(url);
-      hlsInstance.attachMedia(audio);
-
-      hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-        audio.volume = volume;
-        audio.play().catch(e => console.error("HLS Play Error:", e));
-
+    // Icecast provides a continuous MP3 stream via HTTP, NOT an HLS playlist.
+    // Therefore, we use Howler in HTML5 mode to connect directly to the mountpoint.
+    const cacheBustedUrl = `${url}?t=${Date.now()}`;
+    const newHowl = new Howl({
+      src: [cacheBustedUrl],
+      html5: true, 
+      format: ['mp3'],
+      xhr: {
+        withCredentials: false
+      },
+      volume: volume,
+      onplay: () => {
         set({ isPlaying: true, isBuffering: false });
 
-        // Visualizer Wiring
+        // Connect Visualizer
         const ctx = Howler.ctx;
-        if (ctx) {
-          // Avoid double connection if node already exists? 
-          // Ideally we need to manage the node. For now, try/catch.
-          try {
-            const source = ctx.createMediaElementSource(audio);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sound = (newHowl as any)._sounds[0];
 
-            let analyser = get().analyser;
-            if (!analyser) {
-              analyser = ctx.createAnalyser();
-              analyser.fftSize = 256;
-              set({ analyser });
-            }
+        if (sound && sound._node && ctx) {
+          const audioNode = sound._node;
+          let analyser = get().analyser;
 
-            // Connect
-            source.connect(analyser);
-            analyser.connect(ctx.destination);
-          } catch (e) {
-            console.warn("Visualizer HLS connect warn:", e);
+          if (!analyser) {
+            analyser = ctx.createAnalyser();
+            analyser.fftSize = 256;
+            set({ analyser });
           }
-        }
-      });
 
-      hlsInstance.on(Hls.Events.ERROR, (event, data) => {
-        if (data.fatal) {
-          switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              console.error("HLS Network Error", data);
-              hlsInstance.startLoad();
-              break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              console.error("HLS Media Error", data);
-              hlsInstance.recoverMediaError();
-              break;
-            default:
-              hlsInstance.destroy();
-              break;
-          }
-        }
-      });
-
-      set({
-        currentlyPlayingId: 'radio-stream',
-        trackTitle: 'IMMORTAL RADIO',
-        trackArtist: 'BROADCAST',
-        howl: null, // We are not using Howl for HLS here
-        hls: hlsInstance,
-        analyser: get().analyser,
-        isLive: true
-      });
-
-    }
-    // --- NATIVE HLS SUPPORT (Safari) ---
-    else if (document.createElement('audio').canPlayType('application/vnd.apple.mpegurl')) {
-      // Fallback to Howl (which uses HTML5 Audio) or direct Audio element
-      // Since Howl manages audio nicely, try that first, but headers might fail.
-      // Safari usually handles ngrok fine without headers if it's the stream content.
-
-      const newHowl = new Howl({
-        src: [url],
-        html5: true,
-        format: ['m3u8'],
-        volume: volume,
-        onplay: () => {
-          set({ isPlaying: true, isBuffering: false });
-
-          // Visualizer
-          const ctx = Howler.ctx;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const sound = (newHowl as any)._sounds[0];
-          if (sound && sound._node) {
-            const audioNode = sound._node;
-            audioNode.crossOrigin = "anonymous";
+          if (analyser && !(sound as any)._visualizerConnected) {
+            try {
+              if (audioNode instanceof HTMLMediaElement && !audioNode.crossOrigin) {
+                audioNode.crossOrigin = "anonymous";
+              }
 
-            let analyser = get().analyser;
-            if (!analyser && ctx) {
-              analyser = ctx.createAnalyser();
-              analyser.fftSize = 256;
-              set({ analyser });
-            }
-
-            if (analyser) {
-              try {
+              if (audioNode instanceof HTMLMediaElement) {
                 const source = ctx.createMediaElementSource(audioNode);
                 source.connect(analyser);
                 analyser.connect(ctx.destination);
-              } catch (e) { console.warn(e); }
+              } else {
+                audioNode.connect(analyser);
+              }
+
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (sound as any)._visualizerConnected = true;
+            } catch (e) {
+              console.warn("Visualizer connection error:", e);
             }
           }
-        },
-        onend: () => set({ isPlaying: false }),
-        // ... other handlers similar to playTrack
-      });
+        }
+      },
+      onend: () => set({ isPlaying: false, isBuffering: false }),
+      onpause: () => set({ isPlaying: false, isBuffering: false }),
+      onstop: () => set({ isPlaying: false, isBuffering: false }),
+      onloaderror: (id, err) => {
+        console.error("Icecast Stream Load Error", id, err);
+        set({ isBuffering: false });
+      },
+      onplayerror: (id, err) => {
+        console.error("Icecast Stream Play Error", id, err);
+        set({ isBuffering: false });
+        if (Howler.ctx && Howler.ctx.state === 'suspended') {
+          Howler.ctx.resume();
+        }
+      }
+    });
 
-      set({
-        currentlyPlayingId: 'radio-stream',
-        trackTitle: 'IMMORTAL RADIO',
-        trackArtist: 'BROADCAST',
-        howl: newHowl,
-        hls: null,
-        analyser: get().analyser,
-        isLive: true
-      });
-      newHowl.play();
+    // Inject CORS attribute BEFORE loading to support Visualizer
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sound = (newHowl as any)._sounds[0];
+    if (sound && sound._node && sound._node instanceof HTMLMediaElement) {
+      sound._node.crossOrigin = 'anonymous';
     }
-    else {
-      console.error("HLS not supported");
-    }
+
+    set({
+      currentlyPlayingId: 'radio-stream',
+      howl: newHowl,
+      analyser: get().analyser,
+      isLive: true,
+      isBuffering: true
+    });
+
+    newHowl.play();
   },
 
   togglePlay: () => {
