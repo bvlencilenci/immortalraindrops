@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase-server';
 import { NewsFeed } from '@/components/NewsFeed';
-import { NewsItem } from '@/components/NewsEntry';
+import { NewsPostItem } from '@/components/NewsEntry';
 import { HomeLivePanel, HomeArchivePanel } from '@/components/HomeSidePanels';
 
 export const revalidate = 0;
@@ -11,9 +11,10 @@ export default async function Home() {
   // Parallel fetch for homepage data
   const [newsRes, settingsRes, tracksRes] = await Promise.all([
     supabase
-      .from('news')
+      .from('news_posts')
       .select('*')
-      .eq('visible', true)
+      .eq('published', true)
+      .lte('published_at', new Date().toISOString())
       .order('published_at', { ascending: false })
       .limit(20),
     supabase
@@ -28,7 +29,7 @@ export default async function Home() {
       .limit(3)
   ]);
 
-  const news = (newsRes.data as NewsItem[]) || [];
+  const news = (newsRes.data as NewsPostItem[]) || [];
   const settings = settingsRes.data || { is_live: false, stream_title: 'OFFLINE', site_title: 'Immortal Raindrops' };
   const recentTracks = tracksRes.data || [];
 

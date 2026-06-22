@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  icecast:
+    image: moulick/icecast:latest
+    container_name: immortal_icecast
+    volumes:
+      - ./icecast/icecast.xml:/usr/share/icecast/icecast.xml:ro
+      - ./icecast/logs:/var/log/icecast
+    restart: unless-stopped
+    environment:
+      - ICECAST_SOURCE_PASSWORD=${ICECAST_SOURCE_PASSWORD:-hackme}
+      - ICECAST_ADMIN_PASSWORD=${ICECAST_ADMIN_PASSWORD:-hackme}
+      - ICECAST_PASSWORD=${ICECAST_PASSWORD:-hackme}
+      - ICECAST_RELAY_PASSWORD=${ICECAST_RELAY_PASSWORD:-hackme}
+
+  liquidsoap:
+    image: savonet/liquidsoap:v2.2.4
+    container_name: immortal_liquidsoap
+    ports:
+      - "8005:8005"
+    volumes:
+      - ./liquidsoap/radio.liq:/etc/liquidsoap/radio.liq:ro
+      - ./playlist:/music/playlist
+      - ./liquidsoap/logs:/var/log/liquidsoap
+    restart: unless-stopped
+    depends_on:
+      - icecast
+    environment:
+      - LIVE_STATUS_WEBHOOK_URL=${LIVE_STATUS_WEBHOOK_URL}
+      - LIVE_STATUS_WEBHOOK_SECRET=${LIVE_STATUS_WEBHOOK_SECRET}
+      - ICECAST_SOURCE_PASSWORD=${ICECAST_SOURCE_PASSWORD:-hackme}
+      - ICECAST_HOST=icecast
+
+  nginx:
+    image: nginx:alpine
+    container_name: immortal_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/certbot_www:/var/www/certbot:ro
+    restart: unless-stopped
+    depends_on:
+      - icecast

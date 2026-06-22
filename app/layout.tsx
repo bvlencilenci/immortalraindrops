@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '../components/Header';
 import SplashGate from '../components/SplashGate';
-import FullScreenVideoOverlay from '../components/FullScreenVideoOverlay';
+import RadioPlayer from '../components/RadioPlayer';
 import { createClient } from '@/lib/supabase-server';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -36,18 +36,12 @@ export default async function RootLayout({
   const supabase = await createClient();
   const { data: settings } = await supabase.from('system_settings').select('footer_text, maintenance_mode').eq('id', 1).single();
 
-  // Basic Maintenance Mode Check (Server Side)
-  // Note: ideally handled in middleware, but this works for basic blocking content.
-  // We'll leave the actual "blocking" logic to a separate visual cover if needed, 
-  // currently we just pass settings or could conditionally render.
-  // User asked for "adjustable", so let's respect it.
-
   return (
     <html lang="en">
       <body className="antialiased min-h-screen flex flex-col bg-black selection:bg-[#ECEEDF] selection:text-black">
         <SplashGate />
         <div className="flex-1 w-full flex flex-col bg-black relative">
-          <FullScreenVideoOverlay />
+          <RadioPlayer />
           <Header />
           <div className="flex-1 w-full flex flex-col">
             {children}

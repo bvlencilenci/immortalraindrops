@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { NewsEntry, type NewsItem } from './NewsEntry';
+import { NewsEntry, type NewsPostItem } from './NewsEntry';
 
-export function NewsFeed({ posts }: { posts: NewsItem[] }) {
+export function NewsFeed({ posts }: { posts: NewsPostItem[] }) {
   return (
     <div className="w-full max-w-3xl mx-auto px-6 py-12 md:py-24 flex flex-col">
       <motion.div

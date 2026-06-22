@@ -1,0 +1,49 @@
+app = 'immortal-radio'
+primary_region = 'lhr'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  PLAYLIST_DIR = '/music/playlist'
+  ICECAST_HOST = '127.0.0.1'
+  ICECAST_SOURCE_PASSWORD = 'hackme' # Override this using fly secrets set
+
+[mounts]
+  source = 'radio_data'
+  destination = '/music'
+
+# HTTP and HTTPS Service (Nginx stream and status page proxy)
+[[services]]
+  internal_port = 80
+  protocol = 'tcp'
+  
+  [[services.ports]]
+    force_https = true
+    handlers = ['http']
+    port = 80
+
+  [[services.ports]]
+    handlers = ['tls', 'http']
+    port = 443
+
+  [[services.http_checks]]
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '30s'
+    method = 'get'
+    path = '/'
+    protocol = 'http'
+
+# TCP Live Harbor DJ Input Service (Direct raw TCP to Liquidsoap harbor)
+[[services]]
+  internal_port = 8005
+  protocol = 'tcp'
+
+  [[services.ports]]
+    port = 8005
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 1024

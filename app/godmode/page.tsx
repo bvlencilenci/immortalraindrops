@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import SubmissionReview from '@/components/admin/SubmissionReview';
 import UserList from '@/components/admin/UserList';
 import SystemSettings from '@/components/admin/SystemSettings';
+import NewsManager from '@/components/admin/NewsManager';
+import HomepageManager from '@/components/admin/HomepageManager';
 
 export default function GodModePage() {
   const router = useRouter();
@@ -124,6 +126,7 @@ export default function GodModePage() {
 
   const tabs = [
     { id: 'submissions', label: 'SUBMISSIONS' },
+    { id: 'playlist', label: 'PLAYLIST', href: '/godmode/playlist' },
     { id: 'users', label: 'USERS' },
     { id: 'system', label: 'PREFERENCES' },
   ];
@@ -145,7 +148,13 @@ export default function GodModePage() {
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => {
+                  if ('href' in tab && tab.href) {
+                    router.push(tab.href);
+                  } else {
+                    setActiveTab(tab.id as any);
+                  }
+                }}
                 className={`font-mono text-[10px] uppercase tracking-[0.3em] px-4 py-3 md:px-6 md:py-3 transition-all border whitespace-nowrap ${activeTab === tab.id
                   ? 'bg-[#ECEEDF] text-black border-[#ECEEDF]'
                   : 'text-[#ECEEDF]/40 border-[#ECEEDF]/10 hover:border-[#ECEEDF]/40 hover:text-[#ECEEDF]'
