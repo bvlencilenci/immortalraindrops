@@ -62,31 +62,15 @@ const SplashGate = () => {
         didPlayFirst.current = true;
         const currentTracks = tracksRef.current;
         if (currentTracks.length > 0) {
-          // Pick a random track
-          const randomTrack = currentTracks[Math.floor(Math.random() * currentTracks.length)];
           setPlaylist(currentTracks);
-
-          const ext = randomTrack.audio_ext || 'wav';
-          const audioUrl = `${r2BaseUrl}/${randomTrack.tile_id}/audio.${ext}`;
-          playTrack(randomTrack.id, audioUrl, randomTrack.title, randomTrack.artist);
+          // Auto-play disabled for broadcast testing
         }
       }
 
       // --- PHASE 3: 70% -> Second Trigger (Confirm Warm & Active Entry Track) ---
       if (p >= 70 && !didPlaySecond.current) {
         didPlaySecond.current = true;
-        const currentTracks = tracksRef.current;
-        if (currentTracks.length > 1) { // Need at least pool to pick from
-          // Pick a NEW random track
-          let randomTrack = currentTracks[Math.floor(Math.random() * currentTracks.length)];
-
-          // Optional: Try to ensure it's different? (Simple retry once)
-          // We rely on random chance is fine, but nice to change it up.
-
-          const ext = randomTrack.audio_ext || 'wav';
-          const audioUrl = `${r2BaseUrl}/${randomTrack.tile_id}/audio.${ext}`;
-          playTrack(randomTrack.id, audioUrl, randomTrack.title, randomTrack.artist);
-        }
+        // Auto-play disabled for broadcast testing
       }
 
       if (p >= 100) {

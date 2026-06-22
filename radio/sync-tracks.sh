@@ -11,11 +11,11 @@ fi
 SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
 SUPABASE_KEY="${SUPABASE_SERVICE_ROLE_KEY}"
 R2_DOMAIN="${NEXT_PUBLIC_R2_PUBLIC_DOMAIN:-pub-83e39df2389c4bef95c442c0e0c6a8ad.r2.dev}"
-PLAYLIST_DIR="${PLAYLIST_DIR:-./playlist}"
+UNIFIED_DIR="${UNIFIED_DIR:-/music/unified}"
 
 # Ensure directories exist
-mkdir -p "${PLAYLIST_DIR}/featured"
-mkdir -p "${PLAYLIST_DIR}/submissions"
+mkdir -p "${UNIFIED_DIR}/featured"
+mkdir -p "${UNIFIED_DIR}/normal"
 
 TEMP_FEATURED=$(mktemp)
 TEMP_SUBMISSIONS=$(mktemp)
@@ -46,13 +46,13 @@ except Exception:
       FILE_NAME=$(basename "$audio_path")
 
       if [ "$is_featured" = "true" ]; then
-        LOCAL_PATH="${PLAYLIST_DIR}/featured/${FILE_NAME}"
+        LOCAL_PATH="${UNIFIED_DIR}/featured/${FILE_NAME}"
         echo "$FILE_NAME" >> "$TEMP_FEATURED"
-        rm -f "${PLAYLIST_DIR}/submissions/${FILE_NAME}"
+        rm -f "${UNIFIED_DIR}/normal/${FILE_NAME}"
       else
-        LOCAL_PATH="${PLAYLIST_DIR}/submissions/${FILE_NAME}"
+        LOCAL_PATH="${UNIFIED_DIR}/normal/${FILE_NAME}"
         echo "$FILE_NAME" >> "$TEMP_SUBMISSIONS"
-        rm -f "${PLAYLIST_DIR}/featured/${FILE_NAME}"
+        rm -f "${UNIFIED_DIR}/featured/${FILE_NAME}"
       fi
 
       if [ ! -f "$LOCAL_PATH" ]; then
@@ -94,13 +94,13 @@ except Exception:
       FILE_NAME=$(basename "$audio_path")
 
       if [ "$is_featured" = "true" ]; then
-        LOCAL_PATH="${PLAYLIST_DIR}/featured/${FILE_NAME}"
+        LOCAL_PATH="${UNIFIED_DIR}/featured/${FILE_NAME}"
         echo "$FILE_NAME" >> "$TEMP_FEATURED"
-        rm -f "${PLAYLIST_DIR}/submissions/${FILE_NAME}"
+        rm -f "${UNIFIED_DIR}/normal/${FILE_NAME}"
       else
-        LOCAL_PATH="${PLAYLIST_DIR}/submissions/${FILE_NAME}"
+        LOCAL_PATH="${UNIFIED_DIR}/normal/${FILE_NAME}"
         echo "$FILE_NAME" >> "$TEMP_SUBMISSIONS"
-        rm -f "${PLAYLIST_DIR}/featured/${FILE_NAME}"
+        rm -f "${UNIFIED_DIR}/featured/${FILE_NAME}"
       fi
 
       if [ ! -f "$LOCAL_PATH" ]; then
@@ -121,7 +121,7 @@ fi
 # ═══════════════════════════════════════════════════════════════════
 echo "🧹 Cleaning stale files..."
 
-find "${PLAYLIST_DIR}/featured" -type f 2>/dev/null | while read -r local_file; do
+find "${UNIFIED_DIR}/featured" -type f 2>/dev/null | while read -r local_file; do
   FILE_NAME=$(basename "$local_file")
   if ! grep -q "^${FILE_NAME}$" "$TEMP_FEATURED" 2>/dev/null; then
     echo "🗑 Removing stale featured: $FILE_NAME"
@@ -129,7 +129,7 @@ find "${PLAYLIST_DIR}/featured" -type f 2>/dev/null | while read -r local_file; 
   fi
 done
 
-find "${PLAYLIST_DIR}/submissions" -type f 2>/dev/null | while read -r local_file; do
+find "${UNIFIED_DIR}/normal" -type f 2>/dev/null | while read -r local_file; do
   FILE_NAME=$(basename "$local_file")
   if ! grep -q "^${FILE_NAME}$" "$TEMP_SUBMISSIONS" 2>/dev/null; then
     echo "🗑 Removing stale submission: $FILE_NAME"
@@ -141,9 +141,9 @@ rm -f "$TEMP_FEATURED"
 rm -f "$TEMP_SUBMISSIONS"
 
 # Ensure liquidsoap user has correct ownership/permissions on downloaded tracks
-if [ -d "${PLAYLIST_DIR}" ]; then
-  chown -R liquidsoap:liquidsoap "${PLAYLIST_DIR}" 2>/dev/null || true
-  chmod -R 775 "${PLAYLIST_DIR}" 2>/dev/null || true
+if [ -d "${UNIFIED_DIR}" ]; then
+  chown -R liquidsoap:liquidsoap "${UNIFIED_DIR}" 2>/dev/null || true
+  chmod -R 775 "${UNIFIED_DIR}" 2>/dev/null || true
 fi
 
 echo "✅ Radio rotation synchronized successfully."

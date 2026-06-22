@@ -7,6 +7,7 @@ interface AudioStore {
   currentlyPlayingId: string | null;
   trackTitle: string | null;
   trackArtist: string | null;
+  streamTitle: string | null;
   isPlaying: boolean;
   isBuffering: boolean;
   duration: number;
@@ -45,6 +46,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   currentlyPlayingId: null,
   trackTitle: null,
   trackArtist: null,
+  streamTitle: null,
   isPlaying: false,
   isLive: false,
   isBuffering: false,
@@ -310,9 +312,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       });
 
       set({
-        currentlyPlayingId: 'live-stream',
-        trackTitle: 'LIVE DJ SET',
-        trackArtist: 'IMMORTAL RAINDROPS',
+        currentlyPlayingId: 'radio-stream',
+        trackTitle: 'IMMORTAL RADIO',
+        trackArtist: 'BROADCAST',
         howl: null, // We are not using Howl for HLS here
         hls: hlsInstance,
         analyser: get().analyser,
@@ -363,9 +365,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       });
 
       set({
-        currentlyPlayingId: 'live-stream',
-        trackTitle: 'LIVE DJ SET',
-        trackArtist: 'IMMORTAL RAINDROPS',
+        currentlyPlayingId: 'radio-stream',
+        trackTitle: 'IMMORTAL RADIO',
+        trackArtist: 'BROADCAST',
         howl: newHowl,
         hls: null,
         analyser: get().analyser,
@@ -468,8 +470,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
   setLiveState: (isLive: boolean, title?: string) => {
     set({ isLive });
-    if (isLive && title) {
-      set({ trackTitle: title });
+    if (title) {
+      set({ streamTitle: title });
     }
   }
 }));

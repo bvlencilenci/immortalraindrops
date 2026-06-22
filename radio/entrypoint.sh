@@ -16,7 +16,7 @@ envsubst '${ICECAST_SOURCE_PASSWORD}' \
 chown icecast2:icecast /etc/icecast2/icecast.xml 2>/dev/null || true
 
 echo "🔧 [entrypoint] Ensuring /music volume directories exist..."
-mkdir -p /music/playlist/featured /music/playlist/submissions
+mkdir -p /music/unified/featured /music/unified/normal
 chown -R liquidsoap:liquidsoap /music 2>/dev/null || true
 chmod -R 775 /music 2>/dev/null || true
 

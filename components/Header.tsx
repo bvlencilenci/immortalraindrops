@@ -22,9 +22,25 @@ const Header = () => {
     adjustVolume,
     currentlyPlayingId,
     hasEntered,
+    streamTitle,
+    isLive,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     seekTo
   } = useAudioStore();
+
+  let displayArtist = trackArtist || 'Unknown Artist';
+  let displayTitle = trackTitle || 'Unknown Track';
+
+  if (currentlyPlayingId === 'radio-stream' && streamTitle) {
+    if (streamTitle.includes(' - ')) {
+      const parts = streamTitle.split(' - ');
+      displayArtist = parts[0];
+      displayTitle = parts.slice(1).join(' - ');
+    } else {
+      displayArtist = 'RADIO';
+      displayTitle = streamTitle;
+    }
+  }
 
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -300,22 +316,22 @@ const Header = () => {
                   <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest whitespace-nowrap">
                     SUBMISSION MODE
                   </span>
-                ) : useAudioStore.getState().isLive ? (
+                ) : isLive ? (
                   <>
                     <span className="font-mono text-[15px] text-[#FF0000] lowercase leading-tight truncate animate-pulse whitespace-nowrap">
                       ● live
                     </span>
                     <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
-                      DJ SET
+                      {displayTitle}
                     </span>
                   </>
                 ) : (
                   <>
                     <span className="font-mono text-[15px] text-[#ECEEDF] lowercase leading-tight truncate whitespace-nowrap">
-                      {trackArtist || 'Unknown Artist'}
+                      {displayArtist}
                     </span>
                     <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
-                      {trackTitle || 'Unknown Track'}
+                      {displayTitle}
                     </span>
                   </>
                 )}
