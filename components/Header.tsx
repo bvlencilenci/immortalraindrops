@@ -263,8 +263,10 @@ const Header = () => {
           <img
             src="/logo.png"
             alt="Immortal Raindrops"
+            width={711}
+            height={1024}
             className="h-10 w-auto opacity-90 hover:opacity-100 transition-opacity"
-            style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
+            style={{ height: '40px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
           />
         </Link>
 
@@ -299,8 +301,10 @@ const Header = () => {
               <img
                 src="/logo.png"
                 alt="Immortal Raindrops"
+                width={711}
+                height={1024}
                 className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity"
-                style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
+                style={{ height: '48px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
               />
             </Link>
 
