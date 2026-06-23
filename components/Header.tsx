@@ -28,17 +28,27 @@ const Header = () => {
     seekTo
   } = useAudioStore();
 
-  let displayArtist = trackArtist || 'Unknown Artist';
-  let displayTitle = trackTitle || 'Unknown Track';
+  let displayArtist = '';
+  let displayTitle = '';
+  let showHeaderMetadata = false;
 
-  if (currentlyPlayingId === 'radio-stream' && streamTitle) {
-    if (streamTitle.includes(' - ')) {
-      const parts = streamTitle.split(' - ');
-      displayArtist = parts[0];
-      displayTitle = parts.slice(1).join(' - ');
-    } else {
-      displayArtist = 'RADIO';
-      displayTitle = streamTitle;
+  if (currentlyPlayingId === 'radio-stream') {
+    if (streamTitle && streamTitle !== 'OFFLINE' && streamTitle !== 'STANDBY' && streamTitle !== 'CONNECTING...') {
+      const parts = streamTitle.split(/ - | — /);
+      displayArtist = parts[0]?.trim();
+      displayTitle = parts.slice(1).join(' - ')?.trim() || parts[0]?.trim();
+      showHeaderMetadata = true;
+    }
+  } else if (currentlyPlayingId) {
+    displayArtist = trackArtist || 'Unknown Artist';
+    displayTitle = trackTitle || 'Unknown Track';
+    showHeaderMetadata = true;
+  } else {
+    if (streamTitle && streamTitle !== 'OFFLINE' && streamTitle !== 'STANDBY' && streamTitle !== 'CONNECTING...') {
+      const parts = streamTitle.split(/ - | — /);
+      displayArtist = parts[0]?.trim();
+      displayTitle = parts.slice(1).join(' - ')?.trim() || parts[0]?.trim();
+      showHeaderMetadata = true;
     }
   }
 
@@ -52,6 +62,7 @@ const Header = () => {
   const [username, setUsername] = useState<string | null>(null);
   const [isGodmode, setIsGodmode] = useState(false);
   const [siteTitle, setSiteTitle] = useState('IMMORTAL RAINDROPS');
+  const [broadcastMode, setBroadcastMode] = useState<'automated' | 'live'>('automated');
 
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
@@ -94,12 +105,13 @@ const Header = () => {
       // Live State
       const { data: liveData } = await supabase
         .from('system_settings')
-        .select('is_live, stream_title')
+        .select('is_live, stream_title, broadcast_mode')
         .eq('id', 1)
         .single();
 
       if (liveData) {
         useAudioStore.getState().setLiveState(liveData.is_live, liveData.stream_title);
+        setBroadcastMode((liveData.broadcast_mode || 'automated') as 'automated' | 'live');
       }
 
       // System Settings (Title)
@@ -130,8 +142,11 @@ const Header = () => {
             filter: 'id=eq.1'
           },
           (payload) => {
-            const newData = payload.new as { is_live: boolean; stream_title: string };
+            const newData = payload.new as { is_live: boolean; stream_title: string; broadcast_mode?: string };
             useAudioStore.getState().setLiveState(newData.is_live, newData.stream_title);
+            if (newData.broadcast_mode) {
+              setBroadcastMode(newData.broadcast_mode as 'automated' | 'live');
+            }
 
             // Optional: If going live, pause any archive playback so user can switch? 
             // Or let them stay on archive until they click LIVE. 
@@ -233,7 +248,10 @@ const Header = () => {
         {/* Left: LIVE */}
         <Link href="/live" className="shrink-0 flex justify-center items-center font-mono text-[11px] xs:text-xs uppercase tracking-widest transition-colors duration-200 border border-transparent px-3 py-3 rounded-xl text-[#ECEEDF] hover:text-white">
           <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>[</span>
-          <span className={`mx-2 ${pathname === '/live' ? 'text-white' : ''} transition-colors duration-200`}>LIVE</span>
+          <span className="flex items-center gap-1">
+            {(isLive || broadcastMode === 'automated') && <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />}
+            <span className={`mx-2 ${pathname === '/live' ? 'text-white' : ''} transition-colors duration-200`}>LIVE</span>
+          </span>
           <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>]</span>
         </Link>
 
@@ -304,27 +322,21 @@ const Header = () => {
                     className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap pl-2"
                   >
                     <Link href="/archive" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
-                    <Link href="/live" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">LIVE</Link>
+                    <Link href="/live" className="flex items-center gap-1.5 text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">
+                      {(isLive || broadcastMode === 'automated') && <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />}
+                      LIVE
+                    </Link>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            {isPlayerActive && (
+            {showHeaderMetadata && (
               <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
                 {pathname === '/submit' ? (
                   <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest whitespace-nowrap">
                     SUBMISSION MODE
                   </span>
-                ) : isLive ? (
-                  <>
-                    <span className="font-mono text-[15px] text-[#FF0000] lowercase leading-tight truncate animate-pulse whitespace-nowrap">
-                      ● live
-                    </span>
-                    <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
-                      {displayTitle}
-                    </span>
-                  </>
                 ) : (
                   <>
                     <span className="font-mono text-[15px] text-[#ECEEDF] lowercase leading-tight truncate whitespace-nowrap">
