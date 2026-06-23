@@ -17,11 +17,27 @@ settings.server.telnet.port.set(7000)
 log("Telnet server configuration loaded.")
 
 # Environment variables
+webhook_url = environment.get("LIVE_STATUS_WEBHOOK_URL")
+webhook_secret = environment.get("LIVE_STATUS_WEBHOOK_SECRET")
 icecast_host = environment.get("ICECAST_HOST")
 icecast_host = if icecast_host != "" then icecast_host else "localhost" end
 icecast_password = environment.get("ICECAST_SOURCE_PASSWORD")
 harbor_env_password = environment.get("LIQUIDSOAP_HARBOR_PASSWORD")
 harbor_password = if harbor_env_password != "" then harbor_env_password else icecast_password end
+
+# Webhook notifications
+def notify_status(is_live, title) =
+  if webhook_url != "" and webhook_secret != "" then
+    headers = [("Content-Type", "application/json"), ("X-Webhook-Secret", webhook_secret)]
+    is_live_str = if is_live then "true" else "false" end
+    
+    # Escape double quotes in title
+    safe_title = string.replace(pattern="\"", (fun (_) -> "\\\""), title)
+    payload = '{"is_live":' ^ is_live_str ^ ',"stream_title":"' ^ safe_title ^ '"}'
+    
+    ignore(http.post(headers=headers, data=payload, webhook_url))
+  end
+end
 
 live_active = ref(false)
 
@@ -35,11 +51,13 @@ live = input.harbor(
   password=harbor_password,
   on_connect=fun(_) -> begin
     log(">>> DJ CONNECTED!");
-    live_active := true
+    live_active := true;
+    notify_status(true, "LIVE DJ SET")
   end,
   on_disconnect=fun() -> begin
     log(">>> DJ DISCONNECTED!");
-    live_active := false
+    live_active := false;
+    notify_status(true, "CURATED PLAYLIST")
   end
 )
 
@@ -81,9 +99,31 @@ source.on_track(normal, fun(m) -> begin
   log(">>> [NORMAL] Now playing: " ^ artist ^ " - " ^ title)
 end)
 
-# PHASE 1E: MAIN FALLBACK CHAIN (Live overrides playlist instantly)
-log("Establishing Fallback Chain...")
 radio = fallback(id="radio", track_sensitive=false, [live, music])
+
+# Metadata handler for track advancement and live updates
+def handle_metadata(m) =
+  title = m["title"]
+  artist = m["artist"]
+  filename = m["filename"]
+
+  # Format the displayed track title
+  display_title = if artist != "" and title != "" then
+    artist ^ " - " ^ title
+  elsif title != "" then
+    title
+  elsif filename != "" then
+    # Fallback to filename (without path) if no tags present
+    file.basename(filename)
+  else
+    "IMMORTAL RAINDROPS RADIO"
+  end;
+
+  log(">>> [METADATA] Track change: " ^ display_title);
+  notify_status(true, display_title)
+end
+
+radio = on_metadata(handle_metadata, radio)
 
 # ==========================================
 # BROADCAST CONTROL: Custom server commands

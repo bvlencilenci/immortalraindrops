@@ -33,7 +33,7 @@ echo "📡 Syncing approved submissions..."
 TEMP_HTTP_CODE_SUB=$(mktemp)
 SUBS_RESPONSE_FILE=$(mktemp)
 
-curl -s -w "%{http_code}" -o "$SUBS_RESPONSE_FILE" -X GET "${SUPABASE_URL}/rest/v1/submissions?status=eq.approved&select=id,title,audio_url" \
+curl -s -w "%{http_code}" -o "$SUBS_RESPONSE_FILE" -X GET "${SUPABASE_URL}/rest/v1/submissions?status=eq.approved&select=id,title,artist_name,audio_url" \
   -H "apikey: ${SUPABASE_KEY}" \
   -H "Authorization: Bearer ${SUPABASE_KEY}" > "$TEMP_HTTP_CODE_SUB"
 
@@ -56,11 +56,15 @@ try:
     for track in data:
         url = track.get('audio_url')
         feat = 'false'
+        artist = track.get('artist_name') or 'Unknown Artist'
+        title = track.get('title') or 'Unknown Title'
+        artist = artist.replace('\t', ' ').replace('\n', ' ')
+        title = title.replace('\t', ' ').replace('\n', ' ')
         if url:
-            print(f'{url} {feat}')
+            print(f'{url}\t{feat}\t{artist}\t{title}')
 except Exception:
     pass
-" <<< "$SUBS_RESPONSE" | while read -r audio_path is_featured; do
+" <<< "$SUBS_RESPONSE" | while IFS=$'\t' read -r audio_path is_featured artist title; do
     if [ -n "$audio_path" ]; then
       FILE_NAME=$(basename "$audio_path")
 
@@ -77,8 +81,18 @@ except Exception:
       if [ ! -f "$LOCAL_PATH" ]; then
         echo "📥 [submissions] Downloading: $FILE_NAME"
         echo "🔗 R2 URL: https://${R2_DOMAIN}/${audio_path}"
-        if ! curl -s --fail --retry 3 --retry-delay 2 -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"; then
+        TEMP_FILE=$(mktemp)
+        if curl -s --fail --retry 3 --retry-delay 2 -o "$TEMP_FILE" "https://${R2_DOMAIN}/${audio_path}"; then
+          echo "🏷 [submissions] Tagging: $artist - $title"
+          if ffmpeg -y -i "$TEMP_FILE" -metadata artist="$artist" -metadata title="$title" -c:a copy "$LOCAL_PATH" >/dev/null 2>&1; then
+            rm -f "$TEMP_FILE"
+          else
+            echo "⚠️ [submissions] ffmpeg failed to tag $FILE_NAME, saving raw file"
+            mv "$TEMP_FILE" "$LOCAL_PATH"
+          fi
+        else
           echo "⚠️ [submissions] Failed to download: $FILE_NAME — skipping"
+          rm -f "$TEMP_FILE"
           rm -f "$LOCAL_PATH"
         fi
       fi
@@ -96,7 +110,7 @@ echo "📡 Syncing admin playlist tracks..."
 TEMP_HTTP_CODE_PLAYLIST=$(mktemp)
 PLAYLIST_RESPONSE_FILE=$(mktemp)
 
-curl -s -w "%{http_code}" -o "$PLAYLIST_RESPONSE_FILE" -X GET "${SUPABASE_URL}/rest/v1/playlist_tracks?active=eq.true&select=id,title,audio_url,featured" \
+curl -s -w "%{http_code}" -o "$PLAYLIST_RESPONSE_FILE" -X GET "${SUPABASE_URL}/rest/v1/playlist_tracks?active=eq.true&select=id,title,artist_name,audio_url,featured" \
   -H "apikey: ${SUPABASE_KEY}" \
   -H "Authorization: Bearer ${SUPABASE_KEY}" > "$TEMP_HTTP_CODE_PLAYLIST"
 
@@ -119,11 +133,15 @@ try:
     for track in data:
         url = track.get('audio_url')
         feat = 'true' if track.get('featured') else 'false'
+        artist = track.get('artist_name') or 'Unknown Artist'
+        title = track.get('title') or 'Unknown Title'
+        artist = artist.replace('\t', ' ').replace('\n', ' ')
+        title = title.replace('\t', ' ').replace('\n', ' ')
         if url:
-            print(f'{url} {feat}')
+            print(f'{url}\t{feat}\t{artist}\t{title}')
 except Exception:
     pass
-" <<< "$PLAYLIST_RESPONSE" | while read -r audio_path is_featured; do
+" <<< "$PLAYLIST_RESPONSE" | while IFS=$'\t' read -r audio_path is_featured artist title; do
     if [ -n "$audio_path" ]; then
       FILE_NAME=$(basename "$audio_path")
 
@@ -140,8 +158,18 @@ except Exception:
       if [ ! -f "$LOCAL_PATH" ]; then
         echo "📥 [playlist] Downloading: $FILE_NAME"
         echo "🔗 R2 URL: https://${R2_DOMAIN}/${audio_path}"
-        if ! curl -s --fail --retry 3 --retry-delay 2 -o "$LOCAL_PATH" "https://${R2_DOMAIN}/${audio_path}"; then
+        TEMP_FILE=$(mktemp)
+        if curl -s --fail --retry 3 --retry-delay 2 -o "$TEMP_FILE" "https://${R2_DOMAIN}/${audio_path}"; then
+          echo "🏷 [playlist] Tagging: $artist - $title"
+          if ffmpeg -y -i "$TEMP_FILE" -metadata artist="$artist" -metadata title="$title" -c:a copy "$LOCAL_PATH" >/dev/null 2>&1; then
+            rm -f "$TEMP_FILE"
+          else
+            echo "⚠️ [playlist] ffmpeg failed to tag $FILE_NAME, saving raw file"
+            mv "$TEMP_FILE" "$LOCAL_PATH"
+          fi
+        else
           echo "⚠️ [playlist] Failed to download: $FILE_NAME — skipping"
+          rm -f "$TEMP_FILE"
           rm -f "$LOCAL_PATH"
         fi
       fi
