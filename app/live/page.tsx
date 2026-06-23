@@ -6,7 +6,7 @@ export const revalidate = 0;
 export default async function Live() {
   const supabase = await createClient();
   
-  const [settingsRes, newsRes, tracksRes] = await Promise.all([
+  const [settingsRes, newsRes, tracksRes, submissionsRes] = await Promise.all([
     supabase
       .from('system_settings')
       .select('is_live, stream_title, broadcast_mode, dj_name, show_title, dj_location, dj_description, playback_history')
@@ -21,7 +21,10 @@ export default async function Live() {
       .limit(10),
     supabase
       .from('tracks')
-      .select('title, artist, tile_id, image_ext')
+      .select('title, artist, tile_id, image_ext'),
+    supabase
+      .from('approved_submissions')
+      .select('title, artist, visual_url')
   ]);
 
   const settings = settingsRes.data;
@@ -36,11 +39,22 @@ export default async function Live() {
 
   const newsPosts = newsRes.data || [];
   const tracks = tracksRes.data || [];
+  const submissions = submissionsRes.data || [];
 
   const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 
     (process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN ? `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN}` : 'https://archive.org/download');
 
   const trackImageMap: Record<string, string> = {};
+
+  // Map approved submissions first
+  submissions.forEach((sub: any) => {
+    if (sub.artist && sub.title && sub.visual_url) {
+      const key = `${sub.artist.toLowerCase()} - ${sub.title.toLowerCase()}`;
+      trackImageMap[key] = `${r2BaseUrl}/${sub.visual_url}`;
+    }
+  });
+
+  // Map archival tracks (overwriting/preceding submissions if duplicate keys exist)
   tracks.forEach((t) => {
     const key = `${t.artist.toLowerCase()} - ${t.title.toLowerCase()}`;
     const ext = t.image_ext || 'jpg';

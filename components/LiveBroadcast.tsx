@@ -24,6 +24,42 @@ interface LiveBroadcastProps {
   trackImageMap?: Record<string, string>;
 }
 
+interface TrackCoverProps {
+  coverUrl?: string;
+  trackKey: string;
+}
+
+function TrackCover({ coverUrl, trackKey }: TrackCoverProps) {
+  const [src, setSrc] = useState(coverUrl || '/logo.png');
+  const [isFallback, setIsFallback] = useState(!coverUrl);
+
+  useEffect(() => {
+    setSrc(coverUrl || '/logo.png');
+    setIsFallback(!coverUrl);
+  }, [coverUrl]);
+
+  return (
+    <img
+      src={src}
+      alt=""
+      className="w-12 h-12 border border-[#ECEEDF]/15 bg-black/40 flex-shrink-0"
+      style={{
+        objectFit: isFallback ? 'contain' : 'cover',
+        filter: isFallback ? 'invert(1)' : 'none',
+        mixBlendMode: isFallback ? 'screen' : 'normal',
+        padding: isFallback ? '4px' : '0px'
+      }}
+      crossOrigin="anonymous"
+      onError={() => {
+        if (!isFallback) {
+          setSrc('/logo.png');
+          setIsFallback(true);
+        }
+      }}
+    />
+  );
+}
+
 export default function LiveBroadcast({
   initialIsLive,
   initialTitle,
@@ -100,7 +136,7 @@ export default function LiveBroadcast({
     };
   }, []);
 
-  // Footer statistics effects (listeners & uptime)
+  // Footer statistics effects (listeners & uptime) & Metadata Polling Fallback
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -109,6 +145,29 @@ export default function LiveBroadcast({
           const data = await res.json();
           setListenerCount(data.listeners || 0);
           setUptimeSeconds(data.uptime || 0);
+
+          // Fallback metadata update if Postgres realtime didn't fire or is disabled
+          if (data.active && data.title) {
+            const formattedTitle = data.artist ? `${data.artist} - ${data.title}` : data.title;
+            setNowPlayingTitle(prev => {
+              if (prev !== formattedTitle && broadcastMode !== 'live') {
+                // Prepend to local playbackHistory so "Last Played" updates instantly on the client
+                if (data.artist && data.title) {
+                  setPlaybackHistory(oldHistory => {
+                    const isDup = oldHistory[0] &&
+                      oldHistory[0].artist.toLowerCase() === data.artist.toLowerCase() &&
+                      oldHistory[0].title.toLowerCase() === data.title.toLowerCase();
+                    if (!isDup) {
+                      return [{ artist: data.artist, title: data.title }, ...oldHistory].slice(0, 5);
+                    }
+                    return oldHistory;
+                  });
+                }
+                return formattedTitle;
+              }
+              return prev;
+            });
+          }
         }
       } catch (err) {
         console.error('Error fetching stream stats:', err);
@@ -116,10 +175,10 @@ export default function LiveBroadcast({
     };
 
     fetchStats();
-    const interval = setInterval(fetchStats, 10000); // Poll stats every 10 seconds
+    const interval = setInterval(fetchStats, 5000); // Poll stats every 5 seconds for snappy updates
 
     return () => clearInterval(interval);
-  }, []);
+  }, [broadcastMode]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -192,21 +251,7 @@ export default function LiveBroadcast({
 
                 return (
                   <div key={i} className="flex items-center gap-4 py-1 border-b border-[#ECEEDF]/5 last:border-b-0 last:pb-0">
-                    {coverUrl ? (
-                      <img
-                        src={coverUrl}
-                        alt=""
-                        className="w-12 h-12 object-cover border border-[#ECEEDF]/15 bg-black/40 flex-shrink-0"
-                        crossOrigin="anonymous"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-12 h-12 bg-white/[0.03] border border-[#ECEEDF]/10 flex items-center justify-center text-[9px] text-[#ECEEDF]/30 flex-shrink-0 select-none">
-                        [TRK]
-                      </div>
-                    )}
+                    <TrackCover coverUrl={coverUrl} trackKey={trackKey} />
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <span className="text-xs font-bold uppercase tracking-wider text-[#ECEEDF]/85 truncate">
                         {track.artist}
