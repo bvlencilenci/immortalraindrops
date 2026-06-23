@@ -394,24 +394,31 @@ export async function approveToArchive(submissionId: string) {
       .single();
     if (fetchErr || !sub) throw new Error(fetchErr?.message || 'Submission not found');
 
-    // 2. Insert into tracks table
+    // 2. Extract file extensions from R2 paths (e.g. "audio/uuid.mp3" → "mp3")
+    const audioExt = sub.audio_url
+      ? sub.audio_url.split('.').pop()?.toLowerCase() || null
+      : null;
+    const imageExt = sub.image_url
+      ? sub.image_url.split('.').pop()?.toLowerCase() || null
+      : null;
+
+    // 3. Use the submission's own id as the tile_id (stable unique identifier)
     const { data: inserted, error: insertErr } = await supabaseAdmin
       .from('tracks')
       .insert([{
         title: sub.title,
-        artist: sub.artist_name,
+        artist: sub.artist_name || null,
         genre: sub.genre || null,
         media_type: sub.media_type || 'song',
-        audio_url: sub.audio_url || null,
-        image_url: sub.image_url || null,
-        video_url: sub.video_url || null,
-        submitted_by: sub.user_id || null,
+        tile_id: sub.id,          // reuse submission UUID as tile reference
+        audio_ext: audioExt,
+        image_ext: imageExt,
       }])
       .select()
       .single();
     if (insertErr) throw insertErr;
 
-    // 3. Mark submission as approved
+    // 4. Mark submission as approved
     await supabaseAdmin
       .from('submissions')
       .update({ status: 'approved', reviewed_at: new Date().toISOString() })
@@ -423,6 +430,7 @@ export async function approveToArchive(submissionId: string) {
     return { success: false, error: err.message };
   }
 }
+
 
 /** Delete a track from the archive (tracks table). */
 export async function deleteTrackFromArchive(trackId: string) {
