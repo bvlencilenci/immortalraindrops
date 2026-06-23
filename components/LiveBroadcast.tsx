@@ -173,7 +173,7 @@ export default function LiveBroadcast({
       <LiveVisualizer />
 
       {/* Main columns grid */}
-      <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-10 md:py-12">
+      <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-10 md:py-12 px-4 md:px-8 backdrop-blur-[4px] bg-black/10">
         
         {/* LEFT COLUMN: LAST PLAYED */}
         <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 pr-0 md:pr-10 flex flex-col gap-6 relative overflow-hidden">
@@ -337,7 +337,7 @@ export default function LiveBroadcast({
       </div>
 
       {/* FOOTER STATUS BAR */}
-      <div className="w-full max-w-full mt-8 border-t border-[#ECEEDF]/10 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase select-none z-10 px-2 md:px-4">
+      <div className="w-full max-w-full mt-8 border-t border-[#ECEEDF]/10 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase select-none z-10 px-4 md:px-8 backdrop-blur-[2px] bg-black/5">
         <div className="flex gap-6">
           <span>LISTENERS: {listenerCount}</span>
           <span>UPTIME: {formatUptime(uptimeSeconds)}</span>
