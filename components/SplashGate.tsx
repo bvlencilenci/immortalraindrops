@@ -5,22 +5,25 @@ import { Howler } from 'howler';
 // Using a separate SplashScreen component is fine, or we can inline the style here.
 // Let's reuse the logic from the previous SplashScreen but make it a "Gate".
 import { useEffect, useState, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 const SplashGate = () => {
   const hasEntered = useAudioStore((state) => state.hasEntered);
   const enterApp = useAudioStore((state) => state.enterApp);
   const setPlaylist = useAudioStore((state) => state.setPlaylist);
-  const playTrack = useAudioStore((state) => state.playTrack);
   const playLiveStream = useAudioStore((state) => state.playLiveStream);
+  const currentlyPlayingId = useAudioStore((state) => state.currentlyPlayingId);
+  const isPlaying = useAudioStore((state) => state.isPlaying);
+
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [tracks, setTracks] = useState<any[]>([]); // Keep state for rendering if needed, but use Ref for logic
+  const [dismissedOnLive, setDismissedOnLive] = useState(false);
   const tracksRef = useRef<any[]>([]); // Ref to access tracks inside interval closure
 
   const [isWarming, setIsWarming] = useState(false);
   const [progress, setProgress] = useState(0);
 
   // Trigger Refs to ensure actions run exactly once
-  const didResume = useRef(false);
   const didPlayFirst = useRef(false);
   const didPlaySecond = useRef(false);
 
@@ -36,17 +39,29 @@ const SplashGate = () => {
     // Fetch tracks immediately on mount
     import('../app/actions').then(({ getTracks }) => {
       getTracks().then((data) => {
-        setTracks(data);
         tracksRef.current = data;
       });
     });
   }, []);
 
+  // Reset dismissed state when navigating away from /live
+  useEffect(() => {
+    if (pathname !== '/live') {
+      setDismissedOnLive(false);
+    }
+  }, [pathname]);
+
+  const isRadioPlaying = currentlyPlayingId === 'radio-stream' && isPlaying;
+  const showSplash = !hasEntered || (pathname === '/live' && !dismissedOnLive && !isRadioPlaying);
+
   if (!mounted) return null; // Avoid hydration mismatch
-  if (hasEntered) return null;
+  if (!showSplash) return null;
 
   const handleEnter = async () => {
     setIsWarming(true);
+    setProgress(0);
+    didPlayFirst.current = false;
+    didPlaySecond.current = false;
     
     // CRITICAL: Must be called synchronously within the onClick handler to bypass browser autoplay policies
     if (Howler.ctx && Howler.ctx.state === 'suspended') {
@@ -87,6 +102,11 @@ const SplashGate = () => {
         setTimeout(() => {
           sessionStorage.setItem('immortal_entered', '1');
           enterApp();
+          if (pathname === '/live') {
+            setDismissedOnLive(true);
+          }
+          setIsWarming(false);
+          setProgress(0);
         }, 200);
       }
     }, 16);

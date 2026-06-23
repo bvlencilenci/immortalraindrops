@@ -48,7 +48,7 @@ export default function LiveBroadcast({
     initialPlaybackHistory || []
   );
 
-  const { currentlyPlayingId, isPlaying, playLiveStream, togglePlay } = useAudioStore();
+  const { currentlyPlayingId, isPlaying } = useAudioStore();
 
   const isRadioPlaying = currentlyPlayingId === 'radio-stream' && isPlaying;
 
@@ -94,15 +94,6 @@ export default function LiveBroadcast({
   }, []);
 
   // Polling removed (upcoming panel replaced by Archive placeholder)
-
-  const handlePlayToggle = () => {
-    if (currentlyPlayingId === 'radio-stream') {
-      togglePlay();
-    } else {
-      const streamUrl = process.env.NEXT_PUBLIC_RADIO_STREAM_URL || '';
-      playLiveStream(streamUrl);
-    }
-  };
 
   // Parse artist and title for display
   const getDisplayTrackInfo = () => {
@@ -227,14 +218,6 @@ export default function LiveBroadcast({
               </div>
             )}
           </div>
-
-          {/* Action Button */}
-          <button
-            onClick={handlePlayToggle}
-            className="w-full py-4 bg-[#ECEEDF] text-black font-bold text-xs tracking-[0.25em] uppercase hover:bg-white active:scale-[0.98] transition-all border border-[#ECEEDF]"
-          >
-            {isRadioPlaying ? '[ PAUSE BROADCAST ]' : '[ TUNE IN ]'}
-          </button>
         </div>
       </div>
 
