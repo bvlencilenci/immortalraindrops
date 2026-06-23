@@ -70,13 +70,6 @@ normal = playlist(
   "/music/unified/normal"
 )
 
-# PHASE 2: Temporary debug logging
-def log_featured(_) = log(">>> DEBUG: Featured source track selected!") end
-def log_normal(_) = log(">>> DEBUG: Normal source track selected!") end
-
-featured = featured.on_track(log_featured)
-normal = normal.on_track(log_normal)
-
 # PHASE 1C: WEIGHTED ROTATION LOGIC (70/30 split) with fallback silence
 log("Applying 70/30 weighted rotation...")
 silence = blank()
