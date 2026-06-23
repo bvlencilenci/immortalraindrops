@@ -34,6 +34,7 @@ export default function LiveVisualizer() {
   const animationFrameRef = useRef<number | null>(null);
   const presetIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isActive, setIsActive] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const isRadioPlaying = currentlyPlayingId === 'radio-stream' && isPlaying;
 
@@ -54,26 +55,25 @@ export default function LiveVisualizer() {
       ctx.resume().catch((err) => console.warn('Failed to resume AudioContext in visualizer:', err));
     }
 
-    setIsActive(true);
-
-    // Detect quality mode based on device size
-    const isMobile = window.innerWidth < 768;
-    const pixelRatio = isMobile ? 0.75 : window.devicePixelRatio;
-
     // Set canvas sizes
     const resizeCanvas = () => {
-      canvas.width = canvas.parentElement?.clientWidth || window.innerWidth;
-      canvas.height = canvas.parentElement?.clientHeight || window.innerHeight;
-      if (visualizerRef.current) {
-        visualizerRef.current.setDimensions(canvas.width, canvas.height);
+      const parent = canvas.parentElement;
+      if (parent) {
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+        if (visualizerRef.current) {
+          visualizerRef.current.setDimensions(canvas.width, canvas.height);
+        }
       }
     };
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
 
     // Initialize Butterchurn visualizer
     let visualizer: any;
     try {
+      const isMobile = window.innerWidth < 768;
+      const pixelRatio = isMobile ? 0.75 : window.devicePixelRatio || 1;
+
       visualizer = butterchurn.createVisualizer(ctx, canvas, {
         width: canvas.width,
         height: canvas.height,
@@ -84,40 +84,67 @@ export default function LiveVisualizer() {
 
       // Connect audio node to visualizer
       visualizer.connectAudio(radioAudioNode);
+      
+      console.log('Butterchurn visualizer initialized successfully');
+      setIsActive(true);
+      setIsInitialized(true);
     } catch (e) {
       console.error('Failed to initialize Butterchurn visualizer:', e);
       setIsActive(false);
+      setIsInitialized(false);
       return;
     }
 
     // Load presets
-    const allPresets = butterchurnPresets.getPresets();
-    const curatedPresets: any[] = [];
-    CURATED_PRESET_NAMES.forEach((name) => {
-      if (allPresets[name]) {
-        curatedPresets.push(allPresets[name]);
-      }
-    });
+    let curatedPresets: any[] = [];
+    try {
+      const allPresets = butterchurnPresets.getPresets();
+      CURATED_PRESET_NAMES.forEach((name) => {
+        if (allPresets[name]) {
+          curatedPresets.push(allPresets[name]);
+        }
+      });
 
-    // Fallback if none found
-    if (curatedPresets.length === 0) {
-      const presetKeys = Object.keys(allPresets);
-      if (presetKeys.length > 0) {
-        curatedPresets.push(allPresets[presetKeys[0]]);
+      // Fallback if none found
+      if (curatedPresets.length === 0) {
+        const presetKeys = Object.keys(allPresets);
+        if (presetKeys.length > 0) {
+          // Get a random sample of 10-15 presets
+          const sampleSize = Math.min(15, Math.max(10, presetKeys.length));
+          for (let i = 0; i < sampleSize; i++) {
+            const randomIdx = Math.floor(Math.random() * presetKeys.length);
+            curatedPresets.push(allPresets[presetKeys[randomIdx]]);
+          }
+        }
       }
+
+      console.log(`Loaded ${curatedPresets.length} presets for rotation`);
+    } catch (e) {
+      console.error('Failed to load presets:', e);
+      curatedPresets = [];
     }
 
     // Start with a random curated preset
-    let currentPresetIdx = Math.floor(Math.random() * curatedPresets.length);
+    let currentPresetIdx = 0;
     if (curatedPresets.length > 0) {
-      visualizer.loadPreset(curatedPresets[currentPresetIdx], 0.0);
+      currentPresetIdx = Math.floor(Math.random() * curatedPresets.length);
+      try {
+        visualizer.loadPreset(curatedPresets[currentPresetIdx], 0.0);
+        console.log(`Loaded preset at index ${currentPresetIdx}`);
+      } catch (e) {
+        console.error('Failed to load initial preset:', e);
+      }
     }
 
     // Preset rotation every 10 seconds with a 2 second blend
     const rotatePreset = () => {
       if (curatedPresets.length > 1) {
         currentPresetIdx = (currentPresetIdx + 1) % curatedPresets.length;
-        visualizer.loadPreset(curatedPresets[currentPresetIdx], 2.0);
+        try {
+          visualizer.loadPreset(curatedPresets[currentPresetIdx], 2.0);
+        } catch (e) {
+          console.error('Failed to load preset during rotation:', e);
+        }
       }
     };
     presetIntervalRef.current = setInterval(rotatePreset, 10000);
@@ -131,19 +158,35 @@ export default function LiveVisualizer() {
       }
 
       if (visualizerRef.current && isRadioPlaying) {
-        visualizerRef.current.render();
+        try {
+          visualizerRef.current.render();
+        } catch (e) {
+          console.error('Error during visualizer render:', e);
+        }
       }
       animationFrameRef.current = requestAnimationFrame(renderLoop);
     };
     renderLoop();
 
+    // Handle window resize
+    const handleResize = () => resizeCanvas();
+    window.addEventListener('resize', handleResize);
+
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
       if (presetIntervalRef.current) {
         clearInterval(presetIntervalRef.current);
+      }
+      // Clean up visualizer
+      if (visualizerRef.current) {
+        try {
+          visualizerRef.current.dispose?.();
+        } catch (e) {
+          console.warn('Error disposing visualizer:', e);
+        }
       }
     };
   }, [radioAudioNode, isRadioPlaying]);
@@ -152,7 +195,9 @@ export default function LiveVisualizer() {
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
       <canvas
         ref={canvasRef}
-        className={`w-full h-full block transition-opacity duration-1000 ${isActive && isRadioPlaying ? 'opacity-80' : 'opacity-0'}`}
+        className={`w-full h-full block transition-opacity duration-1000 ${
+          isActive && isRadioPlaying && isInitialized ? 'opacity-80' : 'opacity-0'
+        }`}
       />
       {/* Fullscreen darkening overlay above visualizer to preserve readability */}
       <div 
