@@ -21,10 +21,10 @@ export default async function Live() {
       .limit(10),
     supabase
       .from('tracks')
-      .select('title, artist, tile_id, image_ext'),
+      .select('title, artist, tile_id, audio_ext'),
     supabase
       .from('approved_submissions')
-      .select('title, artist, visual_url')
+      .select('title, artist, audio_url')
   ]);
 
   const settings = settingsRes.data;
@@ -44,21 +44,21 @@ export default async function Live() {
   const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 
     (process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN ? `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN}` : 'https://archive.org/download');
 
-  const trackImageMap: Record<string, string> = {};
+  const trackAudioMap: Record<string, string> = {};
 
   // Map approved submissions first
   submissions.forEach((sub: any) => {
-    if (sub.artist && sub.title && sub.visual_url) {
+    if (sub.artist && sub.title && sub.audio_url) {
       const key = `${sub.artist.toLowerCase()} - ${sub.title.toLowerCase()}`;
-      trackImageMap[key] = `${r2BaseUrl}/${sub.visual_url}`;
+      trackAudioMap[key] = `${r2BaseUrl}/${sub.audio_url}`;
     }
   });
 
   // Map archival tracks (overwriting/preceding submissions if duplicate keys exist)
   tracks.forEach((t) => {
     const key = `${t.artist.toLowerCase()} - ${t.title.toLowerCase()}`;
-    const ext = t.image_ext || 'jpg';
-    trackImageMap[key] = `${r2BaseUrl}/${t.tile_id}/visual.${ext}`;
+    const ext = t.audio_ext || 'mp3';
+    trackAudioMap[key] = `${r2BaseUrl}/${t.tile_id}/audio.${ext}`;
   });
 
   return (
@@ -73,7 +73,7 @@ export default async function Live() {
         initialDjDescription={djDescription}
         initialPlaybackHistory={playbackHistory}
         newsPosts={newsPosts}
-        trackImageMap={trackImageMap}
+        trackAudioMap={trackAudioMap}
       />
     </main>
   );
