@@ -81,26 +81,23 @@ log("Establishing Fallback Chain...")
 radio = fallback(track_sensitive=false, [live, music])
 
 # Metadata handler for track info
-def handle_metadata(m) =
-  title = m["title"]
-  artist = m["artist"]
-  filename = m["filename"]
-
-  display_title = if artist != "" and title != "" then
-    artist ^ " - " ^ title
-  elsif title != "" then
-    title
-  elsif filename != "" then
-    path.basename(filename)
-  else
-    "IMMORTAL RADIO"
-  end
-
-  is_live = live_active()
-  notify_status(is_live, display_title)
-end
-
-radio = source.on_metadata(handle_metadata, radio)
+radio = source.on_metadata(fun(m) ->
+  begin
+    title = m["title"];
+    artist = m["artist"];
+    filename = m["filename"];
+    display_title = if artist != "" and title != "" then
+      artist ^ " - " ^ title
+    elsif title != "" then
+      title
+    elsif filename != "" then
+      path.basename(filename)
+    else
+      "IMMORTAL RADIO"
+    end;
+    is_live = live_active();
+    notify_status(is_live, display_title)
+  end, radio)
 
 # PHASE 1F: ICECAST OUTPUT CONFIGURATION
 log("Connecting output stream to Icecast on localhost:8000/radio...")
