@@ -119,7 +119,7 @@ def handle_metadata(m) =
   notify_status(true, display_title)
 end
 
-radio = on_metadata(handle_metadata, radio)
+radio = source.on_metadata(radio, handle_metadata)
 
 # ==========================================
 # BROADCAST CONTROL: Custom server commands
