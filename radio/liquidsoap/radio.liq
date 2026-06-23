@@ -43,7 +43,6 @@ log("Configuring BUTT Harbor input on port 8005...")
 live = input.harbor(
   "live",
   port=8005,
-  bind_addr="0.0.0.0",
   auth=fun(login, password) -> password == harbor_password,
   on_connect=fun(_) -> begin
     log(">>> DJ CONNECTED!");
