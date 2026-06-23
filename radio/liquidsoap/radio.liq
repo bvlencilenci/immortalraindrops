@@ -18,24 +18,6 @@ icecast_password = environment.get("ICECAST_SOURCE_PASSWORD")
 harbor_env_password = environment.get("LIQUIDSOAP_HARBOR_PASSWORD")
 harbor_password = if harbor_env_password != "" then harbor_env_password else icecast_password end
 
-# Webhook UI Notifications
-def notify_status(is_live, title) =
-  if webhook_url != "" and webhook_secret != "" then
-    headers = [("Content-Type", "application/json"), ("X-Webhook-Secret", webhook_secret)]
-    is_live_str = if is_live then "true" else "false" end
-    
-    # Safely escape title for JSON (basic quote escaping)
-    safe_title = string.replace(pattern="\"", (fun (_) -> "\\\""), title)
-    payload = '{"is_live":' ^ is_live_str ^ ',"stream_title":"' ^ safe_title ^ '"}'
-    
-    try
-      ignore(http.post(webhook_url, headers=headers, data=payload))
-    catch e do
-      log("Webhook error: #{e}")
-    end
-  end
-end
-
 live_active = ref(false)
 
 # PHASE 1D: LIVE DJ INPUT (BUTT HARBOUR)
@@ -45,13 +27,11 @@ live = input.harbor(
   port=8005,
   on_connect=fun(_) -> begin
     log(">>> DJ CONNECTED!");
-    live_active := true;
-    notify_status(true, "LIVE SET")
+    live_active := true
   end,
   on_disconnect=fun() -> begin
     log(">>> DJ DISCONNECTED!");
-    live_active := false;
-    notify_status(false, "PLAYLIST ROTATION")
+    live_active := false
   end
 )
 
@@ -80,24 +60,7 @@ music = fallback([featured, normal, silence])
 log("Establishing Fallback Chain...")
 radio = fallback(track_sensitive=false, [live, music])
 
-# Metadata handler for track info
-radio = source.on_metadata(fun(m) ->
-  begin
-    title = m["title"];
-    artist = m["artist"];
-    filename = m["filename"];
-    display_title = if artist != "" and title != "" then
-      artist ^ " - " ^ title
-    elsif title != "" then
-      title
-    elsif filename != "" then
-      path.basename(filename)
-    else
-      "IMMORTAL RADIO"
-    end;
-    is_live = live_active();
-    notify_status(is_live, display_title)
-  end, radio)
+
 
 # PHASE 1F: ICECAST OUTPUT CONFIGURATION
 log("Connecting output stream to Icecast on localhost:8000/radio...")
