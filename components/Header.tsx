@@ -258,14 +258,14 @@ const Header = () => {
         {/* Center: LOGO */}
         <Link
           href="/"
-          className="shrink-0 flex flex-col items-center justify-center group leading-none mx-1 gap-0.5"
+          className="shrink-0 flex items-center justify-center mx-1"
         >
-          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
-            IMMORTAL
-          </span>
-          <span className="font-mono text-[13px] xs:text-sm font-bold text-[#ECEEDF] uppercase tracking-tighter">
-            RAINDROPS
-          </span>
+          <img
+            src="/logo.png"
+            alt="Immortal Raindrops"
+            className="h-10 w-auto opacity-90 hover:opacity-100 transition-opacity"
+            style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
+          />
         </Link>
 
         {/* Right: ARCHIVE */}
@@ -291,17 +291,17 @@ const Header = () => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Center: LOGO (Text) */}
+            {/* Center: LOGO (Image) */}
             <Link
               href="/"
-              className="shrink-0 flex flex-col items-start justify-center group leading-none whitespace-nowrap font-mono"
+              className="shrink-0 flex items-center justify-center"
             >
-              <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                IMMORTAL
-              </span>
-              <span className="font-mono text-base text-[#ECEEDF] uppercase tracking-tighter opacity-90 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                RAINDROPS
-              </span>
+              <img
+                src="/logo.png"
+                alt="Immortal Raindrops"
+                className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity"
+                style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
+              />
             </Link>
 
             <div className="flex items-center gap-4">

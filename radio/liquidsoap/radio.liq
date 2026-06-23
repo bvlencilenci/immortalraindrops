@@ -131,7 +131,7 @@ radio = fallback(id="radio", track_sensitive=false, [live, music])
 
 # Metadata handler for track advancement and live updates
 def handle_metadata(m) =
-  log(">>> [METADATA_RAW] " ^ string.representation(m))
+  log(">>> [METADATA_RAW] " ^ string(m))
 
   title = if m["title"] != "" then m["title"] else "" end
   artist = if m["artist"] != "" then m["artist"] else "" end

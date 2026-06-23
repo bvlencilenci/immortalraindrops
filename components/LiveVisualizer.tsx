@@ -148,11 +148,11 @@ export default function LiveVisualizer() {
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
       <canvas
         ref={canvasRef}
-        className={`w-full h-full block transition-opacity duration-1000 ${isActive && isRadioPlaying ? 'opacity-70' : 'opacity-0'}`}
+        className={`w-full h-full block transition-opacity duration-1000 ${isActive && isRadioPlaying ? 'opacity-80' : 'opacity-0'}`}
       />
       {/* Fullscreen darkening overlay above visualizer to preserve readability */}
       <div 
-        className="absolute inset-0 bg-black/75 mix-blend-multiply"
+        className="absolute inset-0 bg-black/45 mix-blend-multiply"
         style={{
           backgroundImage: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03))',
           backgroundSize: '100% 4px, 6px 100%',
