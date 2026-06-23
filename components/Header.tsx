@@ -352,10 +352,10 @@ const Header = () => {
                   </>
                 ) : showHeaderMetadata ? (
                   <>
-                    <span className="font-mono text-[13px] text-[#ECEEDF]/60 lowercase leading-tight truncate whitespace-nowrap">
+                    <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
                       {displayArtist}
                     </span>
-                    <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap mt-0.5">
+                    <span className="font-mono text-[13px] text-[#ECEEDF]/60 lowercase leading-tight truncate whitespace-nowrap mt-0.5">
                       {displayTitle}
                     </span>
                   </>
