@@ -80,7 +80,7 @@ normal = normal.on_track(log_normal)
 # PHASE 1C: WEIGHTED ROTATION LOGIC (70/30 split) with fallback silence
 log("Applying 70/30 weighted rotation...")
 silence = blank()
-music = fallback([random(weights=[70, 30], [featured, normal]), silence])
+music = fallback([add(weights=[70, 30], [featured, normal]), silence])
 
 # PHASE 1E: FALLBACK LOGIC (Priority 1: Live, Priority 2: Playlist)
 # Switches instantly via track_sensitive=false
