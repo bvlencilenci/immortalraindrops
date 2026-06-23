@@ -9,6 +9,16 @@ set("log.level", 4) # Debug level for troubleshooting
 
 log("=== IMMORTAL RAINDROPS RADIO ENGINE STARTING ===")
 
+# Enable telnet server (local only — not exposed externally)
+settings.server.telnet.set(true)
+settings.server.telnet.bind_addr.set("127.0.0.1")
+settings.server.telnet.port.set(1234)
+
+# Enable HTTP server for remote commands (proxied through Nginx)
+settings.server.harbor.set(true)
+settings.server.harbor.bind_addrs.set(["0.0.0.0"])
+settings.server.harbor.port.set(7000)
+
 # Environment variables
 webhook_url = environment.get("LIVE_STATUS_WEBHOOK_URL")
 webhook_secret = environment.get("LIVE_STATUS_WEBHOOK_SECRET")
@@ -39,28 +49,56 @@ live = input.harbor(
 log("Configuring Unified Playlists from /music/unified...")
 
 featured = playlist(
+  id="featured",
   mode="random",
   reload_mode="watch",
   "/music/unified/featured"
 )
 
 normal = playlist(
+  id="normal",
   mode="random",
   reload_mode="watch",
   "/music/unified/normal"
 )
 
-# PHASE 1C: WEIGHTED ROTATION LOGIC (70/30 split) with fallback silence
-log("Applying 70/30 weighted rotation...")
-silence = blank()
-music = fallback([featured, normal, silence])
+# PHASE 1C: PLAYLIST ROTATION with fallback silence
+log("Applying playlist rotation with fallback...")
+silence = blank(id="silence")
+music = fallback(id="music", [featured, normal, silence])
 
 # PHASE 1E: FALLBACK LOGIC (Priority 1: Live, Priority 2: Playlist)
 # Switches instantly via track_sensitive=false
 log("Establishing Fallback Chain...")
-radio = fallback(track_sensitive=false, [live, music])
+radio = fallback(id="radio", track_sensitive=false, [live, music])
 
+# ==========================================
+# BROADCAST CONTROL: Custom server commands
+# ==========================================
 
+# Command: now_playing — returns current metadata
+server.register(
+  namespace="broadcast",
+  description="Get current now-playing information",
+  usage="now_playing",
+  "now_playing",
+  fun(_) -> begin
+    is_live_str = if live_active() then "true" else "false" end;
+    "is_live=" ^ is_live_str
+  end
+)
+
+# Command: status — returns engine status
+server.register(
+  namespace="broadcast",
+  description="Get engine status",
+  usage="status",
+  "status",
+  fun(_) -> begin
+    is_live_str = if live_active() then "LIVE" else "PLAYLIST" end;
+    "mode=" ^ is_live_str
+  end
+)
 
 # PHASE 1F: ICECAST OUTPUT CONFIGURATION
 log("Connecting output stream to Icecast on localhost:8000/radio...")

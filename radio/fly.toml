@@ -41,6 +41,14 @@ primary_region = 'lhr'
   [[services.ports]]
     port = 8005
 
+# Liquidsoap HTTP Command API (server.harbor)
+[[services]]
+  internal_port = 7000
+  protocol = 'tcp'
+
+  [[services.ports]]
+    port = 7000
+
 [[vm]]
   cpu_kind = 'shared'
   cpus = 1

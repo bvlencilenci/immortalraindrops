@@ -376,3 +376,64 @@ export async function updateSubmissionStatus(id: string, status: string, admin_n
     return { success: false, error: err.message };
   }
 }
+
+// ==========================================
+// BROADCAST CONTROL: Liquidsoap Commands
+// ==========================================
+
+const COMMAND_API_URL = process.env.NEXT_PUBLIC_SITE_URL
+  ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/radio/command`
+  : 'https://immortalraindrops.art/api/radio/command';
+
+async function sendRadioCommand(command: string): Promise<{ success: boolean; result?: string; error?: string }> {
+  try {
+    const secret = process.env.LIVE_STATUS_WEBHOOK_SECRET;
+    if (!secret) throw new Error('LIVE_STATUS_WEBHOOK_SECRET not configured');
+
+    const res = await fetch(COMMAND_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Secret': secret,
+      },
+      body: JSON.stringify({ command }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: data.error || `HTTP ${res.status}` };
+    }
+
+    return { success: true, result: data.result };
+  } catch (err: any) {
+    console.error('[BROADCAST] Command failed:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function radioSkipTrack() {
+  await verifyAdmin();
+  return sendRadioCommand('radio.skip');
+}
+
+export async function radioSkipFeatured() {
+  await verifyAdmin();
+  return sendRadioCommand('featured.skip');
+}
+
+export async function radioSkipNormal() {
+  await verifyAdmin();
+  return sendRadioCommand('normal.skip');
+}
+
+export async function radioGetStatus() {
+  await verifyAdmin();
+  return sendRadioCommand('broadcast.status');
+}
+
+export async function radioGetNowPlaying() {
+  await verifyAdmin();
+  return sendRadioCommand('broadcast.now_playing');
+}
+
