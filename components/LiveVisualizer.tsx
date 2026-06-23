@@ -50,6 +50,10 @@ export default function LiveVisualizer() {
       return;
     }
 
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch((err) => console.warn('Failed to resume AudioContext in visualizer:', err));
+    }
+
     setIsActive(true);
 
     // Detect quality mode based on device size

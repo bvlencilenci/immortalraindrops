@@ -296,14 +296,14 @@ const Header = () => {
             {/* Center: LOGO (Image) */}
             <Link
               href="/"
-              className="shrink-0 flex items-center justify-center animate-pulse"
+              className="shrink-0 flex items-center justify-center"
             >
               <img
                 src="/logo.png"
                 alt="Immortal Raindrops"
                 width={711}
                 height={1024}
-                className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity"
+                className="h-12 w-auto"
                 style={{ height: '48px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
               />
             </Link>
@@ -334,7 +334,7 @@ const Header = () => {
             </div>
 
             {/* Divider and Station Info / Track Metadata */}
-            {(currentlyPlayingId === 'radio-stream' || isLive || showHeaderMetadata) && !isHovered && (
+            {(currentlyPlayingId === 'radio-stream' || isLive || showHeaderMetadata) && (
               <div className="flex flex-col justify-center max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
                 {pathname === '/submit' ? (
                   <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-none tracking-widest whitespace-nowrap">
@@ -422,7 +422,7 @@ const Header = () => {
         </div>
 
         {/* BLOCK 2: Center - Player Buttons (Absolute Center Pivot) */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-6 z-50">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-4 z-50">
           {isPlayerActive && (
             <>
               <button
@@ -478,11 +478,14 @@ const Header = () => {
           )}
         </div>
 
-        {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
-        {
-          isPlayerActive && currentlyPlayingId !== 'radio-stream' && (
+        {/* BLOCK 4: Full-Width Scrubber/Border Line (Outside Padded Wrapper) - Desktop Only */}
+        {isPlayerActive && (
+          currentlyPlayingId === 'radio-stream' ? (
+            /* Live mode: Solid full-width 2px line at the bottom, non-interactive */
+            <div className="hidden md:block absolute bottom-0 left-0 right-0 w-full h-[2px] bg-[#ECEEDF] z-[60] pointer-events-none" />
+          ) : (
+            /* Archive mode: Interactive scrubber */
             <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">
-
               {/* Interaction Layer (Invisible Input - Massive Hitbox) */}
               <div className="absolute bottom-[-18px] left-0 w-full h-[48px] z-50">
                 <input
@@ -521,7 +524,7 @@ const Header = () => {
               </div>
             </div>
           )
-        }
+        )}
       </header>
     </>
   );

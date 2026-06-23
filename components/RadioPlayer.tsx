@@ -8,7 +8,10 @@ export default function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { currentlyPlayingId, isPlaying, volume } = useAudioStore();
 
-  const streamUrl = process.env.NEXT_PUBLIC_RADIO_STREAM_URL || '';
+  let streamUrl = process.env.NEXT_PUBLIC_RADIO_STREAM_URL || '';
+  if (!streamUrl || streamUrl.endsWith('/live')) {
+    streamUrl = 'https://immortal-radio.fly.dev/radio';
+  }
 
   // Synchronize playback state
   useEffect(() => {
@@ -25,6 +28,11 @@ export default function RadioPlayer() {
       
       // Force reload to sync with live stream and avoid buffer lag
       audio.load();
+
+      // Force resume context to ensure Web Audio routing works and visualizer gets data
+      if (Howler.ctx && Howler.ctx.state === 'suspended') {
+        Howler.ctx.resume().catch((err) => console.warn('Failed to resume AudioContext:', err));
+      }
 
       audio.play().then(() => {
         // Expose source node for Butterchurn visualizer
