@@ -5,15 +5,18 @@ const TELNET_HOST = process.env.RADIO_TELNET_HOST || 'immortal-radio.fly.dev';
 const TELNET_PORT = parseInt(process.env.RADIO_TELNET_PORT || '7000', 10);
 const WEBHOOK_SECRET = process.env.LIVE_STATUS_WEBHOOK_SECRET;
 
-function executeTelnetCommand(host: string, port: number, command: string, timeoutMs = 5000): Promise<string> {
+function executeTelnetCommand(host: string, port: number, command: string, timeoutMs = 3000): Promise<string> {
   return new Promise((resolve, reject) => {
     const socket = new net.Socket();
     let dataBuffer = '';
     let resolved = false;
 
+    console.log(`>>> LIQUIDSOAP CMD: ${command}`);
+
     const timer = setTimeout(() => {
       resolved = true;
       socket.destroy();
+      console.error(`<<< TIMEOUT - NO RESPONSE FOR CMD: ${command}`);
       reject(new Error('Timeout waiting for telnet response'));
     }, timeoutMs);
 
@@ -36,6 +39,7 @@ function executeTelnetCommand(host: string, port: number, command: string, timeo
         if (result.endsWith('END')) {
           result = result.slice(0, -3).trim();
         }
+        console.log(`<<< RESPONSE for ${command}: ${result}`);
         resolve(result);
       }
     });
@@ -44,6 +48,7 @@ function executeTelnetCommand(host: string, port: number, command: string, timeo
       if (!resolved) {
         clearTimeout(timer);
         resolved = true;
+        console.error(`<<< ERROR FOR CMD ${command}: ${err.message}`);
         reject(err);
       }
     });
@@ -52,7 +57,9 @@ function executeTelnetCommand(host: string, port: number, command: string, timeo
       if (!resolved) {
         clearTimeout(timer);
         resolved = true;
-        resolve(dataBuffer.trim());
+        const result = dataBuffer.trim();
+        console.log(`<<< SOCKET CLOSED FOR CMD ${command}. Buffer: ${result}`);
+        resolve(result);
       }
     });
   });
