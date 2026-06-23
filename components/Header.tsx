@@ -293,13 +293,19 @@ const Header = () => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Logo Text (Brutalist style matching reference image) */}
+            {/* Center: LOGO (Image) */}
             <Link
               href="/"
-              className="shrink-0 flex flex-col font-mono text-[13px] font-black tracking-[0.2em] leading-[1.1] text-white hover:text-[#ECEEDF] transition-colors select-none"
+              className="shrink-0 flex items-center justify-center animate-pulse"
             >
-              <span>IMMORTAL</span>
-              <span>RAINDROPS</span>
+              <img
+                src="/logo.png"
+                alt="Immortal Raindrops"
+                width={711}
+                height={1024}
+                className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity"
+                style={{ height: '48px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
+              />
             </Link>
 
             {/* Vertical Separator */}
