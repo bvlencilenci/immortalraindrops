@@ -355,12 +355,24 @@ input[type=range].header-needle-range::-webkit-slider-runnable-track {
 /* Mobile-specific layout fixes */
 @media (max-width: 768px) {
   .mobile-padding {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    padding-left: 1rem;  /* Reduce from 1.25rem */
+    padding-right: 1rem;
   }
   
   .mobile-gap {
-    gap: 1.5rem;
+    gap: 1rem;  /* Reduce from 1.5rem */
+  }
+}
+
+/* Add extra-small screen support */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;  /* Reduce from 16px */
+  }
+  
+  .grid {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
   }
 }
 

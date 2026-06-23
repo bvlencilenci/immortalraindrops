@@ -173,10 +173,10 @@ export default function LiveBroadcast({
       <LiveVisualizer />
 
       {/* Main columns grid */}
-      <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-10 md:py-12 px-4 md:px-8 backdrop-blur-[4px] bg-black/10">
+      <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-6 md:py-12 px-3 sm:px-4 md:px-8 backdrop-blur-[4px] bg-black/20">
         
         {/* LEFT COLUMN: LAST PLAYED */}
-        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 pr-0 md:pr-10 flex flex-col gap-6 relative overflow-hidden">
+        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 px-2 sm:px-0 md:pr-10 flex flex-col gap-6 relative overflow-hidden">
           <h2 className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-3 mb-2">
             LAST PLAYED
           </h2>
@@ -223,7 +223,7 @@ export default function LiveBroadcast({
         </div>
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 pr-0 md:pr-10 flex flex-col items-center justify-center text-center gap-16 min-h-[400px] relative overflow-hidden select-none">
+        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 px-2 sm:px-0 md:pr-10 flex flex-col items-center justify-center text-center gap-16 min-h-[400px] relative overflow-hidden select-none">
           
           <div className="flex flex-col items-center gap-8 w-full z-10">
             {/* Status Badge */}
@@ -295,7 +295,7 @@ export default function LiveBroadcast({
         </div>
 
         {/* RIGHT COLUMN: NEWS DISPATCH */}
-        <div className="bg-transparent pb-0 pr-0 flex flex-col gap-6 relative overflow-hidden">
+        <div className="bg-transparent pb-0 pr-0 px-2 sm:px-0 flex flex-col gap-6 relative overflow-hidden">
           <h2 className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-3 mb-2">
             NEWS DISPATCH
           </h2>
