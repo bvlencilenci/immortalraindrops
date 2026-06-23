@@ -381,10 +381,8 @@ export async function updateSubmissionStatus(id: string, status: string, admin_n
 // ARCHIVE MANAGEMENT
 // ==========================================
 
-/** Approve a submission and add it to the archive (tracks table). */
-export async function approveToArchive(submissionId: string, opts: {
-  addToFeatured?: boolean;
-}) {
+/** Approve a submission and add it to the public archive (tracks table). */
+export async function approveToArchive(submissionId: string) {
   try {
     await verifyAdmin();
 
@@ -418,26 +416,6 @@ export async function approveToArchive(submissionId: string, opts: {
       .from('submissions')
       .update({ status: 'approved', reviewed_at: new Date().toISOString() })
       .eq('id', submissionId);
-
-    // 4. Optionally push to featured live queue
-    if (opts.addToFeatured && sub.audio_url) {
-      const secret = process.env.LIVE_STATUS_WEBHOOK_SECRET;
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://immortalraindrops.art';
-      if (secret) {
-        await fetch(`${siteUrl}/api/radio/featured/submit`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Secret': secret,
-          },
-          body: JSON.stringify({
-            url: `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN}/${sub.audio_url}`,
-            title: sub.title,
-            artist: sub.artist_name || 'Unknown Artist',
-          }),
-        });
-      }
-    }
 
     revalidatePath('/godmode');
     return { success: true, trackId: inserted?.id };
@@ -476,6 +454,47 @@ export async function getArchiveTracks() {
     return { success: true, tracks: data || [] };
   } catch (err: any) {
     return { success: false, error: err.message, tracks: [] };
+  }
+}
+
+/** Approve a submission and add it to the radio playlist (playlist_tracks table). */
+export async function approveToPlaylist(submissionId: string) {
+  try {
+    await verifyAdmin();
+
+    // 1. Fetch the submission
+    const { data: sub, error: fetchErr } = await supabaseAdmin
+      .from('submissions')
+      .select('*')
+      .eq('id', submissionId)
+      .single();
+    if (fetchErr || !sub) throw new Error(fetchErr?.message || 'Submission not found');
+
+    if (!sub.audio_url) throw new Error('Submission has no audio URL');
+
+    // 2. Insert into playlist_tracks table
+    const audioUrl = `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN}/${sub.audio_url}`;
+    const { error: insertErr } = await supabaseAdmin
+      .from('playlist_tracks')
+      .insert([{
+        title: sub.title,
+        artist_name: sub.artist_name || null,
+        audio_url: audioUrl,
+        featured: false,
+        active: true,
+      }]);
+    if (insertErr) throw insertErr;
+
+    // 3. Mark submission as approved
+    await supabaseAdmin
+      .from('submissions')
+      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+      .eq('id', submissionId);
+
+    revalidatePath('/godmode');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
   }
 }
 

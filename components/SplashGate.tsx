@@ -26,10 +26,12 @@ const SplashGate = () => {
 
   useEffect(() => {
     setMounted(true);
-    // Restore entered state from sessionStorage (survives SPA nav, resets on hard refresh)
+    // Restore entered state from sessionStorage (survives SPA nav, resets on hard refresh/new tab)
+    // Use setState directly — NOT enterApp() — because there's no user gesture here.
+    // AudioContext resume only happens in the real click flow below.
     const alreadyEntered = sessionStorage.getItem('immortal_entered') === '1';
     if (alreadyEntered && !hasEntered) {
-      enterApp();
+      useAudioStore.setState({ hasEntered: true });
     }
     // Fetch tracks immediately on mount
     import('../app/actions').then(({ getTracks }) => {

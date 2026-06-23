@@ -2,7 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { updateSubmissionStatus, approveToArchive } from '@/app/godmode/actions';
+import { updateSubmissionStatus, approveToArchive, approveToPlaylist } from '@/app/godmode/actions';
+
+const R2 = process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN || 'assets.immortalraindrops.art';
+
+function Toast({ msg, ok }: { msg: string; ok: boolean }) {
+  return (
+    <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] font-mono text-[11px] uppercase tracking-[0.25em] px-8 py-4 shadow-2xl border transition-all ${
+      ok
+        ? 'bg-[#ECEEDF] text-black border-[#ECEEDF]'
+        : 'bg-red-600/90 text-white border-red-400/50 backdrop-blur-sm'
+    }`}>
+      {ok ? '✓ ' : '✗ '}{msg}
+    </div>
+  );
+}
 
 export default function SubmissionReview() {
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -24,37 +38,49 @@ export default function SubmissionReview() {
 
   const showToast = (msg: string, ok: boolean) => {
     setToast({ msg, ok });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 3500);
   };
 
   const handleReject = async (id: string, currentNotes: string) => {
     const notes = prompt('Rejection notes (optional):', currentNotes || '') ?? currentNotes;
-    setBusy(id + '-reject');
+    setBusy(id + ':reject');
     const res = await updateSubmissionStatus(id, 'rejected', notes);
     setBusy(null);
     if (res.success) {
       setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status: 'rejected', admin_notes: notes } : s));
-      showToast('SUBMISSION REJECTED', true);
+      showToast('Submission rejected', true);
     } else {
-      showToast(`ERROR: ${res.error}`, false);
+      showToast(res.error || 'Failed to reject', false);
     }
   };
 
-  const handleApproveArchive = async (id: string, addToFeatured: boolean) => {
-    setBusy(id + (addToFeatured ? '-feat' : '-arch'));
-    const res = await approveToArchive(id, { addToFeatured });
+  const handleArchive = async (id: string) => {
+    setBusy(id + ':archive');
+    const res = await approveToArchive(id);
     setBusy(null);
     if (res.success) {
       setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status: 'approved' } : s));
-      showToast(addToFeatured ? 'APPROVED + QUEUED TO FEATURED RADIO' : 'APPROVED + ADDED TO ARCHIVE', true);
+      showToast('Added to Archive', true);
     } else {
-      showToast(`ERROR: ${res.error}`, false);
+      showToast(res.error || 'Failed', false);
+    }
+  };
+
+  const handlePlaylist = async (id: string) => {
+    setBusy(id + ':playlist');
+    const res = await approveToPlaylist(id);
+    setBusy(null);
+    if (res.success) {
+      setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status: 'approved' } : s));
+      showToast('Added to Radio Playlist', true);
+    } else {
+      showToast(res.error || 'Failed', false);
     }
   };
 
   if (loading) return (
-    <div className="text-[#ECEEDF] p-8 font-mono tracking-widest text-xs animate-pulse">
-      RETRIEVING_TRANSMISSIONS...
+    <div className="text-[#ECEEDF]/40 p-12 font-mono tracking-[0.3em] text-xs animate-pulse uppercase">
+      Loading submissions...
     </div>
   );
 
@@ -62,123 +88,156 @@ export default function SubmissionReview() {
   const reviewed = submissions.filter(s => s.status !== 'pending');
 
   return (
-    <div className="flex flex-col gap-6 font-mono text-[#ECEEDF] animate-in fade-in duration-500">
+    <div className="flex flex-col gap-8 max-w-4xl">
+      {toast && <Toast msg={toast.msg} ok={toast.ok} />}
 
-      {/* Toast */}
-      {toast && (
-        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 font-mono text-[10px] uppercase tracking-[0.3em] px-6 py-3 border ${
-          toast.ok
-            ? 'bg-[#ECEEDF] text-black border-[#ECEEDF]'
-            : 'bg-red-600 text-white border-red-400/50'
-        } shadow-lg`}>
-          {toast.ok ? '✓' : '✗'} {toast.msg}
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-[#ECEEDF]/5 p-4 border border-[#ECEEDF]/10">
-        <div className="text-[#ECEEDF]/40 text-[10px] uppercase tracking-widest">
-          {pending.length} PENDING · {reviewed.length} REVIEWED
+      {/* Header row */}
+      <div className="flex items-center justify-between border-b border-[#ECEEDF]/10 pb-4">
+        <div>
+          <span className="text-[#ECEEDF]/30 font-mono text-[10px] uppercase tracking-[0.3em]">
+            {pending.length} pending · {reviewed.length} reviewed
+          </span>
         </div>
         <button
           onClick={fetchSubmissions}
-          className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40 hover:text-[#ECEEDF] border border-[#ECEEDF]/10 hover:border-[#ECEEDF]/40 px-3 py-1.5 transition-colors"
+          className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#ECEEDF]/30 hover:text-[#ECEEDF] border border-[#ECEEDF]/10 hover:border-[#ECEEDF]/30 px-4 py-2 transition-all"
         >
-          REFRESH
+          Refresh
         </button>
       </div>
 
-      {/* Pending Queue */}
-      <div className="border border-[#ECEEDF]/10 bg-black/40 p-4 md:p-6 flex flex-col gap-3">
-        <h3 className="text-xs uppercase tracking-widest text-[#ECEEDF]/70 border-b border-[#ECEEDF]/10 pb-3">
-          PENDING_REVIEW ({pending.length})
-        </h3>
+      {/* Pending */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#ECEEDF]/40">
+          Pending Review ({pending.length})
+        </h2>
 
         {pending.length === 0 ? (
-          <div className="text-[#ECEEDF]/30 text-xs py-8 text-center">QUEUE EMPTY — ALL TRANSMISSIONS REVIEWED.</div>
+          <div className="border border-[#ECEEDF]/5 p-10 text-center">
+            <p className="font-mono text-sm text-[#ECEEDF]/20 uppercase tracking-[0.3em]">Queue empty</p>
+          </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {pending.map(sub => (
-              <div key={sub.id} className="border border-[#ECEEDF]/10 p-4 bg-black/50 hover:bg-[#ECEEDF]/5 transition-colors">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <div className="text-xs font-bold uppercase tracking-wider text-[#ECEEDF] mb-1">{sub.title}</div>
-                    <div className="text-[10px] text-[#ECEEDF]/70 uppercase tracking-widest">— {sub.artist_name}</div>
-                    <div className="text-[9px] mt-2 opacity-40 uppercase tracking-widest">FROM: {sub.email}</div>
+              <div
+                key={sub.id}
+                className="border border-[#ECEEDF]/10 bg-[#ECEEDF]/[0.02] hover:bg-[#ECEEDF]/[0.04] transition-colors p-5 md:p-6"
+              >
+                {/* Track identity */}
+                <div className="flex justify-between items-start gap-4 mb-5">
+                  <div className="flex flex-col gap-1.5 min-w-0">
+                    <h3 className="font-mono text-base md:text-lg font-bold text-[#ECEEDF] tracking-tight truncate">
+                      {sub.title}
+                    </h3>
+                    <p className="font-mono text-sm text-[#ECEEDF]/60 tracking-wide truncate">
+                      {sub.artist_name}
+                    </p>
+                    <p className="font-mono text-[10px] text-[#ECEEDF]/25 uppercase tracking-[0.2em] mt-1">
+                      {sub.email}
+                    </p>
                   </div>
-                  <div className="px-2 py-1 uppercase tracking-widest text-[8px] border text-yellow-500 border-yellow-500/50 bg-yellow-500/10">
-                    [PENDING]
-                  </div>
+                  <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.2em] px-2.5 py-1 border border-yellow-500/40 text-yellow-400/80 bg-yellow-500/5">
+                    pending
+                  </span>
                 </div>
 
-                <div className="flex gap-4 my-4 text-[9px] uppercase tracking-widest">
-                  {sub.audio_url && (
-                    <a href={`https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN || 'assets.immortalraindrops.art'}/${sub.audio_url}`}
-                      target="_blank" className="underline hover:text-white transition-colors">
-                      REVIEW_AUDIO
-                    </a>
-                  )}
-                  {sub.video_url && (
-                    <a href={`https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN || 'assets.immortalraindrops.art'}/${sub.video_url}`}
-                      target="_blank" className="underline hover:text-white transition-colors">
-                      REVIEW_VIDEO
-                    </a>
-                  )}
-                  {sub.image_url && (
-                    <a href={`https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN || 'assets.immortalraindrops.art'}/${sub.image_url}`}
-                      target="_blank" className="underline hover:text-white transition-colors">
-                      REVIEW_ART
-                    </a>
-                  )}
-                </div>
+                {/* File review links */}
+                {(sub.audio_url || sub.video_url || sub.image_url) && (
+                  <div className="flex gap-5 mb-5 font-mono text-[10px] uppercase tracking-[0.2em]">
+                    {sub.audio_url && (
+                      <a
+                        href={`https://${R2}/${sub.audio_url}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#ECEEDF]/50 hover:text-[#ECEEDF] underline underline-offset-4 transition-colors"
+                      >
+                        Listen ↗
+                      </a>
+                    )}
+                    {sub.video_url && (
+                      <a
+                        href={`https://${R2}/${sub.video_url}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#ECEEDF]/50 hover:text-[#ECEEDF] underline underline-offset-4 transition-colors"
+                      >
+                        Video ↗
+                      </a>
+                    )}
+                    {sub.image_url && (
+                      <a
+                        href={`https://${R2}/${sub.image_url}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#ECEEDF]/50 hover:text-[#ECEEDF] underline underline-offset-4 transition-colors"
+                      >
+                        Artwork ↗
+                      </a>
+                    )}
+                  </div>
+                )}
 
-                {/* Action Row */}
-                <div className="flex flex-wrap gap-2 border-t border-[#ECEEDF]/10 pt-4">
+                {/* Action buttons */}
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-[#ECEEDF]/5">
                   <button
-                    onClick={() => handleApproveArchive(sub.id, false)}
+                    onClick={() => handleArchive(sub.id)}
                     disabled={busy !== null}
-                    className="px-3 py-2 bg-green-500/10 text-green-400 border border-green-500/40 hover:bg-green-500 hover:text-black transition-colors text-[9px] uppercase tracking-widest disabled:opacity-30"
+                    className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2.5 border border-[#ECEEDF]/20 text-[#ECEEDF]/70 hover:bg-[#ECEEDF] hover:text-black hover:border-[#ECEEDF] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    {busy === sub.id + '-arch' ? 'SAVING...' : '✓ APPROVE → ARCHIVE'}
+                    {busy === sub.id + ':archive' ? 'Saving…' : '+ Archive'}
                   </button>
                   <button
-                    onClick={() => handleApproveArchive(sub.id, true)}
+                    onClick={() => handlePlaylist(sub.id)}
                     disabled={busy !== null}
-                    className="px-3 py-2 bg-purple-500/10 text-purple-400 border border-purple-500/40 hover:bg-purple-500 hover:text-white transition-colors text-[9px] uppercase tracking-widest disabled:opacity-30"
+                    className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2.5 border border-[#ECEEDF]/20 text-[#ECEEDF]/70 hover:bg-[#ECEEDF] hover:text-black hover:border-[#ECEEDF] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    {busy === sub.id + '-feat' ? 'QUEUING...' : '★ APPROVE → ARCHIVE + FEATURED RADIO'}
+                    {busy === sub.id + ':playlist' ? 'Adding…' : '+ Playlist'}
                   </button>
                   <button
                     onClick={() => handleReject(sub.id, sub.admin_notes)}
                     disabled={busy !== null}
-                    className="px-3 py-2 bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-black transition-colors text-[9px] uppercase tracking-widest disabled:opacity-30"
+                    className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2.5 border border-red-900/40 text-red-500/60 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
                   >
-                    {busy === sub.id + '-reject' ? 'REJECTING...' : '✗ REJECT'}
+                    {busy === sub.id + ':reject' ? 'Rejecting…' : 'Reject'}
                   </button>
                 </div>
+
+                {sub.admin_notes && (
+                  <p className="mt-3 font-mono text-[10px] text-[#ECEEDF]/30 uppercase tracking-widest">
+                    Note: {sub.admin_notes}
+                  </p>
+                )}
               </div>
             ))}
           </div>
         )}
-      </div>
+      </section>
 
       {/* Reviewed */}
       {reviewed.length > 0 && (
-        <div className="border border-[#ECEEDF]/10 bg-black/40 p-4 md:p-6 flex flex-col gap-3">
-          <h3 className="text-xs uppercase tracking-widest text-[#ECEEDF]/40 border-b border-[#ECEEDF]/10 pb-3">
-            REVIEWED ({reviewed.length})
-          </h3>
-          <div className="flex flex-col gap-2">
+        <section className="flex flex-col gap-4">
+          <h2 className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#ECEEDF]/25">
+            Reviewed ({reviewed.length})
+          </h2>
+          <div className="flex flex-col divide-y divide-[#ECEEDF]/5 border border-[#ECEEDF]/5">
             {reviewed.map(sub => (
-              <div key={sub.id} className="flex justify-between items-center border-b border-[#ECEEDF]/5 py-2 text-[10px] opacity-50">
-                <span className="truncate max-w-[60%]">{sub.artist_name} — {sub.title}</span>
-                <span className={`uppercase tracking-widest text-[8px] ${
-                  sub.status === 'approved' ? 'text-green-500' : 'text-red-500'
-                }`}>[{sub.status}]</span>
+              <div key={sub.id} className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-[#ECEEDF]/[0.02] transition-colors">
+                <div className="min-w-0 flex-1">
+                  <span className="font-mono text-sm text-[#ECEEDF]/50 truncate block">
+                    {sub.artist_name} — {sub.title}
+                  </span>
+                </div>
+                <span className={`shrink-0 font-mono text-[9px] uppercase tracking-[0.2em] px-2 py-0.5 border ${
+                  sub.status === 'approved'
+                    ? 'text-green-400/70 border-green-500/20'
+                    : 'text-red-400/70 border-red-500/20'
+                }`}>
+                  {sub.status}
+                </span>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
