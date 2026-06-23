@@ -23,6 +23,7 @@ interface AudioStore {
   hls: Hls | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   analyser: AnalyserNode | null;
+  radioAudioNode: MediaElementAudioSourceNode | null;
 
   setPlaylist: (tracks: Track[]) => void;
   playTrack: (id: string, url: string, title: string, artist: string, mediaType?: string) => Promise<void>;
@@ -57,6 +58,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   howl: null,
   hls: null,
   analyser: null,
+  radioAudioNode: null,
 
   hasEntered: false,
   activeFullscreenUrl: null,

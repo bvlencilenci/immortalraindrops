@@ -105,16 +105,12 @@ radio = fallback(id="radio", track_sensitive=false, [live, music])
 def handle_metadata(m) =
   title = m["title"]
   artist = m["artist"]
-  filename = m["filename"]
 
   # Format the displayed track title
   display_title = if artist != "" and title != "" then
     artist ^ " - " ^ title
   elsif title != "" then
     title
-  elsif filename != "" then
-    # Fallback to filename (without path) if no tags present
-    file.basename(filename)
   else
     "IMMORTAL RAINDROPS RADIO"
   end;

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
+import { Howler } from 'howler';
 
 export default function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -21,7 +22,20 @@ export default function RadioPlayer() {
       if (!audio.src || audio.src !== streamUrl) {
         audio.src = streamUrl;
       }
-      audio.play().catch((err) => {
+      audio.play().then(() => {
+        // Expose source node for Butterchurn visualizer
+        const ctx = Howler.ctx;
+        if (ctx && !(audio as any)._sourceNode) {
+          try {
+            const sourceNode = ctx.createMediaElementSource(audio);
+            sourceNode.connect(ctx.destination);
+            (audio as any)._sourceNode = sourceNode;
+            useAudioStore.setState({ radioAudioNode: sourceNode });
+          } catch (e) {
+            console.warn('Error connecting radio audio to Web Audio:', e);
+          }
+        }
+      }).catch((err) => {
         console.error('Radio playback blocked/failed:', err);
       });
     } else {
