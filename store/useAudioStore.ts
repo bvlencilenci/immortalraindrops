@@ -234,7 +234,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       await Howler.ctx.resume();
     }
 
-    const { howl, hls, volume } = get();
+    const { howl, hls } = get();
 
     // Cleanup previous
     if (howl) {
@@ -246,90 +246,14 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       set({ hls: null });
     }
 
-    // Icecast provides a continuous MP3 stream via HTTP, NOT an HLS playlist.
-    // Therefore, we use Howler in HTML5 mode to connect directly to the mountpoint.
-    const cacheBustedUrl = `${url}?t=${Date.now()}`;
-    const newHowl = new Howl({
-      src: [cacheBustedUrl],
-      html5: true, 
-      format: ['mp3'],
-      xhr: {
-        withCredentials: false
-      },
-      volume: volume,
-      onplay: () => {
-        set({ isPlaying: true, isBuffering: false });
-
-        // Connect Visualizer
-        const ctx = Howler.ctx;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const sound = (newHowl as any)._sounds[0];
-
-        if (sound && sound._node && ctx) {
-          const audioNode = sound._node;
-          let analyser = get().analyser;
-
-          if (!analyser) {
-            analyser = ctx.createAnalyser();
-            analyser.fftSize = 256;
-            set({ analyser });
-          }
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if (analyser && !(sound as any)._visualizerConnected) {
-            try {
-              if (audioNode instanceof HTMLMediaElement && !audioNode.crossOrigin) {
-                audioNode.crossOrigin = "anonymous";
-              }
-
-              if (audioNode instanceof HTMLMediaElement) {
-                const source = ctx.createMediaElementSource(audioNode);
-                source.connect(analyser);
-                analyser.connect(ctx.destination);
-              } else {
-                audioNode.connect(analyser);
-              }
-
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (sound as any)._visualizerConnected = true;
-            } catch (e) {
-              console.warn("Visualizer connection error:", e);
-            }
-          }
-        }
-      },
-      onend: () => set({ isPlaying: false, isBuffering: false }),
-      onpause: () => set({ isPlaying: false, isBuffering: false }),
-      onstop: () => set({ isPlaying: false, isBuffering: false }),
-      onloaderror: (id, err) => {
-        console.error("Icecast Stream Load Error", id, err);
-        set({ isBuffering: false });
-      },
-      onplayerror: (id, err) => {
-        console.error("Icecast Stream Play Error", id, err);
-        set({ isBuffering: false });
-        if (Howler.ctx && Howler.ctx.state === 'suspended') {
-          Howler.ctx.resume();
-        }
-      }
-    });
-
-    // Inject CORS attribute BEFORE loading to support Visualizer
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sound = (newHowl as any)._sounds[0];
-    if (sound && sound._node && sound._node instanceof HTMLMediaElement) {
-      sound._node.crossOrigin = 'anonymous';
-    }
-
     set({
       currentlyPlayingId: 'radio-stream',
-      howl: newHowl,
-      analyser: get().analyser,
+      howl: null,
+      analyser: null,
       isLive: true,
-      isBuffering: true
+      isPlaying: true,
+      isBuffering: false
     });
-
-    newHowl.play();
   },
 
   togglePlay: () => {
