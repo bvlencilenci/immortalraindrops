@@ -7,7 +7,16 @@ import {
   radioSkipNormal,
   radioGetStatus,
   radioGetNowPlaying,
+  radioSubmitFeaturedQueue,
+  radioGetFeaturedQueue,
 } from '@/app/godmode/actions';
+
+interface QueuedTrack {
+  url: string;
+  title: string;
+  artist: string;
+  addedAt: number;
+}
 
 export default function BroadcastControls() {
   const [status, setStatus] = useState<string>('CONNECTING...');
@@ -15,6 +24,13 @@ export default function BroadcastControls() {
   const [isSkipping, setIsSkipping] = useState(false);
   const [lastAction, setLastAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Queue state
+  const [queue, setQueue] = useState<QueuedTrack[]>([]);
+  const [inputUrl, setInputUrl] = useState('');
+  const [inputTitle, setInputTitle] = useState('');
+  const [inputArtist, setInputArtist] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Flash feedback for 2 seconds
   const flashAction = (msg: string) => {
@@ -27,7 +43,7 @@ export default function BroadcastControls() {
     setTimeout(() => setError(null), 4000);
   };
 
-  // Poll status every 10 seconds
+  // Poll status
   const fetchStatus = useCallback(async () => {
     try {
       const [statusRes, npRes] = await Promise.all([
@@ -51,11 +67,27 @@ export default function BroadcastControls() {
     }
   }, []);
 
+  // Poll queue state
+  const fetchQueue = useCallback(async () => {
+    try {
+      const res = await radioGetFeaturedQueue();
+      if (res.success && res.queue) {
+        setQueue(res.queue);
+      }
+    } catch (err) {
+      console.error('Failed to fetch queue:', err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 10000);
+    fetchQueue();
+    const interval = setInterval(() => {
+      fetchStatus();
+      fetchQueue();
+    }, 10000);
     return () => clearInterval(interval);
-  }, [fetchStatus]);
+  }, [fetchStatus, fetchQueue]);
 
   const handleSkip = async (type: 'main' | 'featured' | 'normal') => {
     setIsSkipping(true);
@@ -83,6 +115,43 @@ export default function BroadcastControls() {
     }
 
     setIsSkipping(false);
+  };
+
+  const handleSubmitQueue = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputUrl) return;
+
+    setIsSubmitting(true);
+    setError(null);
+
+    // Optimistic update
+    const tempTrack: QueuedTrack = {
+      url: inputUrl,
+      title: inputTitle || 'Unknown Title',
+      artist: inputArtist || 'Unknown Artist',
+      addedAt: Date.now(),
+    };
+    setQueue((prev) => [...prev, tempTrack]);
+
+    const res = await radioSubmitFeaturedQueue({
+      url: inputUrl,
+      title: inputTitle,
+      artist: inputArtist,
+    });
+
+    if (res.success) {
+      flashAction('SUBMITTED TO FEATURED QUEUE');
+      setInputUrl('');
+      setInputTitle('');
+      setInputArtist('');
+      if (res.queue) setQueue(res.queue);
+    } else {
+      flashError(res.error || 'Submission failed');
+      // Rollback optimistic update
+      fetchQueue();
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -129,7 +198,7 @@ export default function BroadcastControls() {
         </div>
       </div>
 
-      {/* SKIP CONTROLS */}
+      {/* TRACK CONTROLS */}
       <div className="border border-[#ECEEDF]/10 bg-[#ECEEDF]/[0.02] p-6 group hover:border-[#ECEEDF]/20 transition-colors">
         <h3 className="text-[#ECEEDF] text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 mb-6 group-hover:opacity-100 transition-opacity">
           TRACK CONTROL
@@ -167,6 +236,85 @@ export default function BroadcastControls() {
             <span>SKIP NORMAL</span>
             <span className="text-[8px] opacity-50">▶▶</span>
           </button>
+        </div>
+      </div>
+
+      {/* FEATURED QUEUE INGESTION */}
+      <div className="border border-[#ECEEDF]/10 bg-[#ECEEDF]/[0.02] p-6 group hover:border-[#ECEEDF]/20 transition-colors">
+        <h3 className="text-[#ECEEDF] text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 mb-6 group-hover:opacity-100 transition-opacity">
+          SUBMIT TO FEATURED QUEUE (LIVE INGESTION)
+        </h3>
+
+        <form onSubmit={handleSubmitQueue} className="flex flex-col gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">TRACK URL (MP3/WAV)</label>
+              <input
+                type="text"
+                value={inputUrl}
+                onChange={(e) => setInputUrl(e.target.value)}
+                placeholder="https://pub-*.r2.dev/track.mp3"
+                required
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] focus:ring-1 focus:ring-[#ECEEDF]/20"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">TRACK TITLE</label>
+              <input
+                type="text"
+                value={inputTitle}
+                onChange={(e) => setInputTitle(e.target.value)}
+                placeholder="Transmission 01"
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] focus:ring-1 focus:ring-[#ECEEDF]/20"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">ARTIST</label>
+              <input
+                type="text"
+                value={inputArtist}
+                onChange={(e) => setInputArtist(e.target.value)}
+                placeholder="Unknown Operator"
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] focus:ring-1 focus:ring-[#ECEEDF]/20"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting || !inputUrl}
+            className="w-full py-3 text-[10px] uppercase tracking-[0.2em] font-bold border border-[#ECEEDF]/20 bg-black/40 text-[#ECEEDF] hover:bg-[#ECEEDF] hover:text-black hover:border-[#ECEEDF] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? 'QUEUEING...' : 'ADD TO FEATURED ROTATION'}
+          </button>
+        </form>
+
+        {/* LIVE QUEUE DISPLAY */}
+        <div>
+          <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40 mb-3 block">CURRENT FEATURED QUEUE</span>
+          {queue.length === 0 ? (
+            <div className="text-[10px] text-[#ECEEDF]/30 border border-[#ECEEDF]/5 p-4 text-center">
+              QUEUE IS EMPTY — AUTOMATED ROTATION ACTIVE
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto border border-[#ECEEDF]/10 p-3 bg-black/20">
+              {queue.map((item, idx) => (
+                <div key={idx} className="flex justify-between items-center text-[10px] border-b border-[#ECEEDF]/5 pb-2 last:border-0 last:pb-0">
+                  <div className="flex flex-col gap-1 truncate max-w-[80%]">
+                    <span className="text-[#ECEEDF] font-bold truncate">
+                      {idx + 1}. {item.artist} — {item.title}
+                    </span>
+                    <span className="text-[#ECEEDF]/30 truncate text-[9px]">
+                      {item.url}
+                    </span>
+                  </div>
+                  <span className="text-[8px] text-[#ECEEDF]/40 shrink-0 font-mono">
+                    {new Date(item.addedAt).toLocaleTimeString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

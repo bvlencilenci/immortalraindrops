@@ -437,3 +437,60 @@ export async function radioGetNowPlaying() {
   return sendRadioCommand('broadcast.now_playing');
 }
 
+export async function radioSubmitFeaturedQueue(track: { url: string; title: string; artist: string }) {
+  try {
+    await verifyAdmin();
+    const secret = process.env.LIVE_STATUS_WEBHOOK_SECRET;
+    if (!secret) throw new Error('LIVE_STATUS_WEBHOOK_SECRET not configured');
+
+    const submitUrl = process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/radio/featured/submit`
+      : 'https://immortalraindrops.art/api/radio/featured/submit';
+
+    const res = await fetch(submitUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Secret': secret,
+      },
+      body: JSON.stringify(track),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to submit track');
+
+    return { success: true, queue: data.queue };
+  } catch (err: any) {
+    console.error('[BROADCAST] Submit to queue failed:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function radioGetFeaturedQueue() {
+  try {
+    await verifyAdmin();
+    const secret = process.env.LIVE_STATUS_WEBHOOK_SECRET;
+    if (!secret) throw new Error('LIVE_STATUS_WEBHOOK_SECRET not configured');
+
+    const queueUrl = process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/radio/featured/queue`
+      : 'https://immortalraindrops.art/api/radio/featured/queue';
+
+    const res = await fetch(queueUrl, {
+      method: 'GET',
+      headers: {
+        'X-Admin-Secret': secret,
+      },
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to get queue');
+
+    return { success: true, queue: data.queue };
+  } catch (err: any) {
+    console.error('[BROADCAST] Get queue failed:', err);
+    return { success: false, error: err.message, queue: [] };
+  }
+}
+
+

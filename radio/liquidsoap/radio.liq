@@ -45,12 +45,34 @@ live = input.harbor(
 # PHASE 1B & PHASE 2(2/3): PLAYLIST SOURCES & FILE DECODING
 log("Configuring Unified Playlists from /music/unified...")
 
-featured = playlist(
-  id="featured",
+# Dynamic Queue Source (Priority 1)
+def get_next_featured() =
+  secret = environment.get("LIVE_STATUS_WEBHOOK_SECRET")
+  site_url = environment.get("NEXT_PUBLIC_SITE_URL")
+  site_url = if site_url != "" then site_url else "https://immortalraindrops.art" end
+  url = site_url ^ "/api/radio/featured/next?secret=" ^ secret
+  
+  response = http.get(url)
+  if response.status_code == 200 and response.body != "" then
+    log(">>> Dynamic queue returned track: " ^ response.body)
+    request.create(response.body)
+  else
+    null()
+  end
+end
+
+dynamic_featured = request.dynamic(id="dynamic_featured", get_next_featured)
+
+# Static Folder Playlist Source (Priority 2 / Fallback)
+static_featured = playlist(
+  id="static_featured",
   mode="random",
   reload_mode="watch",
   "/music/unified/featured"
 )
+
+# Combined featured source: pulls from dynamic queue first, falls back to static playlist
+featured = fallback(id="featured", [dynamic_featured, static_featured])
 
 normal = playlist(
   id="normal",
