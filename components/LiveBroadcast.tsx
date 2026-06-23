@@ -47,7 +47,6 @@ export default function LiveBroadcast({
   const [playbackHistory, setPlaybackHistory] = useState<PlaybackHistoryItem[]>(
     initialPlaybackHistory || []
   );
-  const [upcomingQueue, setUpcomingQueue] = useState<UpcomingTrack[]>([]);
 
   const { currentlyPlayingId, isPlaying, playLiveStream, togglePlay } = useAudioStore();
 
@@ -94,24 +93,7 @@ export default function LiveBroadcast({
     };
   }, []);
 
-  // Poll upcoming queue from API
-  const fetchUpcomingQueue = async () => {
-    try {
-      const res = await fetch('/api/radio/queue');
-      const data = await res.json();
-      if (data.success && data.queue) {
-        setUpcomingQueue(data.queue);
-      }
-    } catch (err) {
-      console.error('Failed to fetch upcoming queue:', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchUpcomingQueue();
-    const interval = setInterval(fetchUpcomingQueue, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  // Polling removed (upcoming panel replaced by Archive placeholder)
 
   const handlePlayToggle = () => {
     if (currentlyPlayingId === 'radio-stream') {
@@ -127,9 +109,6 @@ export default function LiveBroadcast({
     if (!isRadioPlaying) {
       return { artist: 'STANDBY', title: '' };
     }
-    if (!isLive) {
-      return { artist: 'IMMORTAL RAINDROPS', title: 'PLAYLIST ROTATION' };
-    }
     const parts = nowPlayingTitle.split(/ - | — /);
     const artist = parts[0]?.trim() || 'Unknown Artist';
     const title = parts[1]?.trim() || parts[0]?.trim() || 'Unknown Title';
@@ -137,6 +116,9 @@ export default function LiveBroadcast({
   };
 
   const { artist: currentArtist, title: currentTitle } = getDisplayTrackInfo();
+
+  // Show live indicator when DJ is connected OR when playing automated curated playlist
+  const showLiveIndicator = isLive || broadcastMode === 'automated';
 
   return (
     <div className="w-full flex-1 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#ECEEDF]/15 text-[#ECEEDF] bg-black font-mono">
@@ -182,14 +164,14 @@ export default function LiveBroadcast({
           <div className="flex flex-col items-center gap-1.5">
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${
-                isLive 
+                showLiveIndicator 
                   ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]' 
                   : 'bg-[#ECEEDF]/20'
               }`} />
               <span className={`text-[10px] tracking-[0.3em] font-bold uppercase ${
-                isLive ? 'text-red-500' : 'text-[#ECEEDF]/30'
+                showLiveIndicator ? 'text-red-500' : 'text-[#ECEEDF]/30'
               }`}>
-                {isLive ? 'LIVE' : 'OFFLINE'}
+                {showLiveIndicator ? 'LIVE' : 'OFFLINE'}
               </span>
             </div>
             
@@ -197,7 +179,7 @@ export default function LiveBroadcast({
               STATUS
             </div>
             <div className="text-[11px] font-bold tracking-widest uppercase border border-[#ECEEDF]/15 px-3 py-1 bg-white/[0.01]">
-              {broadcastMode === 'live' ? 'LIVE DJ SET' : 'AUTOMATED BROADCAST'}
+              {broadcastMode === 'live' ? 'LIVE DJ SET' : 'CURATED PLAYLIST'}
             </div>
           </div>
 
@@ -256,33 +238,15 @@ export default function LiveBroadcast({
         </div>
       </div>
 
-      {/* RIGHT COLUMN: UPCOMING */}
+      {/* RIGHT COLUMN: ARCHIVE */}
       <div className="p-8 md:p-12 flex flex-col gap-8">
         <h2 className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-3">
-          UPCOMING
+          ARCHIVE
         </h2>
         <div className="flex flex-col gap-6">
-          {upcomingQueue.length === 0 ? (
-            <div className="text-[10px] text-[#ECEEDF]/20 uppercase tracking-widest">
-              NO QUEUED TRACKS
-            </div>
-          ) : (
-            upcomingQueue.map((track, i) => (
-              <div key={i} className="flex gap-4 items-start">
-                <span className="text-[10px] font-bold text-[#ECEEDF]/30 shrink-0 font-mono mt-0.5">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div className="flex flex-col gap-1 min-w-0">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#ECEEDF]/80 truncate">
-                    {track.artist}
-                  </span>
-                  <span className="text-[11px] uppercase tracking-wider text-[#ECEEDF]/45 truncate">
-                    {track.title}
-                  </span>
-                </div>
-              </div>
-            ))
-          )}
+          <div className="text-[10px] text-[#ECEEDF]/20 uppercase tracking-widest">
+            COMING SOON
+          </div>
         </div>
       </div>
       
