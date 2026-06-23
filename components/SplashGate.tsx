@@ -26,6 +26,11 @@ const SplashGate = () => {
 
   useEffect(() => {
     setMounted(true);
+    // Restore entered state from sessionStorage (survives SPA nav, resets on hard refresh)
+    const alreadyEntered = sessionStorage.getItem('immortal_entered') === '1';
+    if (alreadyEntered && !hasEntered) {
+      enterApp();
+    }
     // Fetch tracks immediately on mount
     import('../app/actions').then(({ getTracks }) => {
       getTracks().then((data) => {
@@ -78,6 +83,7 @@ const SplashGate = () => {
         clearInterval(interval);
         // Small delay to let user see 100%
         setTimeout(() => {
+          sessionStorage.setItem('immortal_entered', '1');
           enterApp();
         }, 200);
       }

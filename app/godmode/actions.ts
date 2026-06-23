@@ -378,6 +378,109 @@ export async function updateSubmissionStatus(id: string, status: string, admin_n
 }
 
 // ==========================================
+// ARCHIVE MANAGEMENT
+// ==========================================
+
+/** Approve a submission and add it to the archive (tracks table). */
+export async function approveToArchive(submissionId: string, opts: {
+  addToFeatured?: boolean;
+}) {
+  try {
+    await verifyAdmin();
+
+    // 1. Fetch the submission
+    const { data: sub, error: fetchErr } = await supabaseAdmin
+      .from('submissions')
+      .select('*')
+      .eq('id', submissionId)
+      .single();
+    if (fetchErr || !sub) throw new Error(fetchErr?.message || 'Submission not found');
+
+    // 2. Insert into tracks table
+    const { data: inserted, error: insertErr } = await supabaseAdmin
+      .from('tracks')
+      .insert([{
+        title: sub.title,
+        artist: sub.artist_name,
+        genre: sub.genre || null,
+        media_type: sub.media_type || 'song',
+        audio_url: sub.audio_url || null,
+        image_url: sub.image_url || null,
+        video_url: sub.video_url || null,
+        submitted_by: sub.user_id || null,
+      }])
+      .select()
+      .single();
+    if (insertErr) throw insertErr;
+
+    // 3. Mark submission as approved
+    await supabaseAdmin
+      .from('submissions')
+      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+      .eq('id', submissionId);
+
+    // 4. Optionally push to featured live queue
+    if (opts.addToFeatured && sub.audio_url) {
+      const secret = process.env.LIVE_STATUS_WEBHOOK_SECRET;
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://immortalraindrops.art';
+      if (secret) {
+        await fetch(`${siteUrl}/api/radio/featured/submit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Secret': secret,
+          },
+          body: JSON.stringify({
+            url: `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN}/${sub.audio_url}`,
+            title: sub.title,
+            artist: sub.artist_name || 'Unknown Artist',
+          }),
+        });
+      }
+    }
+
+    revalidatePath('/godmode');
+    return { success: true, trackId: inserted?.id };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/** Delete a track from the archive (tracks table). */
+export async function deleteTrackFromArchive(trackId: string) {
+  try {
+    await verifyAdmin();
+
+    const { error } = await supabaseAdmin
+      .from('tracks')
+      .delete()
+      .eq('id', trackId);
+
+    if (error) throw error;
+    revalidatePath('/godmode');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/** List all tracks in the archive. */
+export async function getArchiveTracks() {
+  try {
+    await verifyAdmin();
+    const { data, error } = await supabaseAdmin
+      .from('tracks')
+      .select('id, title, artist, genre, media_type, audio_url, image_url, created_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return { success: true, tracks: data || [] };
+  } catch (err: any) {
+    return { success: false, error: err.message, tracks: [] };
+  }
+}
+
+
+// ==========================================
 // BROADCAST CONTROL: Liquidsoap Commands
 // ==========================================
 
