@@ -29,10 +29,14 @@ export async function POST(req: Request) {
     // Parse stream title for history tracking
     let playbackHistoryUpdate = null;
 
+    const upperTitle = streamTitle.toUpperCase();
+    const isStationTitle = ['OFFLINE', 'STANDBY', 'PLAYLIST ROTATION', 'CONNECTING...', 'IMMORTAL RAINDROPS', 'IMMORTAL RAINDROPS RADIO', 'CURATED PLAYLIST', 'AUTOMATED BROADCAST'].includes(upperTitle);
+
     if (
       isLive &&
       streamTitle &&
-      !['OFFLINE', 'STANDBY', 'PLAYLIST ROTATION', 'CONNECTING...'].includes(streamTitle.toUpperCase())
+      !isStationTitle &&
+      streamTitle.includes(' - ')
     ) {
       let artist = artistField.trim();
       let title = titleField.trim();

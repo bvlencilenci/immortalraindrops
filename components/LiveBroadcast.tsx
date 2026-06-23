@@ -130,15 +130,29 @@ export default function LiveBroadcast({
 
   // Parse artist and title for display
   const getDisplayTrackInfo = () => {
-    if (!nowPlayingTitle || ['OFFLINE', 'STANDBY', 'CONNECTING...'].includes(nowPlayingTitle.toUpperCase())) {
-      return { artist: 'STANDBY', title: '' };
+    if (!nowPlayingTitle) {
+      return { artist: 'UNKNOWN ARTIST', title: 'UNKNOWN TRACK' };
     }
-    const parts = nowPlayingTitle.split(/ - | — /);
-    const artist = parts[0]?.trim() || 'Unknown Artist';
-    const title = parts[1]?.trim() || parts[0]?.trim() || 'Unknown Title';
-    const current = { artist, title };
-    console.log("CURRENT TRACK", current);
-    return current;
+    
+    const clean = nowPlayingTitle.trim();
+    const upper = clean.toUpperCase();
+    
+    if (
+      !clean ||
+      ['OFFLINE', 'STANDBY', 'CONNECTING...', 'IMMORTAL RAINDROPS', 'IMMORTAL RAINDROPS RADIO', 'PLAYLIST ROTATION', 'CURATED PLAYLIST', 'AUTOMATED BROADCAST'].includes(upper)
+    ) {
+      return { artist: 'UNKNOWN ARTIST', title: 'UNKNOWN TRACK' };
+    }
+    
+    const parts = clean.split(/ - | — /);
+    if (parts.length < 2) {
+      return { artist: 'UNKNOWN ARTIST', title: 'UNKNOWN TRACK' };
+    }
+    
+    const artist = parts[0]?.trim() || 'UNKNOWN ARTIST';
+    const title = parts.slice(1).join(' - ')?.trim() || 'UNKNOWN TRACK';
+    
+    return { artist, title };
   };
 
   const formatUptime = (totalSeconds: number) => {
@@ -154,12 +168,12 @@ export default function LiveBroadcast({
   const showLiveIndicator = isLive || broadcastMode === 'automated';
 
   return (
-    <div className="relative w-full flex-1 flex flex-col items-center justify-between min-h-0 bg-black overflow-hidden px-4 md:px-8 py-8 font-mono">
+    <div className="relative w-full flex-1 flex flex-col items-center justify-between min-h-0 bg-black overflow-hidden px-2 md:px-4 py-8 font-mono">
       {/* generative waves visualizer */}
       <LiveVisualizer />
 
       {/* Main columns grid */}
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 items-stretch z-10 my-auto">
+      <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-10 md:py-12">
         
         {/* LEFT COLUMN: LAST PLAYED */}
         <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 pr-0 md:pr-10 flex flex-col gap-6 relative overflow-hidden">
@@ -209,7 +223,7 @@ export default function LiveBroadcast({
         </div>
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 pr-0 md:pr-10 flex flex-col items-center justify-center text-center gap-10 min-h-[400px] relative overflow-hidden select-none">
+        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 pr-0 md:pr-10 flex flex-col items-center justify-center text-center gap-16 min-h-[400px] relative overflow-hidden select-none">
           
           <div className="flex flex-col items-center gap-8 w-full z-10">
             {/* Status Badge */}
@@ -236,7 +250,7 @@ export default function LiveBroadcast({
             </div>
 
             {/* Now Playing visual display */}
-            <div className="w-full py-8 flex flex-col items-center justify-center min-h-[180px] max-w-sm mt-4">
+            <div className="w-full flex flex-col items-center justify-center min-h-[180px] max-w-sm">
               {broadcastMode === 'live' ? (
                 <div className="flex flex-col gap-4 w-full">
                   <div>
@@ -266,16 +280,14 @@ export default function LiveBroadcast({
                   )}
                 </div>
               ) : (
-                <div className="flex flex-col items-center text-center gap-2.5 w-full">
-                  <span className="text-[8px] tracking-[0.2em] text-[#ECEEDF]/30 uppercase">NOW PLAYING</span>
-                  <div className="text-3xl md:text-5xl font-extrabold tracking-widest uppercase text-[#ECEEDF] truncate max-w-full px-2">
+                <div className="flex flex-col items-center text-center gap-3 w-full">
+                  <span className="text-[9px] tracking-[0.3em] text-[#ECEEDF]/30 uppercase font-bold">NOW PLAYING</span>
+                  <div className="text-4xl md:text-6xl font-black tracking-widest uppercase text-[#ECEEDF] truncate max-w-full px-2 mt-2">
                     {currentArtist}
                   </div>
-                  {currentTitle && (
-                    <div className="text-sm md:text-lg tracking-widest uppercase text-[#ECEEDF]/60 truncate max-w-full px-2 mt-1">
-                      {currentTitle}
-                    </div>
-                  )}
+                  <div className="text-lg md:text-2xl tracking-[0.15em] uppercase text-[#ECEEDF]/60 truncate max-w-full px-2 mt-1">
+                    {currentTitle}
+                  </div>
                 </div>
               )}
             </div>
@@ -325,7 +337,7 @@ export default function LiveBroadcast({
       </div>
 
       {/* FOOTER STATUS BAR */}
-      <div className="w-full max-w-6xl mt-8 border-t border-[#ECEEDF]/10 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase select-none z-10">
+      <div className="w-full max-w-full mt-8 border-t border-[#ECEEDF]/10 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase select-none z-10 px-2 md:px-4">
         <div className="flex gap-6">
           <span>LISTENERS: {listenerCount}</span>
           <span>UPTIME: {formatUptime(uptimeSeconds)}</span>

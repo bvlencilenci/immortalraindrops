@@ -279,7 +279,7 @@ const Header = () => {
       </motion.nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
-      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-[11.1vh] px-[4vw] transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
+      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-[11.1vh] px-4 transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
         ? "bg-black/40 border-b border-[#ECEEDF]/10"
         : "bg-black"
         }`}>
@@ -296,7 +296,7 @@ const Header = () => {
             {/* Center: LOGO (Image) */}
             <Link
               href="/"
-              className="shrink-0 flex items-center justify-center ml-8 lg:ml-12"
+              className="shrink-0 flex items-center justify-center"
             >
               <img
                 src="/logo.png"
@@ -335,22 +335,33 @@ const Header = () => {
               </AnimatePresence>
             </div>
 
-            {showHeaderMetadata && (
+            {/* Divider and Station Info / Track Metadata */}
+            {(currentlyPlayingId === 'radio-stream' || isLive || showHeaderMetadata) && (
               <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
                 {pathname === '/submit' ? (
-                  <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate tracking-widest whitespace-nowrap">
+                  <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-none tracking-widest whitespace-nowrap">
                     SUBMISSION MODE
                   </span>
-                ) : (
+                ) : (currentlyPlayingId === 'radio-stream' || (!currentlyPlayingId && isLive)) ? (
                   <>
-                    <span className="font-mono text-[15px] text-[#ECEEDF] lowercase leading-tight truncate whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 font-mono text-[9px] font-bold text-red-500 tracking-[0.2em] uppercase leading-none">
+                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                      LIVE
+                    </div>
+                    <span className="font-mono text-[12px] text-[#ECEEDF]/70 uppercase font-bold leading-none tracking-wider whitespace-nowrap mt-1.5">
+                      IMMORTAL RAINDROPS RADIO
+                    </span>
+                  </>
+                ) : showHeaderMetadata ? (
+                  <>
+                    <span className="font-mono text-[13px] text-[#ECEEDF]/60 lowercase leading-tight truncate whitespace-nowrap">
                       {displayArtist}
                     </span>
-                    <span className="font-mono text-[15px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
+                    <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap mt-0.5">
                       {displayTitle}
                     </span>
                   </>
-                )}
+                ) : null}
               </div>
             )}
           </div>
@@ -371,7 +382,11 @@ const Header = () => {
 
             {/* VOLUME CONTROLS */}
             {isPlayerActive && (
-              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+              <div className={`flex flex-shrink-0 ${
+                currentlyPlayingId === 'radio-stream' 
+                  ? 'items-center justify-center' 
+                  : 'flex-col items-end gap-1'
+              }`}>
                 <div className="flex items-center gap-4">
                   <button
                     className="flex items-center justify-center"
@@ -402,10 +417,11 @@ const Header = () => {
                     }}
                   />
                 </div>
-                {/* Time Display */}
-                <span className="w-[120px] text-center font-mono text-[12px] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
-                  {formatTime(seek)} / {formatTime(duration)}
-                </span>
+                {currentlyPlayingId !== 'radio-stream' && (
+                  <span className="w-[120px] text-center font-mono text-[12px] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
+                    {formatTime(seek)} / {formatTime(duration)}
+                  </span>
+                )}
               </div>
             )}
           </div>
@@ -416,9 +432,18 @@ const Header = () => {
           {isPlayerActive && (
             <>
               <button
-                onClick={(e) => { e.stopPropagation(); skipBack(); }}
-                className="absolute right-full mr-[15rem] hover:opacity-50 transition-opacity flex items-center justify-center whitespace-nowrap"
+                onClick={(e) => {
+                  if (currentlyPlayingId === 'radio-stream') return;
+                  e.stopPropagation();
+                  skipBack();
+                }}
+                className={`absolute right-full mr-[15rem] flex items-center justify-center whitespace-nowrap transition-opacity ${
+                  currentlyPlayingId === 'radio-stream'
+                    ? 'opacity-20 pointer-events-none'
+                    : 'hover:opacity-50'
+                }`}
                 title="Previous / Restart"
+                disabled={currentlyPlayingId === 'radio-stream'}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-8 h-8" fill="#ECEEDF">
                   <path d="M199.81,34a16,16,0,0,0-16.24.43L64,109.23V40a8,8,0,0,0-16,0V216a8,8,0,0,0,16,0V146.77l119.57,74.78A15.95,15.95,0,0,0,208,208.12V47.88A15.86,15.86,0,0,0,199.81,34ZM192,208,64.16,128,192,48.07Z" />
@@ -438,9 +463,18 @@ const Header = () => {
                 </button>
               </div>
               <button
-                onClick={(e) => { e.stopPropagation(); skipTrack(); }}
-                className="absolute left-full ml-[15rem] hover:opacity-50 transition-opacity flex items-center justify-center whitespace-nowrap"
+                onClick={(e) => {
+                  if (currentlyPlayingId === 'radio-stream') return;
+                  e.stopPropagation();
+                  skipTrack();
+                }}
+                className={`absolute left-full ml-[15rem] flex items-center justify-center whitespace-nowrap transition-opacity ${
+                  currentlyPlayingId === 'radio-stream'
+                    ? 'opacity-20 pointer-events-none'
+                    : 'hover:opacity-50'
+                }`}
                 title="Skip"
+                disabled={currentlyPlayingId === 'radio-stream'}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-8 h-8" fill="#ECEEDF">
                   <path d="M200,32a8,8,0,0,0-8,8v69.23L72.43,34.45A15.95,15.95,0,0,0,48,47.88V208.12a16,16,0,0,0,24.43,13.43L192,146.77V216a8,8,0,0,0,16,0V40A8,8,0,0,0,200,32ZM64,207.93V48.05l127.84,80Z" />
@@ -452,7 +486,7 @@ const Header = () => {
 
         {/* BLOCK 4: Full-Width Scrubber (Outside Padded Wrapper) - Desktop Only */}
         {
-          isPlayerActive && (
+          isPlayerActive && currentlyPlayingId !== 'radio-stream' && (
             <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">
 
               {/* Interaction Layer (Invisible Input - Massive Hitbox) */}

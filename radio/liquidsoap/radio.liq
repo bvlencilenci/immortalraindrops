@@ -89,22 +89,23 @@ live = input.harbor(
   end
 )
 
-# PHASE 1B: PLAYLIST SOURCES
-log("Configuring Unified Playlists from /music/unified...")
+# PHASE 1B: PLAYLIST SOURCES WITH TRUE COOLDOWN
+log("Configuring Dynamic Playlists via Python cooldown scheduler...")
 
-featured = playlist(
-  id="featured",
-  mode="randomize",
-  reload_mode="watch",
-  "/music/unified/featured"
-)
+def get_next_track_featured() =
+  result = process.read("python3 /radio/next-track.py featured")
+  path = string.trim(result)
+  request.create(path)
+end
 
-normal = playlist(
-  id="normal",
-  mode="randomize",
-  reload_mode="watch",
-  "/music/unified/normal"
-)
+def get_next_track_normal() =
+  result = process.read("python3 /radio/next-track.py normal")
+  path = string.trim(result)
+  request.create(path)
+end
+
+featured = request.dynamic(id="featured", get_next_track_featured)
+normal = request.dynamic(id="normal", get_next_track_normal)
 
 # PHASE 1C: STARTUP-RESILIENT PLAYLIST ROTATION
 # playlists uses default track_sensitive=true — no mid-song cuts

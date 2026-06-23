@@ -36,7 +36,8 @@ WORKDIR /radio
 COPY sync-tracks.sh /radio/sync-tracks.sh
 COPY sync-daemon.sh /radio/sync-daemon.sh
 COPY entrypoint.sh /radio/entrypoint.sh
-RUN chmod +x /radio/sync-tracks.sh /radio/sync-daemon.sh /radio/entrypoint.sh
+COPY next-track.py /radio/next-track.py
+RUN chmod +x /radio/sync-tracks.sh /radio/sync-daemon.sh /radio/entrypoint.sh /radio/next-track.py
 
 # Ensure proper configuration file permissions
 RUN chown -R root:root /etc/nginx/nginx.conf && \
