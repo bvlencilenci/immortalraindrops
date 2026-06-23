@@ -50,7 +50,7 @@ export default function LiveBroadcast({
   );
 
   // Dynamic statistics states for footer
-  const [listenerCount, setListenerCount] = useState(128);
+  const [listenerCount, setListenerCount] = useState(0);
   const [uptimeSeconds, setUptimeSeconds] = useState(0);
 
   const { currentlyPlayingId, isPlaying } = useAudioStore();
@@ -102,23 +102,28 @@ export default function LiveBroadcast({
 
   // Footer statistics effects (listeners & uptime)
   useEffect(() => {
-    const interval = setInterval(() => {
-      setListenerCount(prev => {
-        const delta = Math.floor(Math.random() * 5) - 2; // Fluctuation of -2 to +2
-        const next = prev + delta;
-        return next > 0 ? next : 10;
-      });
-    }, 6000);
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/radio/stats');
+        if (res.ok) {
+          const data = await res.json();
+          setListenerCount(data.listeners || 0);
+          setUptimeSeconds(data.uptime || 0);
+        }
+      } catch (err) {
+        console.error('Error fetching stream stats:', err);
+      }
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 10000); // Poll stats every 10 seconds
+
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    // Start uptime at a realistic seed (e.g. 3 hours, 17 minutes, 42 seconds)
-    const initialSeconds = 3 * 3600 + 17 * 60 + 42;
-    setUptimeSeconds(initialSeconds);
-
     const interval = setInterval(() => {
-      setUptimeSeconds(prev => prev + 1);
+      setUptimeSeconds(prev => (prev > 0 ? prev + 1 : 0));
     }, 1000);
     return () => clearInterval(interval);
   }, []);

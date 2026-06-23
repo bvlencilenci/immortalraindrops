@@ -296,7 +296,7 @@ const Header = () => {
             {/* Center: LOGO (Image) */}
             <Link
               href="/"
-              className="shrink-0 flex items-center justify-center"
+              className="shrink-0 flex items-center justify-center ml-8 lg:ml-12"
             >
               <img
                 src="/logo.png"

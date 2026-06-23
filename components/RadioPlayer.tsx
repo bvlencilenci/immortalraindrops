@@ -22,6 +22,10 @@ export default function RadioPlayer() {
       if (!audio.src || audio.src !== streamUrl) {
         audio.src = streamUrl;
       }
+      
+      // Force reload to sync with live stream and avoid buffer lag
+      audio.load();
+
       audio.play().then(() => {
         // Expose source node for Butterchurn visualizer
         const ctx = Howler.ctx;
@@ -40,8 +44,8 @@ export default function RadioPlayer() {
       });
     } else {
       audio.pause();
-      // Clear src to stop connection buffer when paused
-      audio.src = '';
+      // Instead of clearing src which breaks the Web Audio routing, we just pause the audio.
+      // We rely on audio.load() when starting play to flush the buffer.
     }
   }, [currentlyPlayingId, isPlaying, streamUrl]);
 
