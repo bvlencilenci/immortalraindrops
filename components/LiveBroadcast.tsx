@@ -433,7 +433,7 @@ export default function LiveBroadcast({
         </div>
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="w-full md:flex-[3] min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-4 md:pb-0 px-2 sm:px-0 md:px-6 flex flex-col items-center justify-between text-center min-h-[320px] md:min-h-[420px] py-6 md:py-10 relative overflow-hidden select-none">
+        <div className="w-full md:flex-[3] min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 px-2 sm:px-0 md:px-6 flex flex-col items-center justify-between text-center min-h-[320px] md:min-h-[420px] pt-6 md:pt-10 pb-2 md:pb-4 relative overflow-hidden select-none">
           
           {/* Status Badge */}
           <div className="flex flex-col items-center gap-2 z-10">
@@ -458,8 +458,11 @@ export default function LiveBroadcast({
             </div>
           </div>
 
+          {/* Spacer to push Now Playing down */}
+          <div className="flex-1" />
+
           {/* Now Playing visual display */}
-          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-xl z-10 mt-auto pt-8">
+          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-xl z-10 pb-2">
             {broadcastMode === 'live' ? (
               <div className="flex flex-col gap-4 w-full">
                 <div>
