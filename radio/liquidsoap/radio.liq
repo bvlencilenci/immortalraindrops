@@ -10,9 +10,11 @@ set("log.level", 4) # Debug level for troubleshooting
 log("=== IMMORTAL RAINDROPS RADIO ENGINE STARTING ===")
 
 # Enable telnet server (exposed for Next.js command route via Fly private network / exposed port)
+log("Enabling telnet server on bind address 0.0.0.0, port 7000...")
 settings.server.telnet.set(true)
 settings.server.telnet.bind_addr.set("0.0.0.0")
 settings.server.telnet.port.set(7000)
+log("Telnet server configuration loaded.")
 
 # Environment variables
 webhook_url = environment.get("LIVE_STATUS_WEBHOOK_URL")
@@ -59,8 +61,22 @@ normal = playlist(
 
 # PHASE 1C: PLAYLIST ROTATION with fallback silence
 log("Applying playlist rotation with fallback...")
-silence = blank(id="silence")
-music = fallback(id="music", [featured, normal, silence])
+playlists = fallback(id="playlists", [featured, normal])
+silence = blank(id="silence", duration=1.)
+music = fallback(id="music", track_sensitive=false, [playlists, silence])
+
+# Register track-change event listeners to trace playlist transitions
+featured = source.on_track(fun(m) -> begin
+  title = if m["title"] != "" then m["title"] else "Unknown Title" end;
+  artist = if m["artist"] != "" then m["artist"] else "Unknown Artist" end;
+  log(">>> [PLAYLIST - FEATURED] Now playing track: " ^ artist ^ " - " ^ title)
+end, featured)
+
+normal = source.on_track(fun(m) -> begin
+  title = if m["title"] != "" then m["title"] else "Unknown Title" end;
+  artist = if m["artist"] != "" then m["artist"] else "Unknown Artist" end;
+  log(">>> [PLAYLIST - NORMAL] Now playing track: " ^ artist ^ " - " ^ title)
+end, normal)
 
 # PHASE 1E: FALLBACK LOGIC (Priority 1: Live, Priority 2: Playlist)
 # Switches instantly via track_sensitive=false
