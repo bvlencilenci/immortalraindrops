@@ -22,14 +22,53 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Bad Request: Invalid payload fields' }, { status: 400 });
     }
 
+    // Parse stream title for history tracking
+    let playbackHistoryUpdate = null;
+
+    if (
+      is_live &&
+      stream_title &&
+      !['OFFLINE', 'STANDBY', 'PLAYLIST ROTATION', 'CONNECTING...'].includes(stream_title.toUpperCase())
+    ) {
+      const parts = stream_title.split(/ - | — /);
+      const artist = parts[0]?.trim() || 'Unknown Artist';
+      const title = parts[1]?.trim() || parts[0]?.trim() || 'Unknown Title';
+
+      // Get current history to append to
+      const { data: currentSettings } = await supabase
+        .from('system_settings')
+        .select('playback_history')
+        .eq('id', 1)
+        .single();
+
+      let history = currentSettings?.playback_history || [];
+      if (!Array.isArray(history)) history = [];
+
+      const lastTrack = history[0] as { artist?: string; title?: string } | undefined;
+      const isDuplicate = lastTrack && 
+        lastTrack.artist?.toLowerCase() === artist.toLowerCase() && 
+        lastTrack.title?.toLowerCase() === title.toLowerCase();
+
+      if (!isDuplicate) {
+        history = [{ artist, title }, ...history].slice(0, 5);
+        playbackHistoryUpdate = history;
+      }
+    }
+
+    const updateFields: any = {
+      is_live,
+      now_playing_title: stream_title,
+      updated_at: new Date().toISOString()
+    };
+
+    if (playbackHistoryUpdate) {
+      updateFields.playback_history = playbackHistoryUpdate;
+    }
+
     // Perform targeted column update on singleton row (id = 1) in system_settings
     const { error } = await supabase
       .from('system_settings')
-      .update({
-        is_live,
-        now_playing_title: stream_title,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateFields)
       .eq('id', 1);
 
     if (error) {

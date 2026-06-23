@@ -27,9 +27,12 @@ live_active = ref(false)
 
 # PHASE 1D: LIVE DJ INPUT (BUTT HARBOUR)
 log("Configuring BUTT Harbor input on port 8005...")
+settings.harbor.bind_addrs.set(["::"])
+
 live = input.harbor(
   "live",
   port=8005,
+  password=harbor_password,
   on_connect=fun(_) -> begin
     log(">>> DJ CONNECTED!");
     live_active := true

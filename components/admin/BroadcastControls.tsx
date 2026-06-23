@@ -9,7 +9,9 @@ import {
   radioGetNowPlaying,
   radioSubmitFeaturedQueue,
   radioGetFeaturedQueue,
+  updateBroadcastSettings,
 } from '@/app/godmode/actions';
+import { supabase } from '@/lib/supabase';
 
 interface QueuedTrack {
   url: string;
@@ -24,6 +26,14 @@ export default function BroadcastControls() {
   const [isSkipping, setIsSkipping] = useState(false);
   const [lastAction, setLastAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Broadcast Mode & DJ settings state
+  const [broadcastMode, setBroadcastMode] = useState<'automated' | 'live'>('automated');
+  const [djName, setDjName] = useState('');
+  const [showTitle, setShowTitle] = useState('');
+  const [djLocation, setDjLocation] = useState('');
+  const [djDescription, setDjDescription] = useState('');
+  const [isUpdatingMode, setIsUpdatingMode] = useState(false);
 
   // Queue state
   const [queue, setQueue] = useState<QueuedTrack[]>([]);
@@ -88,6 +98,58 @@ export default function BroadcastControls() {
     }, 10000);
     return () => clearInterval(interval);
   }, [fetchStatus, fetchQueue]);
+
+  // Load initial broadcast settings from database
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('system_settings')
+          .select('broadcast_mode, dj_name, show_title, dj_location, dj_description')
+          .eq('id', 1)
+          .single();
+        
+        if (error) throw error;
+        if (data) {
+          setBroadcastMode((data.broadcast_mode || 'automated') as 'automated' | 'live');
+          setDjName(data.dj_name || '');
+          setShowTitle(data.show_title || '');
+          setDjLocation(data.dj_location || '');
+          setDjDescription(data.dj_description || '');
+        }
+      } catch (err: any) {
+        console.error('Failed to load initial broadcast settings:', err);
+      }
+    };
+    loadSettings();
+  }, []);
+
+  const handleSaveBroadcastSettings = async (modeOverride?: 'automated' | 'live') => {
+    setIsUpdatingMode(true);
+    setError(null);
+
+    const activeMode = modeOverride || broadcastMode;
+
+    try {
+      const res = await updateBroadcastSettings({
+        broadcast_mode: activeMode,
+        dj_name: djName,
+        show_title: showTitle,
+        dj_location: djLocation,
+        dj_description: djDescription,
+      });
+
+      if (res.success) {
+        flashAction('BROADCAST CONFIG SAVED');
+      } else {
+        flashError(res.error || 'Failed to update broadcast configuration');
+      }
+    } catch (err: any) {
+      flashError(err.message || 'Error saving settings');
+    } finally {
+      setIsUpdatingMode(false);
+    }
+  };
 
   const handleSkip = async (type: 'main' | 'featured' | 'normal') => {
     setIsSkipping(true);
@@ -236,6 +298,168 @@ export default function BroadcastControls() {
             <span>SKIP NORMAL</span>
             <span className="text-[8px] opacity-50">▶▶</span>
           </button>
+        </div>
+      </div>
+
+      {/* BROADCAST CONFIGURATION */}
+      <div className="border border-[#ECEEDF]/10 bg-[#ECEEDF]/[0.02] p-6 group hover:border-[#ECEEDF]/20 transition-colors">
+        <h3 className="text-[#ECEEDF] text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 mb-6 group-hover:opacity-100 transition-opacity">
+          BROADCAST MODE & CONFIG
+        </h3>
+
+        {/* Mode Toggles */}
+        <div className="flex flex-col gap-4 mb-6">
+          <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">SELECT BROADCAST MODE</span>
+          <div className="flex gap-6">
+            <label className="flex items-center gap-3 text-xs uppercase tracking-wider cursor-pointer select-none">
+              <input
+                type="radio"
+                name="broadcast_mode"
+                value="automated"
+                checked={broadcastMode === 'automated'}
+                onChange={() => {
+                  setBroadcastMode('automated');
+                  handleSaveBroadcastSettings('automated');
+                }}
+                disabled={isUpdatingMode}
+                className="accent-[#ECEEDF] cursor-pointer"
+              />
+              <span>AUTOMATED RADIO</span>
+            </label>
+            <label className="flex items-center gap-3 text-xs uppercase tracking-wider cursor-pointer select-none">
+              <input
+                type="radio"
+                name="broadcast_mode"
+                value="live"
+                checked={broadcastMode === 'live'}
+                onChange={() => {
+                  setBroadcastMode('live');
+                  handleSaveBroadcastSettings('live');
+                }}
+                disabled={isUpdatingMode}
+                className="accent-[#ECEEDF] cursor-pointer"
+              />
+              <span>LIVE DJ BROADCAST</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Live DJ Details form */}
+        {broadcastMode === 'live' && (
+          <div className="border border-[#ECEEDF]/10 bg-black/40 p-5 flex flex-col gap-4">
+            <span className="text-[9px] uppercase tracking-widest text-red-500 font-bold block mb-1">
+              LIVE DJ SET DETAILS (AUTO-SAVES ON UNFOCUS / BLUR)
+            </span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">DJ NAME</label>
+                <input
+                  type="text"
+                  value={djName}
+                  onChange={(e) => setDjName(e.target.value)}
+                  onBlur={() => handleSaveBroadcastSettings()}
+                  placeholder="VOID ANGEL"
+                  className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">SHOW TITLE</label>
+                <input
+                  type="text"
+                  value={showTitle}
+                  onChange={(e) => setShowTitle(e.target.value)}
+                  onBlur={() => handleSaveBroadcastSettings()}
+                  placeholder="NIGHT TRANSMISSION 004"
+                  className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">LOCATION</label>
+                <input
+                  type="text"
+                  value={djLocation}
+                  onChange={(e) => setDjLocation(e.target.value)}
+                  onBlur={() => handleSaveBroadcastSettings()}
+                  placeholder="LONDON"
+                  className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">DESCRIPTION</label>
+              <textarea
+                value={djDescription}
+                onChange={(e) => setDjDescription(e.target.value)}
+                onBlur={() => handleSaveBroadcastSettings()}
+                placeholder="2 HOURS OF DUB TECHNO"
+                rows={3}
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] resize-none"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* DJ BROADCAST */}
+      <div className="border border-[#ECEEDF]/10 bg-[#ECEEDF]/[0.02] p-6 group hover:border-[#ECEEDF]/20 transition-colors">
+        <h3 className="text-[#ECEEDF] text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 mb-6 group-hover:opacity-100 transition-opacity">
+          DJ BROADCAST
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Live Source Indicator */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">LIVE SOURCE</span>
+            <div className="flex items-center gap-3">
+              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                status === 'LIVE'
+                  ? 'bg-red-500 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.8)]'
+                  : 'bg-[#ECEEDF]/15'
+              }`} />
+              <div className="flex flex-col">
+                <span className={`text-sm font-bold tracking-tight ${
+                  status === 'LIVE' ? 'text-red-400' : 'text-[#ECEEDF]/40'
+                }`}>
+                  {status === 'LIVE' ? 'DJ LIVE — OVERRIDING PLAYLIST' : 'NO LIVE SOURCE'}
+                </span>
+                <span className="text-[9px] text-[#ECEEDF]/25 mt-0.5 uppercase tracking-widest">
+                  {status === 'LIVE' ? 'Harbor connected on port 8005' : 'Automated playlist active'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Status Mirror */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">ENGINE MODE</span>
+            <span className={`text-sm font-bold tracking-tight ${
+              status === 'LIVE' ? 'text-red-400' : status === 'OFFLINE' ? 'text-[#ECEEDF]/20' : 'text-[#ECEEDF]/70'
+            }`}>
+              {status}
+            </span>
+          </div>
+        </div>
+
+        {/* Instruction Block */}
+        <div className="border border-[#ECEEDF]/10 bg-black/40 p-4">
+          <span className="text-[9px] uppercase tracking-[0.3em] text-[#ECEEDF]/30 block mb-3">HOW TO GO LIVE</span>
+          <ol className="flex flex-col gap-2">
+            {[
+              { n: '1', text: 'Run ./dj-connect.sh from the project root' },
+              { n: '2', text: 'Wait for "Tunnel active on 127.0.0.1:8005"' },
+              { n: '3', text: 'Open BUTT → Server: 127.0.0.1:8005, Mount: /live' },
+              { n: '4', text: 'Hit Connect — playlist overrides automatically' },
+              { n: '5', text: 'Disconnect in BUTT, then Ctrl+C in terminal to end' },
+            ].map(({ n, text }) => (
+              <li key={n} className="flex gap-3 text-[10px] text-[#ECEEDF]/40">
+                <span className="text-[#ECEEDF]/20 font-bold w-3 shrink-0">{n}.</span>
+                <span>{text}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="text-[9px] text-[#ECEEDF]/20 mt-3 border-t border-[#ECEEDF]/5 pt-3">
+            See <span className="text-[#ECEEDF]/40">docs/dj-setup.md</span> for full BUTT config reference.
+          </p>
         </div>
       </div>
 

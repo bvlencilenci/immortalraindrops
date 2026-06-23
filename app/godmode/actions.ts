@@ -623,4 +623,35 @@ export async function radioGetFeaturedQueue() {
   }
 }
 
+export async function updateBroadcastSettings(settings: {
+  broadcast_mode: 'automated' | 'live';
+  dj_name?: string;
+  show_title?: string;
+  dj_location?: string;
+  dj_description?: string;
+}) {
+  try {
+    await verifyAdmin();
+
+    const { error } = await supabaseAdmin
+      .from('system_settings')
+      .update({
+        broadcast_mode: settings.broadcast_mode,
+        dj_name: settings.dj_name || null,
+        show_title: settings.show_title || null,
+        dj_location: settings.dj_location || null,
+        dj_description: settings.dj_description || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', 1);
+
+    if (error) throw error;
+    revalidatePath('/', 'layout');
+    return { success: true };
+  } catch (err: any) {
+    console.error('[BROADCAST] Update settings failed:', err);
+    return { success: false, error: err.message };
+  }
+}
+
 
