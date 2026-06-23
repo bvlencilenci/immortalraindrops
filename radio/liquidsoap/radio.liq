@@ -61,14 +61,12 @@ log("Configuring Unified Playlists from /music/unified...")
 featured = playlist(
   mode="random",
   reload_mode="watch",
-  fallible=true,
   "/music/unified/featured"
 )
 
 normal = playlist(
   mode="random",
   reload_mode="watch",
-  fallible=true,
   "/music/unified/normal"
 )
 
