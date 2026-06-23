@@ -14,9 +14,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description: data?.meta_description || 'IMMORTAL RAINDROPS WORLDWIDE',
     keywords: data?.keywords ? data.keywords.split(',') : ['art', 'music', 'visuals'],
     icons: {
-      icon: '/logo.png',
-      shortcut: '/logo.png',
-      apple: '/logo.png',
+      icon: '/logo-tab.png',
+      shortcut: '/logo-tab.png',
+      apple: '/logo-tab.png',
     },
     openGraph: {
       title: data?.site_title || 'Immortal Raindrops',
