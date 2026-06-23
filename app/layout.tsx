@@ -13,6 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
     title: data?.site_title || 'Immortal Raindrops',
     description: data?.meta_description || 'IMMORTAL RAINDROPS WORLDWIDE',
     keywords: data?.keywords ? data.keywords.split(',') : ['art', 'music', 'visuals'],
+    icons: {
+      icon: '/logo.png',
+      shortcut: '/logo.png',
+      apple: '/logo.png',
+    },
     openGraph: {
       title: data?.site_title || 'Immortal Raindrops',
       description: data?.meta_description || 'IMMORTAL RAINDROPS WORLDWIDE',
