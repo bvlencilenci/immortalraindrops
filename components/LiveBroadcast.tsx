@@ -392,15 +392,15 @@ export default function LiveBroadcast({
   const showLiveIndicator = isLive || broadcastMode === 'automated';
 
   return (
-    <div className="relative w-full flex-1 flex flex-col items-center justify-between min-h-0 bg-black overflow-hidden px-2 md:px-4 py-8 font-mono">
+    <div className="relative w-full flex-1 flex flex-col items-center justify-between min-h-0 bg-black overflow-hidden font-mono">
       {/* generative waves visualizer */}
       <LiveVisualizer />
 
-      {/* Main columns container */}
-      <div className="w-full max-w-full flex flex-col md:flex-row gap-2 md:gap-4 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-4 md:py-8 px-3 sm:px-4 md:px-8 backdrop-blur-[4px] bg-black/[0.35]">
+      {/* Main columns container - centered with padding */}
+      <div className="w-full max-w-full flex flex-col md:flex-row gap-2 md:gap-4 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-4 md:py-8 px-6 sm:px-8 md:px-12 lg:px-16 backdrop-blur-[4px] bg-black/[0.35]">
         
         {/* LEFT COLUMN: LAST PLAYED */}
-        <div className="w-full md:flex-1 min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-4 md:pb-0 px-2 sm:px-0 md:pr-4 flex flex-col gap-3 relative overflow-hidden">
+        <div className="w-full md:flex-1 min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-4 md:pb-0 md:pr-6 flex flex-col gap-3 relative overflow-hidden">
           <h2 className="text-[9px] md:text-[10px] lg:text-[11px] tracking-[0.15em] font-bold text-[#ECEEDF]/80 uppercase border-b border-[#ECEEDF]/10 pb-2 mb-1 whitespace-nowrap">
             LAST PLAYED
           </h2>
@@ -433,7 +433,7 @@ export default function LiveBroadcast({
         </div>
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="w-full md:flex-[3] min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 px-2 sm:px-0 md:px-6 flex flex-col items-center justify-start text-center">
+        <div className="w-full md:flex-[3] min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 md:px-8 flex flex-col items-center justify-start text-center">
           
           {/* Status Badge */}
           <div className="flex flex-col items-center gap-2 z-10">
@@ -461,8 +461,8 @@ export default function LiveBroadcast({
           {/* Spacer to push Now Playing down */}
           <div className="flex-1" />
 
-          {/* Now Playing visual display */}
-          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-xl z-10 pb-2 mt-12">
+          {/* Now Playing visual display - pushed much lower */}
+          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-2xl z-10 pb-8 mt-20">
             {broadcastMode === 'live' ? (
               <div className="flex flex-col gap-4 w-full">
                 <div>
@@ -506,7 +506,7 @@ export default function LiveBroadcast({
         </div>
 
         {/* RIGHT COLUMN: NEWS */}
-        <div className="w-full md:flex-1 min-w-0 bg-transparent pb-0 px-2 sm:px-0 md:pl-4 flex flex-col gap-3 relative overflow-hidden">
+        <div className="w-full md:flex-1 min-w-0 bg-transparent pb-0 md:pl-6 flex flex-col gap-3 relative overflow-hidden">
           <h2 className="text-[9px] md:text-[10px] lg:text-[11px] tracking-[0.15em] font-bold text-[#ECEEDF]/80 uppercase border-b border-[#ECEEDF]/10 pb-2 mb-1 whitespace-nowrap">
             NEWS
           </h2>
@@ -548,7 +548,7 @@ export default function LiveBroadcast({
       </div>
 
       {/* FOOTER STATUS BAR */}
-      <div className="w-full max-w-full mt-6 border-t border-[#ECEEDF]/10 pt-3 flex flex-row flex-wrap justify-between items-center gap-y-2 gap-x-4 text-[8px] md:text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase">
+      <div className="w-full max-w-full mt-6 border-t border-[#ECEEDF]/10 pt-3 px-6 sm:px-8 md:px-12 flex flex-row flex-wrap justify-between items-center gap-y-2 gap-x-4 text-[8px] md:text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase">
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           <span>LISTENERS: {listenerCount}</span>
           <span>UPTIME: {formatUptime(uptimeSeconds)}</span>
