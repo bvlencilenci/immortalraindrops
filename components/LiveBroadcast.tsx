@@ -42,7 +42,7 @@ function TrackCover({ coverUrl, trackKey }: TrackCoverProps) {
     <img
       src={src}
       alt=""
-      className="w-12 h-12 border border-[#ECEEDF]/15 bg-black/40 flex-shrink-0"
+      className="w-10 h-10 border border-[#ECEEDF]/15 bg-black/40 flex-shrink-0"
       style={{
         objectFit: isFallback ? 'contain' : 'cover',
         filter: isFallback ? 'invert(1)' : 'none',
@@ -231,17 +231,17 @@ export default function LiveBroadcast({
       {/* generative waves visualizer */}
       <LiveVisualizer />
 
-      {/* Main columns grid */}
-      <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-6 md:py-12 px-3 sm:px-4 md:px-8 backdrop-blur-[4px] bg-black/20">
+      {/* Main columns container */}
+      <div className="w-full max-w-full flex flex-col md:flex-row gap-2 md:gap-4 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-4 md:py-8 px-3 sm:px-4 md:px-8 backdrop-blur-[4px] bg-black/20 min-h-0 overflow-hidden">
         
         {/* LEFT COLUMN: LAST PLAYED */}
-        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 px-2 sm:px-0 md:pr-10 flex flex-col gap-6 relative overflow-hidden">
-          <h2 className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-3 mb-2">
+        <div className="w-full md:w-1/5 flex-shrink-0 min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-4 md:pb-0 px-2 sm:px-0 md:pr-4 flex flex-col gap-3 relative overflow-hidden">
+          <h2 className="text-[8px] md:text-[9px] lg:text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-2 mb-1">
             LAST PLAYED
           </h2>
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4 overflow-y-auto max-h-[160px] md:max-h-[350px] pr-1 custom-scrollbar">
             {playbackHistory.length === 0 ? (
-              <div className="text-[10px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
+              <div className="text-[8px] md:text-[9px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
                 NO HISTORY RECORDED
               </div>
             ) : (
@@ -250,13 +250,13 @@ export default function LiveBroadcast({
                 const coverUrl = trackImageMap[trackKey];
 
                 return (
-                  <div key={i} className="flex items-center gap-4 py-1 border-b border-[#ECEEDF]/5 last:border-b-0 last:pb-0">
+                  <div key={i} className="flex items-center gap-3 py-1 border-b border-[#ECEEDF]/5 last:border-b-0 last:pb-0">
                     <TrackCover coverUrl={coverUrl} trackKey={trackKey} />
                     <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#ECEEDF]/85 truncate">
+                      <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#ECEEDF]/85 truncate">
                         {track.artist}
                       </span>
-                      <span className="text-[10px] uppercase tracking-wider text-[#ECEEDF]/50 truncate">
+                      <span className="text-[9px] md:text-[10px] uppercase tracking-wider text-[#ECEEDF]/50 truncate">
                         {track.title}
                       </span>
                     </div>
@@ -268,9 +268,9 @@ export default function LiveBroadcast({
         </div>
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 px-2 sm:px-0 md:pr-10 flex flex-col items-center justify-center text-center gap-16 min-h-[400px] relative overflow-hidden select-none">
+        <div className="w-full md:w-3/5 flex-shrink-0 min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-4 md:pb-0 px-2 sm:px-0 md:px-4 flex flex-col items-center justify-center text-center gap-6 md:gap-12 min-h-fit relative overflow-hidden select-none">
           
-          <div className="flex flex-col items-center gap-8 w-full z-10">
+          <div className="flex flex-col items-center gap-4 md:gap-8 w-full z-10">
             {/* Status Badge */}
             <div className="flex flex-col items-center gap-1.5">
               <div className="flex items-center gap-2">
@@ -279,58 +279,58 @@ export default function LiveBroadcast({
                     ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]' 
                     : 'bg-[#ECEEDF]/20'
                 }`} />
-                <span className={`text-[10px] tracking-[0.3em] font-bold uppercase ${
+                <span className={`text-[8px] md:text-[9px] lg:text-[10px] tracking-[0.3em] font-bold uppercase ${
                   showLiveIndicator ? 'text-red-500' : 'text-[#ECEEDF]/30'
                 }`}>
                   {showLiveIndicator ? 'LIVE' : 'OFFLINE'}
                 </span>
               </div>
               
-              <div className="text-[8px] tracking-widest text-[#ECEEDF]/30 uppercase mt-2">
+              <div className="text-[8px] tracking-widest text-[#ECEEDF]/30 uppercase mt-1">
                 STATUS
               </div>
-              <div className="text-[11px] font-bold tracking-widest uppercase border border-[#ECEEDF]/15 px-3 py-1 bg-white/[0.01]">
+              <div className="text-[9px] md:text-[11px] font-bold tracking-widest uppercase border border-[#ECEEDF]/15 px-3 py-1 bg-white/[0.01]">
                 {broadcastMode === 'live' ? 'LIVE DJ SET' : 'AUTOMATED BROADCAST'}
               </div>
             </div>
 
             {/* Now Playing visual display */}
-            <div className="w-full flex flex-col items-center justify-center min-h-[180px] max-w-xl">
+            <div className="w-full flex flex-col items-center justify-center min-h-fit flex-1 max-w-xl">
               {broadcastMode === 'live' ? (
-                <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-3 w-full">
                   <div>
                     <span className="text-[8px] tracking-[0.2em] text-[#ECEEDF]/30 uppercase block mb-1">DJ</span>
-                    <span className="text-2xl md:text-4xl font-extrabold tracking-widest uppercase text-red-500 truncate block px-2">
+                    <span className="text-lg md:text-3xl font-extrabold tracking-widest uppercase text-red-500 truncate block px-2">
                       {djName || 'VOID OPERATOR'}
                     </span>
                   </div>
                   <div>
                     <span className="text-[8px] tracking-[0.2em] text-[#ECEEDF]/30 uppercase block mb-1">NOW BROADCASTING</span>
-                    <span className="text-sm md:text-lg font-bold tracking-wider uppercase text-[#ECEEDF]/85 truncate block px-2">
+                    <span className="text-xs md:text-base font-bold tracking-wider uppercase text-[#ECEEDF]/85 truncate block px-2">
                       {showTitle || 'NIGHT TRANSMISSION'}
                     </span>
                   </div>
                   {djLocation && (
                     <div>
                       <span className="text-[8px] tracking-[0.2em] text-[#ECEEDF]/30 uppercase block mb-1">LOCATION</span>
-                      <span className="text-[10px] tracking-widest uppercase text-[#ECEEDF]/60 truncate block px-2">
+                      <span className="text-[9px] md:text-[10px] tracking-widest uppercase text-[#ECEEDF]/60 truncate block px-2">
                         {djLocation}
                       </span>
                     </div>
                   )}
                   {djDescription && (
-                    <p className="text-[9px] text-[#ECEEDF]/40 tracking-wider uppercase leading-relaxed border-t border-[#ECEEDF]/10 pt-3 mt-1 px-4 break-words">
+                    <p className="text-[8px] md:text-[9px] text-[#ECEEDF]/40 tracking-wider uppercase leading-relaxed border-t border-[#ECEEDF]/10 pt-2 mt-1 px-4 break-words">
                       {djDescription}
                     </p>
                   )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center text-center gap-3 w-full">
-                  <span className="text-[9px] tracking-[0.3em] text-[#ECEEDF]/30 uppercase font-bold">NOW PLAYING</span>
-                  <div className="text-3xl md:text-5xl font-black tracking-widest uppercase text-[#ECEEDF] px-2 mt-2 text-center break-words w-full">
+                  <span className="text-[8px] md:text-[9px] tracking-[0.3em] text-[#ECEEDF]/30 uppercase font-bold">NOW PLAYING</span>
+                  <div className="text-xl md:text-3xl font-black tracking-widest uppercase text-[#ECEEDF] px-2 mt-1 text-center break-words w-full">
                     {currentArtist}
                   </div>
-                  <div className="text-lg md:text-2xl tracking-[0.15em] uppercase text-[#ECEEDF]/60 px-2 mt-1 text-center break-words w-full">
+                  <div className="text-sm md:text-lg tracking-[0.15em] uppercase text-[#ECEEDF]/60 px-2 mt-0.5 text-center break-words w-full">
                     {currentTitle}
                   </div>
                 </div>
@@ -340,19 +340,19 @@ export default function LiveBroadcast({
         </div>
 
         {/* RIGHT COLUMN: NEWS DISPATCH */}
-        <div className="bg-transparent pb-0 pr-0 px-2 sm:px-0 flex flex-col gap-6 relative overflow-hidden">
-          <h2 className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-3 mb-2">
+        <div className="w-full md:w-1/5 flex-shrink-0 min-w-0 bg-transparent pb-0 px-2 sm:px-0 md:pl-4 flex flex-col gap-3 relative overflow-hidden">
+          <h2 className="text-[8px] md:text-[9px] lg:text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-2 mb-1">
             NEWS DISPATCH
           </h2>
-          <div className="flex flex-col gap-5 max-h-[480px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex flex-col gap-4 max-h-[180px] md:max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
             {newsPosts.length === 0 ? (
-              <div className="text-[10px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
+              <div className="text-[8px] md:text-[9px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
                 NO DISPATCHES RECORDED
               </div>
             ) : (
               newsPosts.map((post) => (
-                <div key={post.id} className="flex flex-col gap-2 border-b border-[#ECEEDF]/5 pb-4 last:border-b-0 last:pb-0">
-                  <div className="flex items-center gap-2 text-[8px] tracking-wider text-[#ECEEDF]/45 uppercase">
+                <div key={post.id} className="flex flex-col gap-1.5 border-b border-[#ECEEDF]/5 pb-3 last:border-b-0 last:pb-0">
+                  <div className="flex items-center gap-2 text-[7px] md:text-[8px] tracking-wider text-[#ECEEDF]/45 uppercase">
                     <span>
                       {new Date(post.published_at).toLocaleDateString('en-GB', {
                         day: 'numeric',
@@ -363,13 +363,13 @@ export default function LiveBroadcast({
                     <span>•</span>
                     <span className="text-[#ECEEDF]/60">[{post.type}]</span>
                   </div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider hover:text-white leading-tight">
+                  <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-wider hover:text-white leading-tight">
                     <a href={`/news/${post.slug}`} className="hover:underline">
                       {post.title}
                     </a>
                   </h3>
                   {post.excerpt && (
-                    <p className="text-[10px] tracking-wider leading-relaxed text-[#ECEEDF]/50 normal-case first-letter:uppercase line-clamp-2">
+                    <p className="text-[9px] md:text-[10px] tracking-wider leading-relaxed text-[#ECEEDF]/50 normal-case first-letter:uppercase line-clamp-2">
                       {post.excerpt}
                     </p>
                   )}
@@ -382,15 +382,15 @@ export default function LiveBroadcast({
       </div>
 
       {/* FOOTER STATUS BAR */}
-      <div className="w-full max-w-full mt-8 border-t border-[#ECEEDF]/10 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase select-none z-10 px-4 md:px-8 backdrop-blur-[2px] bg-black/5">
-        <div className="flex gap-6">
+      <div className="w-full max-w-full mt-6 border-t border-[#ECEEDF]/10 pt-3 flex flex-row flex-wrap justify-between items-center gap-y-2 gap-x-4 text-[8px] md:text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase select-none z-10 px-4 md:px-8 backdrop-blur-[2px] bg-black/5">
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
           <span>LISTENERS: {listenerCount}</span>
           <span>UPTIME: {formatUptime(uptimeSeconds)}</span>
         </div>
-        <div className="font-bold text-[#ECEEDF]/65">
+        <div className="font-bold text-[#ECEEDF]/65 text-center w-full sm:w-auto my-1 sm:my-0">
           {broadcastMode === 'live' ? 'LIVE DJ BROADCAST' : 'CURATED PLAYLIST'}
         </div>
-        <div className="flex gap-6">
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
           <span>EST. 2026</span>
           <span>LONDON, UK</span>
         </div>
