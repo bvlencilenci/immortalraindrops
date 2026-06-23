@@ -289,32 +289,24 @@ const Header = () => {
 
           {/* BLOCK 1: Left - Station Identity */}
           <div
-            className="flex items-center justify-start shrink-0 gap-8 z-30"
+            className="flex items-center justify-start shrink-0 gap-6 z-30"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Center: LOGO (Image) */}
+            {/* Logo Text (Brutalist style matching reference image) */}
             <Link
               href="/"
-              className="shrink-0 flex items-center justify-center"
+              className="shrink-0 flex flex-col font-mono text-[13px] font-black tracking-[0.2em] leading-[1.1] text-white hover:text-[#ECEEDF] transition-colors select-none"
             >
-              <img
-                src="/logo.png"
-                alt="Immortal Raindrops"
-                width={711}
-                height={1024}
-                className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity"
-                style={{ height: '48px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
-              />
+              <span>IMMORTAL</span>
+              <span>RAINDROPS</span>
             </Link>
 
-            <div className="flex items-center gap-4">
-              <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-30'}`}>
-                <div className="w-[1px] h-5 bg-[#ECEEDF] font-thin"></div>
-                <div className="w-[1px] h-5 bg-[#ECEEDF] font-thin"></div>
-                <div className="w-[1px] h-5 bg-[#ECEEDF] font-thin"></div>
-              </div>
+            {/* Vertical Separator */}
+            <div className="w-[1px] h-8 bg-[#ECEEDF]/20 shrink-0" />
 
+            {/* Navigation links (Desktop) that reveal on hover */}
+            <div className="flex items-center">
               <AnimatePresence>
                 {isHovered && (
                   <motion.div
@@ -323,7 +315,7 @@ const Header = () => {
                     animate={{ width: "auto", opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap pl-2"
+                    className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap pr-4"
                   >
                     <Link href="/archive" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
                     <Link href="/live" className="flex items-center gap-1.5 text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">
@@ -336,8 +328,8 @@ const Header = () => {
             </div>
 
             {/* Divider and Station Info / Track Metadata */}
-            {(currentlyPlayingId === 'radio-stream' || isLive || showHeaderMetadata) && (
-              <div className="flex flex-col justify-center border-l border-[#ECEEDF]/20 pl-6 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
+            {(currentlyPlayingId === 'radio-stream' || isLive || showHeaderMetadata) && !isHovered && (
+              <div className="flex flex-col justify-center max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
                 {pathname === '/submit' ? (
                   <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-none tracking-widest whitespace-nowrap">
                     SUBMISSION MODE
@@ -382,11 +374,7 @@ const Header = () => {
 
             {/* VOLUME CONTROLS */}
             {isPlayerActive && (
-              <div className={`flex flex-shrink-0 ${
-                currentlyPlayingId === 'radio-stream' 
-                  ? 'items-center justify-center' 
-                  : 'flex-col items-end gap-1'
-              }`}>
+              <div className="flex flex-col items-end gap-1 shrink-0">
                 <div className="flex items-center gap-4">
                   <button
                     className="flex items-center justify-center"
@@ -417,18 +405,18 @@ const Header = () => {
                     }}
                   />
                 </div>
-                {currentlyPlayingId !== 'radio-stream' && (
-                  <span className="w-[120px] text-center font-mono text-[12px] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate">
-                    {formatTime(seek)} / {formatTime(duration)}
-                  </span>
-                )}
+                <span className="w-[120px] text-center font-mono text-[12px] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate mt-1">
+                  {currentlyPlayingId === 'radio-stream'
+                    ? '--:-- / --:--'
+                    : `${formatTime(seek)} / ${formatTime(duration)}`}
+                </span>
               </div>
             )}
           </div>
         </div>
 
         {/* BLOCK 2: Center - Player Buttons (Absolute Center Pivot) */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-50">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-6 z-50">
           {isPlayerActive && (
             <>
               <button
@@ -437,7 +425,7 @@ const Header = () => {
                   e.stopPropagation();
                   skipBack();
                 }}
-                className={`absolute right-full mr-[15rem] flex items-center justify-center whitespace-nowrap transition-opacity ${
+                className={`flex items-center justify-center whitespace-nowrap transition-opacity ${
                   currentlyPlayingId === 'radio-stream'
                     ? 'opacity-20 pointer-events-none'
                     : 'hover:opacity-50'
@@ -449,7 +437,7 @@ const Header = () => {
                   <path d="M199.81,34a16,16,0,0,0-16.24.43L64,109.23V40a8,8,0,0,0-16,0V216a8,8,0,0,0,16,0V146.77l119.57,74.78A15.95,15.95,0,0,0,208,208.12V47.88A15.86,15.86,0,0,0,199.81,34ZM192,208,64.16,128,192,48.07Z" />
                 </svg>
               </button>
-              <div className="relative"> {/* Pivot Point */}
+              <div> {/* Pivot Point */}
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePlay(); }}
                   className="hover:opacity-50 transition-opacity flex items-center justify-center whitespace-nowrap"
@@ -468,7 +456,7 @@ const Header = () => {
                   e.stopPropagation();
                   skipTrack();
                 }}
-                className={`absolute left-full ml-[15rem] flex items-center justify-center whitespace-nowrap transition-opacity ${
+                className={`flex items-center justify-center whitespace-nowrap transition-opacity ${
                   currentlyPlayingId === 'radio-stream'
                     ? 'opacity-20 pointer-events-none'
                     : 'hover:opacity-50'

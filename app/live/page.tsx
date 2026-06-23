@@ -48,7 +48,7 @@ export default async function Live() {
   });
 
   return (
-    <main className="flex-1 w-full flex flex-col bg-black min-h-0">
+    <main className="flex-1 w-full flex flex-col bg-black min-h-0 live-broadcast-page">
       <LiveBroadcast
         initialIsLive={isLive}
         initialTitle={streamTitle}

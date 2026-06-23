@@ -377,3 +377,8 @@ input[type=range].header-needle-range::-webkit-slider-runnable-track {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Hide global layout footer when live broadcast page is open */
+body:has(.live-broadcast-page) footer {
+  display: none !important;
+}

@@ -52,6 +52,7 @@ export default function LiveBroadcast({
   // Dynamic statistics states for footer
   const [listenerCount, setListenerCount] = useState(0);
   const [uptimeSeconds, setUptimeSeconds] = useState(0);
+  const [upcomingQueue, setUpcomingQueue] = useState<{ artist: string; title: string }[]>([]);
 
   const { currentlyPlayingId, isPlaying } = useAudioStore();
 
@@ -127,6 +128,25 @@ export default function LiveBroadcast({
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch upcoming queue when now playing title changes
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      try {
+        const res = await fetch('/api/radio/queue');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.queue) {
+            setUpcomingQueue(data.queue.slice(0, 5));
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching upcoming queue:', err);
+      }
+    };
+
+    fetchUpcoming();
+  }, [nowPlayingTitle]);
 
   // Parse artist and title for display
   const getDisplayTrackInfo = () => {
@@ -226,6 +246,13 @@ export default function LiveBroadcast({
         <div className="bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-8 md:pb-0 pr-0 md:pr-10 flex flex-col items-center justify-center text-center gap-16 min-h-[400px] relative overflow-hidden select-none">
           
           <div className="flex flex-col items-center gap-8 w-full z-10">
+            {/* Station Branding */}
+            <div className="flex flex-col items-center font-bold text-center select-none uppercase mb-2 tracking-[0.4em] text-[#ECEEDF]/45">
+              <span className="text-xl md:text-2xl leading-[1.3]">I M M O R T A L</span>
+              <span className="text-xl md:text-2xl leading-[1.3]">R A I N D R O P S</span>
+              <span className="text-xl md:text-2xl leading-[1.3]">R A D I O</span>
+            </div>
+
             {/* Status Badge */}
             <div className="flex flex-col items-center gap-1.5">
               <div className="flex items-center gap-2">
@@ -294,42 +321,53 @@ export default function LiveBroadcast({
           </div>
         </div>
 
-        {/* RIGHT COLUMN: NEWS DISPATCH */}
+        {/* RIGHT COLUMN: UPCOMING */}
         <div className="bg-transparent pb-0 pr-0 flex flex-col gap-6 relative overflow-hidden">
           <h2 className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/40 uppercase border-b border-[#ECEEDF]/10 pb-3 mb-2">
-            NEWS DISPATCH
+            UPCOMING
           </h2>
-          <div className="flex flex-col gap-5 max-h-[480px] overflow-y-auto pr-2 custom-scrollbar">
-            {newsPosts.length === 0 ? (
+          <div className="flex flex-col gap-5">
+            {upcomingQueue.length === 0 ? (
               <div className="text-[10px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
-                NO DISPATCHES RECORDED
+                NO UPCOMING QUEUE
               </div>
             ) : (
-              newsPosts.map((post) => (
-                <div key={post.id} className="flex flex-col gap-2 border-b border-[#ECEEDF]/5 pb-4 last:border-b-0 last:pb-0">
-                  <div className="flex items-center gap-2 text-[8px] tracking-wider text-[#ECEEDF]/45 uppercase">
-                    <span>
-                      {new Date(post.published_at).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
+              upcomingQueue.map((track, i) => {
+                const trackKey = `${track.artist.toLowerCase()} - ${track.title.toLowerCase()}`;
+                const coverUrl = trackImageMap[trackKey];
+                const indexStr = (i + 1).toString().padStart(2, '0');
+
+                return (
+                  <div key={i} className="flex items-center gap-4 py-1 border-b border-[#ECEEDF]/5 last:border-b-0 last:pb-0">
+                    <span className="text-[11px] font-bold font-mono text-[#ECEEDF]/40 shrink-0">
+                      {indexStr}
                     </span>
-                    <span>•</span>
-                    <span className="text-[#ECEEDF]/60">[{post.type}]</span>
+                    {coverUrl ? (
+                      <img
+                        src={coverUrl}
+                        alt=""
+                        className="w-12 h-12 object-cover border border-[#ECEEDF]/15 bg-black/40 flex-shrink-0"
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-white/[0.03] border border-[#ECEEDF]/10 flex items-center justify-center text-[9px] text-[#ECEEDF]/30 flex-shrink-0 select-none">
+                        [TRK]
+                      </div>
+                    )}
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#ECEEDF]/85 truncate">
+                        {track.artist}
+                      </span>
+                      <span className="text-[10px] uppercase tracking-wider text-[#ECEEDF]/50 truncate">
+                        {track.title}
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider hover:text-white leading-tight">
-                    <a href={`/news/${post.slug}`} className="hover:underline">
-                      {post.title}
-                    </a>
-                  </h3>
-                  {post.excerpt && (
-                    <p className="text-[10px] tracking-wider leading-relaxed text-[#ECEEDF]/50 normal-case first-letter:uppercase line-clamp-2">
-                      {post.excerpt}
-                    </p>
-                  )}
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
