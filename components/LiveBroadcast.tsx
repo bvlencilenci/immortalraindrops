@@ -106,7 +106,7 @@ export default function LiveBroadcast({
 
   // Parse artist and title for display
   const getDisplayTrackInfo = () => {
-    if (!isRadioPlaying) {
+    if (!nowPlayingTitle || ['OFFLINE', 'STANDBY', 'CONNECTING...'].includes(nowPlayingTitle.toUpperCase())) {
       return { artist: 'STANDBY', title: '' };
     }
     const parts = nowPlayingTitle.split(/ - | — /);
