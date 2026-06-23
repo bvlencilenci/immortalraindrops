@@ -100,7 +100,7 @@ def handle_metadata(m) =
   notify_status(is_live, display_title)
 end
 
-radio = radio.on_metadata(handle_metadata)
+radio = source.on_metadata(handle_metadata, radio)
 
 # PHASE 1F: ICECAST OUTPUT CONFIGURATION
 log("Connecting output stream to Icecast on localhost:8000/radio...")
