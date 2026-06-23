@@ -219,21 +219,54 @@ export default function SubmissionReview() {
           <h2 className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#ECEEDF]/25">
             Reviewed ({reviewed.length})
           </h2>
-          <div className="flex flex-col divide-y divide-[#ECEEDF]/5 border border-[#ECEEDF]/5">
+          <div className="flex flex-col gap-2">
             {reviewed.map(sub => (
-              <div key={sub.id} className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-[#ECEEDF]/[0.02] transition-colors">
-                <div className="min-w-0 flex-1">
-                  <span className="font-mono text-sm text-[#ECEEDF]/50 truncate block">
-                    {sub.artist_name} — {sub.title}
+              <div
+                key={sub.id}
+                className="border border-[#ECEEDF]/5 bg-[#ECEEDF]/[0.01] hover:bg-[#ECEEDF]/[0.03] transition-colors p-4"
+              >
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-mono text-sm text-[#ECEEDF]/60 font-medium truncate">
+                      {sub.artist_name} — {sub.title}
+                    </p>
+                    {sub.audio_url && (
+                      <a
+                        href={`https://${R2}/${sub.audio_url}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-[10px] text-[#ECEEDF]/25 hover:text-[#ECEEDF]/60 underline underline-offset-4 transition-colors"
+                      >
+                        Listen ↗
+                      </a>
+                    )}
+                  </div>
+                  <span className={`shrink-0 font-mono text-[9px] uppercase tracking-[0.2em] px-2 py-0.5 border ${
+                    sub.status === 'approved'
+                      ? 'text-green-400/60 border-green-500/15'
+                      : 'text-red-400/60 border-red-500/15'
+                  }`}>
+                    {sub.status}
                   </span>
                 </div>
-                <span className={`shrink-0 font-mono text-[9px] uppercase tracking-[0.2em] px-2 py-0.5 border ${
-                  sub.status === 'approved'
-                    ? 'text-green-400/70 border-green-500/20'
-                    : 'text-red-400/70 border-red-500/20'
-                }`}>
-                  {sub.status}
-                </span>
+
+                {/* Action buttons — always available regardless of review status */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleArchive(sub.id)}
+                    disabled={busy !== null}
+                    className="font-mono text-[9px] uppercase tracking-[0.2em] px-3 py-2 border border-[#ECEEDF]/15 text-[#ECEEDF]/40 hover:bg-[#ECEEDF] hover:text-black hover:border-[#ECEEDF] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    {busy === sub.id + ':archive' ? 'Saving…' : '+ Archive'}
+                  </button>
+                  <button
+                    onClick={() => handlePlaylist(sub.id)}
+                    disabled={busy !== null}
+                    className="font-mono text-[9px] uppercase tracking-[0.2em] px-3 py-2 border border-[#ECEEDF]/15 text-[#ECEEDF]/40 hover:bg-[#ECEEDF] hover:text-black hover:border-[#ECEEDF] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    {busy === sub.id + ':playlist' ? 'Adding…' : '+ Playlist'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
