@@ -9,15 +9,10 @@ set("log.level", 4) # Debug level for troubleshooting
 
 log("=== IMMORTAL RAINDROPS RADIO ENGINE STARTING ===")
 
-# Enable telnet server (local only — not exposed externally)
+# Enable telnet server (exposed for Next.js command route via Fly private network / exposed port)
 settings.server.telnet.set(true)
-settings.server.telnet.bind_addr.set("127.0.0.1")
-settings.server.telnet.port.set(1234)
-
-# Enable HTTP server for remote commands (proxied through Nginx)
-settings.server.harbor.set(true)
-settings.server.harbor.bind_addrs.set(["0.0.0.0"])
-settings.server.harbor.port.set(7000)
+settings.server.telnet.bind_addr.set("0.0.0.0")
+settings.server.telnet.port.set(7000)
 
 # Environment variables
 webhook_url = environment.get("LIVE_STATUS_WEBHOOK_URL")

@@ -1,12 +1,67 @@
 import { NextResponse } from 'next/server';
+import net from 'net';
 
-const RADIO_HOST = process.env.RADIO_COMMAND_HOST || 'https://immortal-radio.fly.dev';
+const TELNET_HOST = process.env.RADIO_TELNET_HOST || 'immortal-radio.fly.dev';
+const TELNET_PORT = parseInt(process.env.RADIO_TELNET_PORT || '7000', 10);
 const WEBHOOK_SECRET = process.env.LIVE_STATUS_WEBHOOK_SECRET;
+
+function executeTelnetCommand(host: string, port: number, command: string, timeoutMs = 5000): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const socket = new net.Socket();
+    let dataBuffer = '';
+    let resolved = false;
+
+    const timer = setTimeout(() => {
+      resolved = true;
+      socket.destroy();
+      reject(new Error('Timeout waiting for telnet response'));
+    }, timeoutMs);
+
+    socket.connect(port, host, () => {
+      socket.write(`${command}\n`);
+    });
+
+    socket.on('data', (data) => {
+      dataBuffer += data.toString();
+      
+      // Liquidsoap telnet protocol responses always end with "END" followed by newlines
+      const trimmed = dataBuffer.trim();
+      if (trimmed.endsWith('END')) {
+        clearTimeout(timer);
+        resolved = true;
+        socket.end();
+
+        // Strip the trailing "END" from the response
+        let result = dataBuffer.trim();
+        if (result.endsWith('END')) {
+          result = result.slice(0, -3).trim();
+        }
+        resolve(result);
+      }
+    });
+
+    socket.on('error', (err) => {
+      if (!resolved) {
+        clearTimeout(timer);
+        resolved = true;
+        reject(err);
+      }
+    });
+
+    socket.on('close', () => {
+      if (!resolved) {
+        clearTimeout(timer);
+        resolved = true;
+        resolve(dataBuffer.trim());
+      }
+    });
+  });
+}
 
 /**
  * POST /api/radio/command
  * 
- * Proxies Liquidsoap telnet commands through the radio server's HTTP interface.
+ * Proxies Liquidsoap telnet commands through a raw TCP socket connection.
  * Protected by LIVE_STATUS_WEBHOOK_SECRET — only callable from server actions.
  * 
  * Body: { command: string }
@@ -42,48 +97,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Command not allowed' }, { status: 403 });
     }
 
-    // 4. Forward to Liquidsoap via Nginx-proxied HTTP API
-    // The Liquidsoap server.harbor exposes commands at:
-    //   GET /command_name?arg=value
-    // We need to translate our telnet-style command to a URL path.
-    // 
-    // Telnet commands like "radio.skip" become GET /radio.skip
-    // Commands with args like "broadcast.now_playing" become GET /broadcast.now_playing
-    
-    const parts = command.split(' ');
-    const cmdPath = parts[0];
-    const cmdArg = parts.slice(1).join(' ');
-    
-    const url = cmdArg 
-      ? `${RADIO_HOST}/api/${cmdPath}?arg=${encodeURIComponent(cmdArg)}`
-      : `${RADIO_HOST}/api/${cmdPath}`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/plain',
-      },
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => 'Unknown error');
-      return NextResponse.json(
-        { error: `Liquidsoap error: ${response.status}`, detail: errorText },
-        { status: 502 }
-      );
-    }
-
-    const result = await response.text();
-    return NextResponse.json({ success: true, result: result.trim() });
+    // 4. Send command via raw TCP socket to Liquidsoap telnet server
+    const result = await executeTelnetCommand(TELNET_HOST, TELNET_PORT, command);
+    return NextResponse.json({ success: true, result });
 
   } catch (err: any) {
     console.error('[RADIO_CMD] Command proxy error:', err);
     
-    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
-      return NextResponse.json({ error: 'Radio server timeout' }, { status: 504 });
-    }
-    
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Radio server communication failed', detail: err.message },
+      { status: 502 }
+    );
   }
 }
