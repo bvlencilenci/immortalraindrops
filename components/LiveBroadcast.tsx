@@ -397,7 +397,7 @@ export default function LiveBroadcast({
       <LiveVisualizer />
 
       {/* Main columns container */}
-      <div className="w-full max-w-full flex flex-col md:flex-row gap-2 md:gap-4 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-4 md:py-8 px-3 sm:px-4 md:px-8 backdrop-blur-[4px] bg-black/20 min-h-0 overflow-hidden">
+      <div className="w-full max-w-full flex flex-col md:flex-row gap-2 md:gap-4 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-4 md:py-8 px-3 sm:px-4 md:px-8 backdrop-blur-[4px] bg-black/[0.35]">
         
         {/* LEFT COLUMN: LAST PLAYED */}
         <div className="w-full md:flex-1 min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-4 md:pb-0 px-2 sm:px-0 md:pr-4 flex flex-col gap-3 relative overflow-hidden">
@@ -433,7 +433,7 @@ export default function LiveBroadcast({
         </div>
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="w-full md:flex-[3] min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 px-2 sm:px-0 md:px-6 flex flex-col items-center justify-between text-center min-h-[320px] md:min-h-[420px] pt-6 md:pt-10 pb-2 md:pb-4 relative overflow-hidden select-none">
+        <div className="w-full md:flex-[3] min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 px-2 sm:px-0 md:px-6 flex flex-col items-center justify-start text-center">
           
           {/* Status Badge */}
           <div className="flex flex-col items-center gap-2 z-10">
@@ -462,7 +462,7 @@ export default function LiveBroadcast({
           <div className="flex-1" />
 
           {/* Now Playing visual display */}
-          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-xl z-10 pb-2">
+          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-xl z-10 pb-2 mt-12">
             {broadcastMode === 'live' ? (
               <div className="flex flex-col gap-4 w-full">
                 <div>
@@ -494,10 +494,10 @@ export default function LiveBroadcast({
             ) : (
               <div className="flex flex-col items-center text-center gap-3 w-full">
                 <span className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/45 uppercase">NOW PLAYING</span>
-                <div className="text-xl md:text-3xl font-black tracking-widest uppercase text-[#ECEEDF] px-2 mt-1.5 text-center break-words w-full">
+                <div className="text-sm md:text-lg tracking-[0.15em] uppercase text-[#ECEEDF]/60 px-2 mt-1 text-center break-words w-full">
                   {currentArtist}
                 </div>
-                <div className="text-sm md:text-lg tracking-[0.15em] uppercase text-[#ECEEDF]/60 px-2 mt-1 text-center break-words w-full">
+                <div className="text-xl md:text-3xl font-black tracking-widest uppercase text-[#ECEEDF] px-2 mt-1.5 text-center break-words w-full">
                   {currentTitle}
                 </div>
               </div>
@@ -548,7 +548,7 @@ export default function LiveBroadcast({
       </div>
 
       {/* FOOTER STATUS BAR */}
-      <div className="w-full max-w-full mt-6 border-t border-[#ECEEDF]/10 pt-3 flex flex-row flex-wrap justify-between items-center gap-y-2 gap-x-4 text-[8px] md:text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase select-none z-10 px-4 md:px-8 backdrop-blur-[2px] bg-black/5">
+      <div className="w-full max-w-full mt-6 border-t border-[#ECEEDF]/10 pt-3 flex flex-row flex-wrap justify-between items-center gap-y-2 gap-x-4 text-[8px] md:text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase">
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           <span>LISTENERS: {listenerCount}</span>
           <span>UPTIME: {formatUptime(uptimeSeconds)}</span>
