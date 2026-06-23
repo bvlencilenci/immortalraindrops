@@ -77,6 +77,7 @@ export default function LiveBroadcast({
             dj_description?: string;
             playback_history?: PlaybackHistoryItem[];
           };
+          console.log("RAW API RESPONSE (REALTIME)", newData);
           setIsLive(newData.is_live);
           setNowPlayingTitle(newData.now_playing_title || newData.stream_title || 'OFFLINE');
           setBroadcastMode((newData.broadcast_mode || 'automated') as 'automated' | 'live');
@@ -85,6 +86,7 @@ export default function LiveBroadcast({
           setDjLocation(newData.dj_location || '');
           setDjDescription(newData.dj_description || '');
           setPlaybackHistory(newData.playback_history || []);
+          console.log("HISTORY", newData.playback_history || []);
         }
       )
       .subscribe();
@@ -125,7 +127,9 @@ export default function LiveBroadcast({
     const parts = nowPlayingTitle.split(/ - | — /);
     const artist = parts[0]?.trim() || 'Unknown Artist';
     const title = parts[1]?.trim() || parts[0]?.trim() || 'Unknown Title';
-    return { artist, title };
+    const current = { artist, title };
+    console.log("CURRENT TRACK", current);
+    return current;
   };
 
   const { artist: currentArtist, title: currentTitle } = getDisplayTrackInfo();

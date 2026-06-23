@@ -37,7 +37,11 @@ export async function POST(req: Request) {
     // Assuming we use row with ID 1 for global site settings
     const { error } = await supabase
       .from('system_settings')
-      .update({ is_live: isLive, stream_title: title, updated_at: new Date().toISOString() })
+      .update({ 
+        is_live: isLive, 
+        stream_title: title, 
+        updated_at: new Date().toISOString() 
+      })
       .eq('id', 1);
 
     if (error) {

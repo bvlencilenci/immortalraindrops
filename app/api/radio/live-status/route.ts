@@ -16,9 +16,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: Invalid Webhook Secret' }, { status: 401 });
     }
 
-    const { is_live, stream_title } = await req.json();
+    const body = await req.json();
+    const isLive = typeof body.is_live === 'boolean' ? body.is_live : (body.is_live === 'true');
+    const streamTitle = body.stream_display || body.stream_title || '';
+    const artistField = body.stream_artist || '';
+    const titleField = body.stream_title || '';
 
-    if (typeof is_live !== 'boolean' || typeof stream_title !== 'string') {
+    if (typeof isLive !== 'boolean' || typeof streamTitle !== 'string') {
       return NextResponse.json({ error: 'Bad Request: Invalid payload fields' }, { status: 400 });
     }
 
@@ -26,13 +30,18 @@ export async function POST(req: Request) {
     let playbackHistoryUpdate = null;
 
     if (
-      is_live &&
-      stream_title &&
-      !['OFFLINE', 'STANDBY', 'PLAYLIST ROTATION', 'CONNECTING...'].includes(stream_title.toUpperCase())
+      isLive &&
+      streamTitle &&
+      !['OFFLINE', 'STANDBY', 'PLAYLIST ROTATION', 'CONNECTING...'].includes(streamTitle.toUpperCase())
     ) {
-      const parts = stream_title.split(/ - | — /);
-      const artist = parts[0]?.trim() || 'Unknown Artist';
-      const title = parts[1]?.trim() || parts[0]?.trim() || 'Unknown Title';
+      let artist = artistField.trim();
+      let title = titleField.trim();
+
+      if (!artist || !title) {
+        const parts = streamTitle.split(/ - | — /);
+        artist = parts[0]?.trim() || 'Unknown Artist';
+        title = parts[1]?.trim() || parts[0]?.trim() || 'Unknown Title';
+      }
 
       // Get current history to append to
       const { data: currentSettings } = await supabase
@@ -56,8 +65,8 @@ export async function POST(req: Request) {
     }
 
     const updateFields: any = {
-      is_live,
-      now_playing_title: stream_title,
+      is_live: isLive,
+      stream_title: streamTitle,
       updated_at: new Date().toISOString()
     };
 

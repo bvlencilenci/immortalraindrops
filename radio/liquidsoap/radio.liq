@@ -39,6 +39,34 @@ def notify_status(is_live, title) =
   end
 end
 
+# New notify_status payload with structured fields
+def notify_status_struct(is_live, artist, title, filename) =
+  if webhook_url != "" and webhook_secret != "" then
+    headers = [("Content-Type", "application/json"), ("X-Webhook-Secret", webhook_secret)]
+    is_live_str = if is_live then "true" else "false" end
+
+    safe_artist = string.replace(pattern="\"", (fun (_) -> "\\\""), artist)
+    safe_title  = string.replace(pattern="\"", (fun (_) -> "\\\""), title)
+    safe_file   = string.replace(pattern="\"", (fun (_) -> "\\\""), filename)
+
+    display_title = if safe_artist != "" and safe_title != "" then
+      safe_artist ^ " - " ^ safe_title
+    elsif safe_title != "" then
+      safe_title
+    else
+      "IMMORTAL RAINDROPS RADIO"
+    end;
+
+    payload = '{"is_live":' ^ is_live_str ^
+              ',"stream_title":"' ^ safe_title ^
+              '","stream_artist":"' ^ safe_artist ^
+              '","stream_display":"' ^ display_title ^
+              '","source_filename":"' ^ safe_file ^ '"}'
+
+    ignore(http.post(headers=headers, data=payload, webhook_url))
+  end
+end
+
 live_active = ref(false)
 
 # PHASE 1D: LIVE DJ INPUT (BUTT HARBOUR)
@@ -103,8 +131,11 @@ radio = fallback(id="radio", track_sensitive=false, [live, music])
 
 # Metadata handler for track advancement and live updates
 def handle_metadata(m) =
-  title = m["title"]
-  artist = m["artist"]
+  log(">>> [METADATA_RAW] " ^ string.representation(m))
+
+  title = if m["title"] != "" then m["title"] else "" end
+  artist = if m["artist"] != "" then m["artist"] else "" end
+  filename = if m["file"] != "" then m["file"] else "" end
 
   # Format the displayed track title
   display_title = if artist != "" and title != "" then
@@ -116,7 +147,7 @@ def handle_metadata(m) =
   end;
 
   log(">>> [METADATA] Track change: " ^ display_title);
-  notify_status(true, display_title)
+  notify_status_struct(true, artist, title, filename)
 end
 
 radio = source.on_metadata(radio, handle_metadata)
