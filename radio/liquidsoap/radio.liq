@@ -52,10 +52,16 @@ def get_next_featured() =
   site_url = if site_url != "" then site_url else "https://immortalraindrops.art" end
   url = site_url ^ "/api/radio/featured/next?secret=" ^ secret
   
-  response = http.get(url)
-  if response.status_code == 200 and response.body != "" then
-    log(">>> Dynamic queue returned track: " ^ response.body)
-    request.create(response.body)
+  # ocurl http.get returns raw response body (string) or throws exception on error
+  response = try
+    http.get(url)
+  catch _ do
+    ""
+  end;
+
+  if response != "" then
+    log(">>> Dynamic queue returned track: " ^ response)
+    request.create(response)
   else
     null()
   end
@@ -134,7 +140,10 @@ server.register(
 )
 
 # PHASE 1F: ICECAST OUTPUT CONFIGURATION
+log("featured source ready: " ^ source.id(featured))
+log("music source ready: " ^ source.id(music))
 log("Connecting output stream to Icecast on localhost:8000/radio...")
+
 output.icecast(
   %mp3(bitrate=320),
   host="localhost",
@@ -147,4 +156,5 @@ output.icecast(
   radio
 )
 
+log("output connected to Icecast: mount=/radio, source=" ^ source.id(radio))
 log("=== RADIO ENGINE FULLY INITIALIZED ===")
