@@ -91,7 +91,7 @@ def handle_metadata(m) =
   elsif title != "" then
     title
   elsif filename != "" then
-    file.basename(filename)
+    path.basename(filename)
   else
     "IMMORTAL RADIO"
   end
