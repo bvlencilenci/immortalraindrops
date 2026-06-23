@@ -17,8 +17,6 @@ settings.server.telnet.port.set(7000)
 log("Telnet server configuration loaded.")
 
 # Environment variables
-webhook_url = environment.get("LIVE_STATUS_WEBHOOK_URL")
-webhook_secret = environment.get("LIVE_STATUS_WEBHOOK_SECRET")
 icecast_host = environment.get("ICECAST_HOST")
 icecast_host = if icecast_host != "" then icecast_host else "localhost" end
 icecast_password = environment.get("ICECAST_SOURCE_PASSWORD")
@@ -42,43 +40,15 @@ live = input.harbor(
   end
 )
 
-# PHASE 1B & PHASE 2(2/3): PLAYLIST SOURCES & FILE DECODING
+# PHASE 1B: PLAYLIST SOURCES
 log("Configuring Unified Playlists from /music/unified...")
 
-# Dynamic Queue Source (Priority 1)
-def get_next_featured() =
-  secret = environment.get("LIVE_STATUS_WEBHOOK_SECRET")
-  site_url = environment.get("NEXT_PUBLIC_SITE_URL")
-  site_url = if site_url != "" then site_url else "https://immortalraindrops.art" end
-  url = site_url ^ "/api/radio/featured/next?secret=" ^ secret
-  
-  # ocurl http.get returns raw response body (string) or throws exception on error
-  response = try
-    http.get(url)
-  catch _ do
-    ""
-  end;
-
-  if response != "" then
-    log(">>> Dynamic queue returned track: " ^ response)
-    request.create(response)
-  else
-    null()
-  end
-end
-
-dynamic_featured = request.dynamic(id="dynamic_featured", get_next_featured)
-
-# Static Folder Playlist Source (Priority 2 / Fallback)
-static_featured = playlist(
-  id="static_featured",
+featured = playlist(
+  id="featured",
   mode="random",
   reload_mode="watch",
   "/music/unified/featured"
 )
-
-# Combined featured source: pulls from dynamic queue first, falls back to static playlist
-featured = fallback(id="featured", [dynamic_featured, static_featured])
 
 normal = playlist(
   id="normal",
@@ -87,27 +57,28 @@ normal = playlist(
   "/music/unified/normal"
 )
 
-# PHASE 1C: PLAYLIST ROTATION with fallback silence
+# PHASE 1C: STARTUP-RESILIENT PLAYLIST ROTATION
+# playlists uses default track_sensitive=true — no mid-song cuts
+# music uses track_sensitive=false — switches off silence immediately when playlists are ready
 log("Applying playlist rotation with fallback...")
 playlists = fallback(id="playlists", [featured, normal])
 silence = blank(id="silence", duration=1.)
 music = fallback(id="music", track_sensitive=false, [playlists, silence])
 
-# Register track-change event listeners to trace playlist transitions
+# Track-change listeners for debugging
 source.on_track(featured, fun(m) -> begin
   title = if m["title"] != "" then m["title"] else "Unknown Title" end;
   artist = if m["artist"] != "" then m["artist"] else "Unknown Artist" end;
-  log(">>> [PLAYLIST - FEATURED] Now playing track: " ^ artist ^ " - " ^ title)
+  log(">>> [FEATURED] Now playing: " ^ artist ^ " - " ^ title)
 end)
 
 source.on_track(normal, fun(m) -> begin
   title = if m["title"] != "" then m["title"] else "Unknown Title" end;
   artist = if m["artist"] != "" then m["artist"] else "Unknown Artist" end;
-  log(">>> [PLAYLIST - NORMAL] Now playing track: " ^ artist ^ " - " ^ title)
+  log(">>> [NORMAL] Now playing: " ^ artist ^ " - " ^ title)
 end)
 
-# PHASE 1E: FALLBACK LOGIC (Priority 1: Live, Priority 2: Playlist)
-# Switches instantly via track_sensitive=false
+# PHASE 1E: MAIN FALLBACK CHAIN (Live overrides playlist instantly)
 log("Establishing Fallback Chain...")
 radio = fallback(id="radio", track_sensitive=false, [live, music])
 
@@ -139,8 +110,7 @@ server.register(
   end
 )
 
-# PHASE 1F: ICECAST OUTPUT CONFIGURATION
-log("featured source ready: " ^ source.id(featured))
+# PHASE 1F: ICECAST OUTPUT
 log("music source ready: " ^ source.id(music))
 log("Connecting output stream to Icecast on localhost:8000/radio...")
 
@@ -156,5 +126,5 @@ output.icecast(
   radio
 )
 
-log("output connected to Icecast: mount=/radio, source=" ^ source.id(radio))
+log("output connected to Icecast: mount=/radio")
 log("=== RADIO ENGINE FULLY INITIALIZED ===")
