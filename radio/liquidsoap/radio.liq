@@ -66,17 +66,17 @@ silence = blank(id="silence", duration=1.)
 music = fallback(id="music", track_sensitive=false, [playlists, silence])
 
 # Register track-change event listeners to trace playlist transitions
-featured = source.on_track(fun(m) -> begin
+source.on_track(featured, fun(m) -> begin
   title = if m["title"] != "" then m["title"] else "Unknown Title" end;
   artist = if m["artist"] != "" then m["artist"] else "Unknown Artist" end;
   log(">>> [PLAYLIST - FEATURED] Now playing track: " ^ artist ^ " - " ^ title)
-end, featured)
+end)
 
-normal = source.on_track(fun(m) -> begin
+source.on_track(normal, fun(m) -> begin
   title = if m["title"] != "" then m["title"] else "Unknown Title" end;
   artist = if m["artist"] != "" then m["artist"] else "Unknown Artist" end;
   log(">>> [PLAYLIST - NORMAL] Now playing track: " ^ artist ^ " - " ^ title)
-end, normal)
+end)
 
 # PHASE 1E: FALLBACK LOGIC (Priority 1: Live, Priority 2: Playlist)
 # Switches instantly via track_sensitive=false
