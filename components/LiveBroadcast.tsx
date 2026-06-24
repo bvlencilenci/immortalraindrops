@@ -60,6 +60,16 @@ export default function LiveBroadcast({
   const [maxTracksFit, setMaxTracksFit] = useState(7);
   const historyContainerRef = useRef<HTMLDivElement>(null);
 
+  const [showNews, setShowNews] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const container = historyContainerRef.current;
     if (!container) return;
@@ -230,18 +240,18 @@ export default function LiveBroadcast({
       <div className="w-full flex-1 flex flex-col md:flex-row items-stretch z-10 backdrop-blur-[4px] bg-transparent min-h-0 overflow-hidden">
 
         {/* LEFT COLUMN: HISTORY */}
-        <div className="glass-panel-left-wrap w-full md:w-64 shrink-0 flex flex-col">
-          <div className="glass-panel-left w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 mb-3 whitespace-nowrap">
+        <div className="glass-panel-left-wrap w-full md:w-64 shrink-0 flex flex-col order-2 md:order-none">
+          <div className="glass-panel-left w-full h-20 md:h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] px-4 py-3 md:p-8 flex flex-row md:flex-col items-center md:items-stretch overflow-x-auto md:overflow-hidden gap-4 md:gap-3 relative scrollbar-none">
+            <h2 className="hidden md:block text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 mb-3 whitespace-nowrap">
               HISTORY
             </h2>
-          <div ref={historyContainerRef} className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden pr-1">
+          <div ref={historyContainerRef} className="flex flex-row md:flex-col gap-4 flex-1 md:min-h-0 overflow-x-auto md:overflow-hidden pr-1 scrollbar-none">
             {playbackHistory.length === 0 ? (
               <div className="text-[8px] md:text-[9px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
                 NO HISTORY RECORDED
               </div>
             ) : (
-              playbackHistory.slice(0, maxTracksFit).map((track, i) => {
+              playbackHistory.slice(0, isMobile ? 10 : maxTracksFit).map((track, i) => {
                 const trackKey = `${track.artist.toLowerCase()} - ${track.title.toLowerCase()}`;
                 const audioUrl = trackAudioMap[trackKey];
 
@@ -256,23 +266,25 @@ export default function LiveBroadcast({
               })
             )}
           </div>
-          <div className="absolute inset-y-0 right-0 w-16 pointer-events-none z-10" style={{ background: 'linear-gradient(to right, transparent, rgba(10,10,8,0.85))' }} />
+          <div className="hidden md:block absolute inset-y-0 right-0 w-16 pointer-events-none z-10" style={{ background: 'linear-gradient(to right, transparent, rgba(10,10,8,0.85))' }} />
         </div>
       </div>
 
 
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="glass-center-panel w-full flex-1 bg-black p-6 md:p-8 flex flex-col items-center justify-between gap-12 text-center min-h-[320px] md:min-h-[420px] relative overflow-hidden select-none">
-          <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-10" style={{ background: 'linear-gradient(to right, rgba(10,10,8,0.7), transparent)' }} />
-          <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-10" style={{ background: 'linear-gradient(to left, rgba(10,10,8,0.7), transparent)' }} />
+        <div className="glass-center-panel w-full h-[55vh] md:h-auto md:flex-1 bg-black p-6 md:p-8 flex flex-col items-center justify-between gap-12 text-center md:min-h-[420px] relative overflow-hidden select-none order-1 md:order-none">
+          <div className="hidden md:block absolute inset-y-0 left-0 w-12 pointer-events-none z-10" style={{ background: 'linear-gradient(to right, rgba(10,10,8,0.7), transparent)' }} />
+          <div className="hidden md:block absolute inset-y-0 right-0 w-12 pointer-events-none z-10" style={{ background: 'linear-gradient(to left, rgba(10,10,8,0.7), transparent)' }} />
           {/* generative waves visualizer constrained to center column */}
           <div className="absolute inset-0 opacity-40 z-0 pointer-events-none">
             <LiveVisualizer />
           </div>
+          {/* Mobile bottom-third shadow gradient */}
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-0 md:hidden" />
 
           {/* Now Playing visual display pinned to the bottom left */}
-          <div className="w-full flex flex-col items-start justify-end min-h-fit max-w-xl z-10 mt-auto pb-2 relative z-10 self-start">
+          <div className="absolute bottom-4 left-4 z-10 md:relative md:bottom-auto md:left-auto w-[calc(100%-2rem)] md:w-full flex flex-col items-start justify-end min-h-fit max-w-xl md:mt-auto md:pb-2 self-start">
             {broadcastMode === 'live' ? (
               <div className={`flex flex-col gap-2 w-full items-start pt-4 px-2 text-left ${
                 currentlyPlayingId === 'radio-stream' ? '' : 'border-t border-[#ECEEDF]/15'
@@ -319,12 +331,19 @@ export default function LiveBroadcast({
 
 
         {/* RIGHT COLUMN: NEWS */}
-        <div className="glass-panel-right-wrap w-full md:w-64 shrink-0 flex flex-col">
-          <div className="glass-panel-right w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 mb-3 whitespace-nowrap">
+        <div className="glass-panel-right-wrap w-full md:w-64 shrink-0 flex flex-col order-3 md:order-none">
+          <div className="glass-panel-right w-full h-auto md:h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-0 md:p-8 flex flex-col gap-0 md:gap-3 relative overflow-hidden">
+            <h2 className="hidden md:block text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 mb-3 whitespace-nowrap">
               NEWS
             </h2>
-          <div className="flex flex-col gap-4 max-h-[180px] md:max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+            <button
+              onClick={() => setShowNews(!showNews)}
+              className="flex md:hidden items-center justify-between text-[#6DBF82] text-xs tracking-widest uppercase border-b border-[#6DBF82]/20 w-full py-3 px-4 cursor-pointer focus:outline-none"
+            >
+              <span>DISPATCHES</span>
+              <span>{showNews ? '▲' : '▼'}</span>
+            </button>
+          <div className={`${showNews ? 'flex' : 'hidden'} md:flex flex-col gap-4 max-h-[300px] md:max-h-[420px] overflow-y-auto p-4 md:p-0 pr-2 custom-scrollbar`}>
             {newsPosts.length === 0 ? (
               <div className="text-[8px] md:text-[9px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
                 NO UPDATES ATM
@@ -357,7 +376,7 @@ export default function LiveBroadcast({
               ))
             )}
           </div>
-          <div className="absolute inset-y-0 left-0 w-16 pointer-events-none z-10" style={{ background: 'linear-gradient(to left, transparent, rgba(10,10,8,0.85))' }} />
+          <div className="hidden md:block absolute inset-y-0 left-0 w-16 pointer-events-none z-10" style={{ background: 'linear-gradient(to left, transparent, rgba(10,10,8,0.85))' }} />
         </div>
       </div>
 
