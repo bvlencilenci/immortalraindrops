@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600&family=VT323&display=swap');
+@font-face {
+  font-family: 'Cour';
+  src: url('/fonts/cour.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import "tailwindcss";
 
 /* =========================
@@ -16,12 +23,10 @@
 }
 
 /* Fonts */
-.font-playfair {
-  font-family: 'Playfair Display', serif;
-}
-
-.font-vt323 {
-  font-family: 'VT323', monospace;
+.font-playfair,
+.font-vt323,
+.font-cour {
+  font-family: 'Cour', monospace;
 }
 
 /* =========================
@@ -30,15 +35,15 @@
 body {
   color: var(--foreground);
   background: radial-gradient(circle at 20% 20%, #0a0a0f, #020203 60%, #000);
-  font-family: 'Playfair Display', serif;
-  font-weight: 300;
+  font-family: 'Cour', monospace;
+  font-weight: 400;
   overflow-x: hidden;
   font-size: 16px;
   -webkit-tap-highlight-color: transparent;
 }
 
 /* =========================
-   GLITCH TEXT CORE (NEW)
+   GLITCH TEXT CORE
 ========================= */
 @keyframes glitch {
   0% {
@@ -90,7 +95,7 @@ body {
   background: linear-gradient(90deg, #0a0a0f, #120018, #001018);
   color: var(--neon-lime);
   padding: 6px 12px;
-  font-family: 'VT323', monospace;
+  font-family: 'Cour', monospace;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   display: flex;
@@ -100,7 +105,7 @@ body {
 }
 
 /* =========================
-   SCANLINES (STRONGER)
+   SCANLINES
 ========================= */
 .scanline {
   position: fixed;
@@ -146,7 +151,7 @@ body::after {
 }
 
 /* =========================
-   MARQUEE = FASTER + LOUDER
+   MARQUEE
 ========================= */
 .animate-marquee {
   animation: marquee 12s linear infinite;
@@ -180,7 +185,7 @@ body::after {
 }
 
 /* =========================
-   MOBILE FEEL = MORE AGGRESSIVE
+   MOBILE FEEL
 ========================= */
 @media (max-width: 768px) {
   body {
@@ -189,35 +194,33 @@ body::after {
 }
 
 /* =========================
-   REMOVE "CLEAN UI FEEL"
+   GLOBAL FIXES
 ========================= */
 * {
   box-sizing: border-box;
-  /* =========================
-   FOOTER SIZE RESTORE (CRITICAL FIX)
+}
+
+/* =========================
+   FOOTER SIZE RESTORE
 ========================= */
+footer,
+.footer {
+  font-size: 11px !important;
+  line-height: 1 !important;
+  padding: 6px 10px !important;
+  height: 36px !important;
+  max-height: 36px !important;
+  min-height: 36px !important;
+  letter-spacing: 0.12em;
+}
 
-  footer,
-  .footer {
-    font-size: 11px !important;
-    line-height: 1 !important;
-    padding: 6px 10px !important;
-    height: 36px !important;
-    max-height: 36px !important;
-    min-height: 36px !important;
-    letter-spacing: 0.12em;
-  }
+footer>div,
+.footer>div {
+  height: 100%;
+  align-items: center;
+}
 
-  /* prevent flex stretching causing “huge footer” look */
-  footer>div,
-  .footer>div {
-    height: 100%;
-    align-items: center;
-  }
-
-  /* kill inherited typography scaling inside footer */
-  footer * {
-    font-size: inherit !important;
-    line-height: 1 !important;
-  }
+footer * {
+  font-size: inherit !important;
+  line-height: 1 !important;
 }

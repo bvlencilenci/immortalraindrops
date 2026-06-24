@@ -20,6 +20,13 @@ interface QueuedTrack {
   addedAt: number;
 }
 
+interface TrackSuggestion {
+  id: string | number;
+  title: string;
+  artist: string;
+  audio_url: string | null;
+}
+
 export default function BroadcastControls() {
   const [status, setStatus] = useState<string>('CONNECTING...');
   const [nowPlaying, setNowPlaying] = useState<string>('—');
@@ -37,9 +44,10 @@ export default function BroadcastControls() {
 
   // Queue state
   const [queue, setQueue] = useState<QueuedTrack[]>([]);
-  const [inputUrl, setInputUrl] = useState('');
-  const [inputTitle, setInputTitle] = useState('');
-  const [inputArtist, setInputArtist] = useState('');
+  const [trackSearch, setTrackSearch] = useState('');
+  const [trackSuggestions, setTrackSuggestions] = useState<TrackSuggestion[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState<TrackSuggestion | null>(null);
+  const [isSearchingTracks, setIsSearchingTracks] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Flash feedback for 2 seconds
@@ -99,6 +107,42 @@ export default function BroadcastControls() {
     return () => clearInterval(interval);
   }, [fetchStatus, fetchQueue]);
 
+  // Search existing uploaded tracks by title or artist for live queue injection
+  useEffect(() => {
+    const query = trackSearch.trim();
+
+    if (selectedTrack || query.length < 2) {
+      setTrackSuggestions([]);
+      setIsSearchingTracks(false);
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      setIsSearchingTracks(true);
+
+      try {
+        const safeQuery = query.replace(/[%_,]/g, ' ').replace(/\s+/g, ' ').trim();
+
+        const { data, error } = await supabase
+          .from('tracks')
+          .select('id, title, artist, audio_url')
+          .or(`title.ilike.%${safeQuery}%,artist.ilike.%${safeQuery}%`)
+          .limit(8);
+
+        if (error) throw error;
+
+        setTrackSuggestions((data || []) as TrackSuggestion[]);
+      } catch (err) {
+        console.error('Failed to search tracks:', err);
+        setTrackSuggestions([]);
+      } finally {
+        setIsSearchingTracks(false);
+      }
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [trackSearch, selectedTrack]);
+
   // Load initial broadcast settings from database
   useEffect(() => {
     const loadSettings = async () => {
@@ -108,7 +152,7 @@ export default function BroadcastControls() {
           .select('broadcast_mode, dj_name, show_title, dj_location, dj_description')
           .eq('id', 1)
           .single();
-        
+
         if (error) throw error;
         if (data) {
           setBroadcastMode((data.broadcast_mode || 'automated') as 'automated' | 'live');
@@ -181,31 +225,40 @@ export default function BroadcastControls() {
 
   const handleSubmitQueue = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputUrl) return;
+
+    if (!selectedTrack) {
+      flashError('SELECT A TRACK FIRST');
+      return;
+    }
+
+    if (!selectedTrack.audio_url) {
+      flashError('SELECTED TRACK HAS NO AUDIO URL');
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
 
     // Optimistic update
     const tempTrack: QueuedTrack = {
-      url: inputUrl,
-      title: inputTitle || 'Unknown Title',
-      artist: inputArtist || 'Unknown Artist',
+      url: selectedTrack.audio_url,
+      title: selectedTrack.title || 'Unknown Title',
+      artist: selectedTrack.artist || 'Unknown Artist',
       addedAt: Date.now(),
     };
     setQueue((prev) => [...prev, tempTrack]);
 
     const res = await radioSubmitFeaturedQueue({
-      url: inputUrl,
-      title: inputTitle,
-      artist: inputArtist,
+      url: selectedTrack.audio_url,
+      title: selectedTrack.title,
+      artist: selectedTrack.artist,
     });
 
     if (res.success) {
       flashAction('SUBMITTED TO FEATURED QUEUE');
-      setInputUrl('');
-      setInputTitle('');
-      setInputArtist('');
+      setTrackSearch('');
+      setSelectedTrack(null);
+      setTrackSuggestions([]);
       if (res.queue) setQueue(res.queue);
     } else {
       flashError(res.error || 'Submission failed');
@@ -234,16 +287,14 @@ export default function BroadcastControls() {
             <div className="flex flex-col gap-2">
               <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">ENGINE MODE</span>
               <div className="flex items-center gap-3">
-                <div className={`w-2.5 h-2.5 rounded-full ${
-                  status === 'LIVE' 
-                    ? 'bg-red-500 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.6)]' 
-                    : status === 'PLAYLIST' 
-                      ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]'
-                      : 'bg-[#ECEEDF]/20'
-                }`} />
-                <span className={`text-xl font-bold tracking-tight ${
-                  status === 'LIVE' ? 'text-red-500' : 'text-[#ECEEDF]'
-                }`}>
+                <div className={`w-2.5 h-2.5 rounded-full ${status === 'LIVE'
+                  ? 'bg-red-500 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.6)]'
+                  : status === 'PLAYLIST'
+                    ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+                    : 'bg-[#ECEEDF]/20'
+                  }`} />
+                <span className={`text-xl font-bold tracking-tight ${status === 'LIVE' ? 'text-red-500' : 'text-[#ECEEDF]'
+                  }`}>
                   {status}
                 </span>
               </div>
@@ -411,15 +462,13 @@ export default function BroadcastControls() {
           <div className="flex flex-col gap-2">
             <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">LIVE SOURCE</span>
             <div className="flex items-center gap-3">
-              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                status === 'LIVE'
-                  ? 'bg-red-500 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.8)]'
-                  : 'bg-[#ECEEDF]/15'
-              }`} />
+              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${status === 'LIVE'
+                ? 'bg-red-500 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.8)]'
+                : 'bg-[#ECEEDF]/15'
+                }`} />
               <div className="flex flex-col">
-                <span className={`text-sm font-bold tracking-tight ${
-                  status === 'LIVE' ? 'text-red-400' : 'text-[#ECEEDF]/40'
-                }`}>
+                <span className={`text-sm font-bold tracking-tight ${status === 'LIVE' ? 'text-red-400' : 'text-[#ECEEDF]/40'
+                  }`}>
                   {status === 'LIVE' ? 'DJ LIVE — OVERRIDING PLAYLIST' : 'NO LIVE SOURCE'}
                 </span>
                 <span className="text-[9px] text-[#ECEEDF]/25 mt-0.5 uppercase tracking-widest">
@@ -432,9 +481,8 @@ export default function BroadcastControls() {
           {/* Quick Status Mirror */}
           <div className="flex flex-col gap-2">
             <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">ENGINE MODE</span>
-            <span className={`text-sm font-bold tracking-tight ${
-              status === 'LIVE' ? 'text-red-400' : status === 'OFFLINE' ? 'text-[#ECEEDF]/20' : 'text-[#ECEEDF]/70'
-            }`}>
+            <span className={`text-sm font-bold tracking-tight ${status === 'LIVE' ? 'text-red-400' : status === 'OFFLINE' ? 'text-[#ECEEDF]/20' : 'text-[#ECEEDF]/70'
+              }`}>
               {status}
             </span>
           </div>
@@ -470,46 +518,93 @@ export default function BroadcastControls() {
         </h3>
 
         <form onSubmit={handleSubmitQueue} className="flex flex-col gap-4 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="flex flex-col gap-2">
-              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">TRACK URL (MP3/WAV)</label>
-              <input
-                type="text"
-                value={inputUrl}
-                onChange={(e) => setInputUrl(e.target.value)}
-                placeholder="https://pub-*.r2.dev/track.mp3"
-                required
-                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] focus:ring-1 focus:ring-[#ECEEDF]/20"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">TRACK TITLE</label>
-              <input
-                type="text"
-                value={inputTitle}
-                onChange={(e) => setInputTitle(e.target.value)}
-                placeholder="Transmission 01"
-                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] focus:ring-1 focus:ring-[#ECEEDF]/20"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">ARTIST</label>
-              <input
-                type="text"
-                value={inputArtist}
-                onChange={(e) => setInputArtist(e.target.value)}
-                placeholder="Unknown Operator"
-                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] focus:ring-1 focus:ring-[#ECEEDF]/20"
-              />
-            </div>
+          <div className="flex flex-col gap-2 relative">
+            <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">
+              SEARCH TRACK BY TITLE OR ARTIST
+            </label>
+            <input
+              type="text"
+              value={selectedTrack ? `${selectedTrack.artist} — ${selectedTrack.title}` : trackSearch}
+              onChange={(e) => {
+                setSelectedTrack(null);
+                setTrackSearch(e.target.value);
+              }}
+              placeholder="Start typing title or artist..."
+              className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] focus:ring-1 focus:ring-[#ECEEDF]/20"
+            />
+
+            {isSearchingTracks && !selectedTrack && (
+              <div className="absolute top-full left-0 right-0 z-30 border border-[#ECEEDF]/10 bg-black px-3 py-3 text-[10px] uppercase tracking-[0.2em] text-[#ECEEDF]/35">
+                SEARCHING ARCHIVE...
+              </div>
+            )}
+
+            {!isSearchingTracks && !selectedTrack && trackSearch.trim().length >= 2 && trackSuggestions.length === 0 && (
+              <div className="absolute top-full left-0 right-0 z-30 border border-[#ECEEDF]/10 bg-black px-3 py-3 text-[10px] uppercase tracking-[0.2em] text-[#ECEEDF]/35">
+                NO TRACKS FOUND
+              </div>
+            )}
+
+            {!selectedTrack && trackSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 z-30 border border-[#ECEEDF]/20 bg-black max-h-64 overflow-y-auto shadow-[0_20px_60px_rgba(0,0,0,0.65)]">
+                {trackSuggestions.map((track) => (
+                  <button
+                    key={track.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTrack(track);
+                      setTrackSearch(`${track.artist} — ${track.title}`);
+                      setTrackSuggestions([]);
+                    }}
+                    className="w-full text-left px-3 py-3 border-b border-[#ECEEDF]/10 hover:bg-[#ECEEDF]/10 transition-colors last:border-b-0"
+                  >
+                    <span className="block text-[11px] text-[#ECEEDF] font-bold truncate">
+                      {track.title || 'Unknown Title'}
+                    </span>
+                    <span className="block text-[10px] text-[#ECEEDF]/45 mt-1 truncate">
+                      {track.artist || 'Unknown Artist'}
+                    </span>
+                    {!track.audio_url && (
+                      <span className="block text-[9px] text-red-400/70 mt-1 uppercase tracking-widest">
+                        Missing audio URL
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+
+          {selectedTrack && (
+            <div className="border border-[#ECEEDF]/10 bg-black/40 p-4 flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <span className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/30 block mb-1">
+                  SELECTED TRACK
+                </span>
+                <span className="text-[11px] text-[#ECEEDF] font-bold truncate block">
+                  {selectedTrack.artist || 'Unknown Artist'} — {selectedTrack.title || 'Unknown Title'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedTrack(null);
+                  setTrackSearch('');
+                  setTrackSuggestions([]);
+                }}
+                className="shrink-0 text-[9px] uppercase tracking-[0.2em] text-[#ECEEDF]/40 hover:text-[#ECEEDF]"
+              >
+                CLEAR
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"
-            disabled={isSubmitting || !inputUrl}
+            disabled={isSubmitting || !selectedTrack || !selectedTrack.audio_url}
             className="w-full py-3 text-[10px] uppercase tracking-[0.2em] font-bold border border-[#ECEEDF]/20 bg-black/40 text-[#ECEEDF] hover:bg-[#ECEEDF] hover:text-black hover:border-[#ECEEDF] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'QUEUEING...' : 'ADD TO FEATURED ROTATION'}
+            {isSubmitting ? 'QUEUEING...' : 'ADD SELECTED TRACK TO FEATURED ROTATION'}
           </button>
         </form>
 
@@ -528,8 +623,8 @@ export default function BroadcastControls() {
                     <span className="text-[#ECEEDF] font-bold truncate">
                       {idx + 1}. {item.artist} — {item.title}
                     </span>
-                    <span className="text-[#ECEEDF]/30 truncate text-[9px]">
-                      {item.url}
+                    <span className="text-[#ECEEDF]/30 truncate text-[9px] uppercase tracking-widest">
+                      LIVE INJECTION
                     </span>
                   </div>
                   <span className="text-[8px] text-[#ECEEDF]/40 shrink-0 font-mono">
