@@ -161,25 +161,25 @@ export default function LiveBroadcast({
     if (!nowPlayingTitle) {
       return { artist: 'UNKNOWN ARTIST', title: 'UNKNOWN TRACK' };
     }
-    
+
     const clean = nowPlayingTitle.trim();
     const upper = clean.toUpperCase();
-    
+
     if (
       !clean ||
       ['OFFLINE', 'STANDBY', 'CONNECTING...', 'IMMORTAL RAINDROPS', 'IMMORTAL RAINDROPS RADIO', 'PLAYLIST ROTATION', 'CURATED PLAYLIST', 'AUTOMATED BROADCAST'].includes(upper)
     ) {
       return { artist: 'UNKNOWN ARTIST', title: 'UNKNOWN TRACK' };
     }
-    
+
     const parts = clean.split(/ - | — /);
     if (parts.length < 2) {
       return { artist: 'UNKNOWN ARTIST', title: 'UNKNOWN TRACK' };
     }
-    
+
     const artist = parts[0]?.trim() || 'UNKNOWN ARTIST';
     const title = parts.slice(1).join(' - ')?.trim() || 'UNKNOWN TRACK';
-    
+
     return { artist, title };
   };
 
@@ -196,29 +196,15 @@ export default function LiveBroadcast({
   const showLiveIndicator = isLive || broadcastMode === 'automated';
 
   return (
-<<<<<<< HEAD
-    <div className="relative w-full flex-1 flex flex-col items-center justify-between min-h-0 bg-black overflow-hidden font-mono">
-      {/* generative waves visualizer */}
-      <LiveVisualizer />
-
-      {/* Main columns container - centered with padding */}
-      <div className="w-full max-w-full flex flex-col md:flex-row gap-2 md:gap-4 items-stretch z-10 my-auto border-y border-[#ECEEDF]/15 py-4 md:py-8 px-6 sm:px-8 md:px-12 lg:px-16 backdrop-blur-[4px] bg-black/[0.35]">
-        
-        {/* LEFT COLUMN: LAST PLAYED */}
-        <div className="w-full md:flex-1 min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 pb-4 md:pb-0 md:pr-6 flex flex-col gap-3 relative overflow-hidden">
-          <h2 className="text-[9px] md:text-[10px] lg:text-[11px] tracking-[0.15em] font-bold text-[#ECEEDF]/80 uppercase border-b border-[#ECEEDF]/10 pb-2 mb-1 whitespace-nowrap">
-            LAST PLAYED
-=======
     <div className="relative w-full flex-1 flex flex-col items-center justify-between min-h-0 bg-[#0A0A08] border border-[#ECEEDF]/10 grain overflow-hidden px-2 md:px-4 py-8">
 
       {/* Main columns container */}
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-stretch z-10 my-auto border border-[#ECEEDF]/8 backdrop-blur-[4px] bg-black/20 min-h-0 overflow-hidden">
-        
+
         {/* LEFT COLUMN: HISTORY */}
         <div className="w-full md:w-64 shrink-0 backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
           <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase border-b border-[#ECEEDF]/15 mb-3 whitespace-nowrap">
             HISTORY
->>>>>>> f749f32 (Design pass V3 — editorial redesign live, header, homepage)
           </h2>
           <div className="flex flex-col gap-4 overflow-y-auto max-h-[180px] md:max-h-[420px] pr-1 custom-scrollbar">
             {playbackHistory.length === 0 ? (
@@ -244,36 +230,10 @@ export default function LiveBroadcast({
         </div>
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-<<<<<<< HEAD
-        <div className="w-full md:flex-[3] min-w-0 bg-transparent border-b md:border-b-0 md:border-r border-[#ECEEDF]/10 md:px-8 flex flex-col items-center justify-start text-center">
-          
-          {/* Status Badge */}
-          <div className="flex flex-col items-center gap-2 z-10">
-            <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${
-                showLiveIndicator 
-                  ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]' 
-                  : 'bg-[#ECEEDF]/20'
-              }`} />
-              <span className={`text-[10px] md:text-[11px] lg:text-[12px] tracking-[0.3em] font-bold uppercase ${
-                showLiveIndicator ? 'text-red-500' : 'text-[#ECEEDF]/30'
-              }`}>
-                {showLiveIndicator ? 'LIVE' : 'OFFLINE'}
-              </span>
-            </div>
-            
-            <div className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/45 uppercase mt-1">
-              STATUS
-            </div>
-            <div className="text-xs md:text-sm lg:text-base font-bold tracking-widest uppercase border border-[#ECEEDF]/20 px-6 py-2.5 bg-white/[0.01]">
-              {broadcastMode === 'live' ? 'LIVE DJ SET' : 'AUTOMATED BROADCAST'}
-            </div>
-=======
         <div className="w-full flex-1 bg-transparent p-6 md:p-8 flex flex-col items-center justify-between gap-12 text-center min-h-[320px] md:min-h-[420px] relative overflow-hidden select-none">
           {/* generative waves visualizer constrained to center column */}
           <div className="absolute inset-0 opacity-40 z-0 pointer-events-none">
             <LiveVisualizer />
->>>>>>> f749f32 (Design pass V3 — editorial redesign live, header, homepage)
           </div>
 
           {/* Status Badge */}
@@ -283,13 +243,8 @@ export default function LiveBroadcast({
             className="relative z-10"
           />
 
-<<<<<<< HEAD
-          {/* Now Playing visual display - pushed much lower */}
-          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-2xl z-10 pb-8 mt-20">
-=======
           {/* Now Playing visual display pinned to the bottom */}
           <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-xl z-10 mt-auto pb-2 relative z-10">
->>>>>>> f749f32 (Design pass V3 — editorial redesign live, header, homepage)
             {broadcastMode === 'live' ? (
               <div className="flex flex-col gap-2 w-full items-center border-t border-[#ECEEDF]/15 pt-4">
                 <span className="text-[7px] tracking-[0.08em] text-[#ECEEDF]/20 uppercase select-none mb-2">LIVE TRANSMISSION // DJ</span>
@@ -314,18 +269,9 @@ export default function LiveBroadcast({
                 )}
               </div>
             ) : (
-<<<<<<< HEAD
-              <div className="flex flex-col items-center text-center gap-3 w-full">
-                <span className="text-[10px] tracking-[0.3em] font-bold text-[#ECEEDF]/45 uppercase">NOW PLAYING</span>
-                <div className="text-sm md:text-lg tracking-[0.15em] uppercase text-[#ECEEDF]/60 px-2 mt-1 text-center break-words w-full">
-                  {currentArtist}
-                </div>
-                <div className="text-xl md:text-3xl font-black tracking-widest uppercase text-[#ECEEDF] px-2 mt-1.5 text-center break-words w-full">
-=======
               <div className="flex flex-col items-center text-center gap-1.5 w-full border-t border-[#ECEEDF]/15 pt-4">
                 <span className="text-[7px] tracking-[0.08em] text-[#ECEEDF]/20 uppercase select-none mb-2">NOW PLAYING</span>
                 <div className="text-2xl md:text-3xl font-black tracking-tight text-white px-2 text-center truncate w-full leading-none font-narrow">
->>>>>>> f749f32 (Design pass V3 — editorial redesign live, header, homepage)
                   {currentTitle}
                 </div>
                 <div className="text-[11px] tracking-[0.3em] text-[#ECEEDF]/40 font-light mt-1 mix-blend-normal uppercase text-center truncate w-full leading-none font-narrow">
@@ -337,13 +283,8 @@ export default function LiveBroadcast({
         </div>
 
         {/* RIGHT COLUMN: NEWS */}
-<<<<<<< HEAD
-        <div className="w-full md:flex-1 min-w-0 bg-transparent pb-0 md:pl-6 flex flex-col gap-3 relative overflow-hidden">
-          <h2 className="text-[9px] md:text-[10px] lg:text-[11px] tracking-[0.15em] font-bold text-[#ECEEDF]/80 uppercase border-b border-[#ECEEDF]/10 pb-2 mb-1 whitespace-nowrap">
-=======
         <div className="w-full md:w-64 shrink-0 backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
           <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase border-b border-[#ECEEDF]/15 mb-3 whitespace-nowrap">
->>>>>>> f749f32 (Design pass V3 — editorial redesign live, header, homepage)
             NEWS
           </h2>
           <div className="flex flex-col gap-4 max-h-[180px] md:max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
@@ -384,23 +325,10 @@ export default function LiveBroadcast({
       </div>
 
       {/* FOOTER STATUS BAR */}
-<<<<<<< HEAD
-      <div className="w-full max-w-full mt-6 border-t border-[#ECEEDF]/10 pt-3 px-6 sm:px-8 md:px-12 flex flex-row flex-wrap justify-between items-center gap-y-2 gap-x-4 text-[8px] md:text-[9px] tracking-[0.2em] text-[#ECEEDF]/40 uppercase">
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <span>LISTENERS: {listenerCount}</span>
-          <span>UPTIME: {formatUptime(uptimeSeconds)}</span>
-        </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <span>EST. 2026</span>
-          <span>LONDON, UK</span>
-        </div>
-      </div>
-=======
       <Footer
         listenerCount={listenerCount}
         uptimeSeconds={uptimeSeconds}
       />
->>>>>>> f749f32 (Design pass V3 — editorial redesign live, header, homepage)
     </div>
   );
 }
