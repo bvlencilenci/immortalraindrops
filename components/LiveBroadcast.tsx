@@ -30,6 +30,8 @@ interface LiveBroadcastProps {
   initialDjLocation?: string;
   initialDjDescription?: string;
   initialPlaybackHistory: PlaybackHistoryItem[];
+  listenerCount?: number;
+  uptimeSeconds?: number;
   newsPosts?: NewsPost[];
   trackAudioMap?: Record<string, string>;
 }
@@ -56,6 +58,8 @@ export default function LiveBroadcast({
   initialDjName,
   initialShowTitle,
   initialPlaybackHistory,
+  listenerCount = 0,
+  uptimeSeconds = 0,
   newsPosts = [],
 }: LiveBroadcastProps) {
 
@@ -502,7 +506,7 @@ export default function LiveBroadcast({
 
       </div>
 
-      <Footer />
+      <Footer listenerCount={listenerCount} uptimeSeconds={uptimeSeconds} />
     </div>
   );
 }
