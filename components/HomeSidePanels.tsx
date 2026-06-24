@@ -1,5 +1,7 @@
 'use client';
 
+import Tile from './Tile';
+import type { Track } from '../types';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { TrackHistoryItem } from './ui/TrackHistoryItem';
