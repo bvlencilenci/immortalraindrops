@@ -5,7 +5,7 @@ export const revalidate = 0;
 
 export default async function Live() {
   const supabase = await createClient();
-  
+
   const [settingsRes, newsRes, tracksRes, submissionsRes] = await Promise.all([
     supabase
       .from('system_settings')
@@ -41,7 +41,7 @@ export default async function Live() {
   const tracks = tracksRes.data || [];
   const submissions = submissionsRes.data || [];
 
-  const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL || 
+  const r2BaseUrl = process.env.NEXT_PUBLIC_R2_URL ||
     (process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN ? `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN}` : 'https://archive.org/download');
 
   const trackAudioMap: Record<string, string> = {};
