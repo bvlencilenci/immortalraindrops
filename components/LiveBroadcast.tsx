@@ -316,7 +316,7 @@ export default function LiveBroadcast({
           />
 
           <div
-            className="relative z-10 px-6 pt-[76px] pb-7 flex flex-col h-full"
+            className="relative z-10 px-6 pt-[32px] pb-7 flex flex-col h-full"
             style={{
               textShadow: railTextShadow,
               maskImage: 'radial-gradient(circle at 4% 44%, black 0%, black 58%, rgba(0,0,0,0.58) 76%, rgba(0,0,0,0.18) 90%, transparent 100%)',
@@ -468,7 +468,7 @@ export default function LiveBroadcast({
           />
 
           <div
-            className="relative z-10 px-5 pt-[76px] pb-7 flex flex-col h-full"
+            className="relative z-10 px-5 pt-[32px] pb-7 flex flex-col h-full"
             style={{
               textShadow: railTextShadow,
               maskImage: 'radial-gradient(circle at 96% 44%, black 0%, black 58%, rgba(0,0,0,0.58) 76%, rgba(0,0,0,0.18) 90%, transparent 100%)',
