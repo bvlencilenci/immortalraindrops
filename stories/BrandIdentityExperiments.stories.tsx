@@ -295,7 +295,7 @@ function BrandIdentityDashboard() {
             <div className="text-xs font-black tracking-widest text-white uppercase">
               THE DRIFTING SYSTEM
             </div>
-            <p className="font-sans text-[11px] leading-relaxed text-[#ECEEDF]/70 normal-case tracking-normal">
+            <p className="font-playfair text-[11px] leading-relaxed text-[#ECEEDF]/70 normal-case tracking-normal">
               Electronic experiments, drone waves, and live transmission logged daily from the underground.
             </p>
           </div>

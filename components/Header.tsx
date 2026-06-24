@@ -221,33 +221,55 @@ const Header = () => {
       {/* --- MOBILE DYNAMIC ISLAND HEADER (< lg) --- */}
       <motion.nav
         layout
-        className="sticky top-0 z-[100] lg:hidden flex items-center justify-between overflow-hidden self-center whitespace-nowrap header-grain"
+        className="fixed top-0 left-0 right-0 z-[100] lg:hidden relative flex items-center justify-between overflow-hidden self-center whitespace-nowrap header-grain bg-black/20 backdrop-blur-[3px] border-b border-white/10"
         initial={{
           top: 0,
           width: "100%",
           maxWidth: "100%",
           borderRadius: 0,
-          backgroundColor: "#0A0A08",
+          backgroundColor: "rgba(0,0,0,0.2)",
           border: "none",
-          borderBottom: currentlyPlayingId === 'radio-stream' ? "none" : "1px solid rgba(255,255,255,0.1)",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "none",
+          backdropFilter: "blur(3px)",
           padding: "1.25rem 1rem",
           gap: "0.5rem"
         }}
         animate={{
-          top: isScrolled ? 12 : 0,
-          width: isScrolled ? "auto" : "100%",
-          maxWidth: isScrolled ? "calc(100% - 32px)" : "100%",
-          borderRadius: isScrolled ? 100 : 0,
-          backgroundColor: isScrolled ? "rgba(0,0,0,0.6)" : "#0A0A08",
-          border: isScrolled ? "1px solid rgba(255,255,255,0.1)" : "none",
-          borderBottom: isScrolled || currentlyPlayingId === 'radio-stream' ? "none" : "1px solid rgba(255,255,255,0.1)",
-          boxShadow: isScrolled ? "0 8px 32px rgba(0, 0, 0, 0.4)" : "none",
-          backdropFilter: isScrolled ? "blur(20px) saturate(180%)" : "none",
+          top: 0,
+          width: "100%",
+          maxWidth: "100%",
+          borderRadius: 0,
+          backgroundColor: isScrolled ? "rgba(0,0,0,0.25)" : "rgba(0,0,0,0.2)",
+          border: "none",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "none",
+          backdropFilter: "blur(3px)",
           padding: isScrolled ? "0.75rem 1rem" : "1.25rem 1rem",
           gap: isScrolled ? "0.5rem" : "0.5rem"
         }}
         transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
       >
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.38), rgba(0,0,0,0.16), rgba(0,0,0,0.28))',
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.08]"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0.045) 0px,
+                rgba(255,255,255,0.045) 1px,
+                transparent 1px,
+                transparent 5px
+              )
+            `,
+          }}
+        />
         {/* Left: LIVE */}
         <NavigationLink
           label="LIVE"
@@ -259,7 +281,7 @@ const Header = () => {
         {/* Center: LOGO */}
         <Link
           href="/"
-          className="shrink-0 flex items-center justify-center mx-1"
+          className="relative z-10 shrink-0 flex items-center justify-center mx-1 bg-black/15 border border-white/5 backdrop-blur-[3px] px-3 rounded-none"
         >
           <img
             src="/logo.png"
@@ -280,18 +302,40 @@ const Header = () => {
       </motion.nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
-      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-16 px-6 transition-all duration-300 ease-in-out backdrop-blur-md header-grain ${
-        currentlyPlayingId === 'radio-stream' ? '' : 'border-b border-[#6DBF82]/15'
-      } ${isScrolled
-        ? "bg-[#0A0A08]/60"
-        : "bg-[#0A0A08]"
-        }`}>
+      <header
+        className="hidden lg:flex fixed top-0 left-0 right-0 z-[100] w-full h-20 min-h-[76px] px-6 py-4 transition-all duration-300 ease-in-out header-grain relative overflow-hidden bg-black/20 backdrop-blur-[3px] border-b border-white/10"
+        style={{
+          backdropFilter: 'blur(3px)',
+          WebkitBackdropFilter: 'blur(3px)',
+        }}
+      >
+
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.38), rgba(0,0,0,0.16), rgba(0,0,0,0.28))',
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.08]"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0.045) 0px,
+                rgba(255,255,255,0.045) 1px,
+                transparent 1px,
+                transparent 5px
+              )
+            `,
+          }}
+        />
 
         {/* Side Elements (Flex) */}
-        <div className="w-full h-full flex items-center justify-between">
+        <div className="relative z-10 w-full h-full flex items-center justify-between">
 
           {/* BLOCK 1: Left - Station Identity */}
-          <div className="flex items-center justify-start shrink-0 gap-4 z-30 group/left">
+          <div className="relative z-10 flex items-center justify-start shrink-0 gap-4 group/left bg-black/20 border border-white/5 backdrop-blur-[3px] px-3 h-12 rounded-none shadow-none">
             {/* Playback Controls (now on Left) */}
             <PlaybackControls
               isPlaying={isPlaying}
@@ -317,10 +361,10 @@ const Header = () => {
               <div
                 className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out max-w-0 opacity-0 group-hover/left:max-w-[340px] group-hover/left:opacity-100 group-hover/left:pr-4"
               >
-                <Link href="/archive" className="text-[#ECEEDF] text-sm tracking-[0.1em] font-sans hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
+                <Link href="/archive" className="text-[#ECEEDF] text-sm tracking-[0.1em] font-playfair hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
                 {/* Only show LIVE nav link if radio is NOT currently playing */}
                 {currentlyPlayingId !== 'radio-stream' && !isLive && (
-                  <Link href="/live" className="flex items-center gap-1.5 text-[#ECEEDF] text-sm tracking-[0.1em] font-sans hover:text-white transition-colors bg-transparent uppercase">
+                  <Link href="/live" className="flex items-center gap-1.5 text-[#ECEEDF] text-sm tracking-[0.1em] font-playfair hover:text-white transition-colors bg-transparent uppercase">
                     LIVE
                   </Link>
                 )}
@@ -331,22 +375,22 @@ const Header = () => {
             {(currentlyPlayingId === 'radio-stream' || isLive || showHeaderMetadata) && (
               pathname === '/submit' ? (
                 <div className="flex items-center max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
-                  <span className="font-sans text-sm text-[#ECEEDF] uppercase font-bold leading-none tracking-[0.25em] whitespace-nowrap">
+                  <span className="font-playfair text-sm text-[#ECEEDF] uppercase font-bold leading-none tracking-[0.25em] whitespace-nowrap">
                     SUBMISSION MODE
                   </span>
                 </div>
               ) : (currentlyPlayingId === 'radio-stream' || (!currentlyPlayingId && isLive)) ? (
                 <div className="flex flex-row items-center gap-4 max-w-[300px] lg:max-w-[450px] whitespace-nowrap overflow-hidden min-w-0">
-                  <Link href="/live" className="flex items-center gap-1.5 font-sans text-[11px] font-bold text-red-500 tracking-[0.08em] uppercase leading-none shrink-0 hover:text-red-400 transition-colors">
+                  <Link href="/live" className="flex items-center gap-1.5 font-playfair text-[11px] font-bold text-red-500 tracking-[0.08em] uppercase leading-none shrink-0 hover:text-red-400 transition-colors">
                     <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
                     LIVE
                   </Link>
                   <div className="flex flex-col justify-center gap-0 min-w-0">
-                    <span className="font-sans text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
+                    <span className="font-playfair text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
                       {displayTitle || 'IMMORTAL RAINDROPS RADIO'}
                     </span>
                     {displayArtist && (
-                      <span className="font-sans text-sm text-[#6DBF82] uppercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
+                      <span className="font-playfair text-sm text-lime-300 uppercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
                         {displayArtist}
                       </span>
                     )}
@@ -354,10 +398,10 @@ const Header = () => {
                 </div>
               ) : showHeaderMetadata ? (
                 <div className="flex flex-col justify-center gap-0 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
-                  <span className="font-sans text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
+                  <span className="font-playfair text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
                     {displayTitle}
                   </span>
-                  <span className="font-sans text-sm text-[#6DBF82] uppercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
+                  <span className="font-playfair text-sm text-lime-300 uppercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
                     {displayArtist}
                   </span>
                 </div>
@@ -366,14 +410,14 @@ const Header = () => {
           </div>
 
           {/* BLOCK 3: Right - Volume Controls */}
-          <div className="flex flex-row items-center justify-end z-40 gap-6 h-full">
+          <div className="relative z-10 flex flex-row items-center justify-end gap-6 h-12 bg-black/20 border border-white/5 backdrop-blur-[3px] px-3 rounded-none shadow-none">
 
 
              {/* SUBMIT BUTTON (Desktop) */}
             <div className="relative self-center flex items-center">
               <Link
                 href="/submit"
-                className="hidden md:flex items-center justify-center font-sans text-sm text-[#6DBF82] tracking-[0.1em] hover:text-white transition-colors uppercase whitespace-nowrap self-center"
+                className="hidden md:flex items-center justify-center font-playfair text-sm text-lime-300 tracking-[0.1em] hover:text-white transition-colors uppercase whitespace-nowrap self-center"
               >
                 SUBMIT
               </Link>
@@ -396,15 +440,15 @@ const Header = () => {
         {/* BLOCK 2: Center - Logo (Absolute Center Pivot) */}
         <Link
           href="/"
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 shrink-0 flex items-center justify-center"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 shrink-0 flex h-[64px] items-center justify-center bg-black/10 border-x border-white/10 backdrop-blur-[3px] px-6 rounded-none shadow-none"
         >
           <img
             src="/logo.png"
             alt="Immortal Raindrops"
             width={52}
             height={52}
-            className="h-12 w-auto logo-breathe"
-            style={{ height: '52px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-2px)' }}
+            className="h-14 w-auto logo-breathe"
+            style={{ height: '58px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-2px)' }}
           />
         </Link>
 

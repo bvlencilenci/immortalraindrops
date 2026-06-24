@@ -81,7 +81,7 @@ export default async function NewsIndexPage() {
                       </Link>
                     </h2>
                     {post.excerpt && (
-                      <p className="text-[#ECEEDF]/70 text-xs leading-relaxed tracking-wider font-sans mt-2">
+                      <p className="text-[#ECEEDF]/70 text-xs leading-relaxed tracking-wider font-playfair mt-2">
                         {post.excerpt}
                       </p>
                     )}

@@ -75,11 +75,9 @@ export default async function RootLayout({
             {children}
           </div>
 
-          {/* Dynamic Footer */}
-          <footer className="w-full py-8 text-center text-[#ECEEDF]/20 font-mono text-[10px] uppercase tracking-widest pointer-events-none mix-blend-plus-lighter shrink-0">
-            {settings?.footer_text || '© 2026 IMMORTAL RAINDROPS'}
-          </footer>
+
         </div>
+        <div className="scanline" />
       </body>
     </html>
   );

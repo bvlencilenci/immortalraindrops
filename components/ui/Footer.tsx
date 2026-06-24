@@ -22,16 +22,18 @@ export function Footer({
 
   return (
     <div 
-      className={`w-full max-w-full mt-0 ${hideBorder ? '' : 'border-t border-[#ECEEDF]/10'} py-3 flex flex-row flex-wrap justify-between items-center gap-y-2 gap-x-4 text-[8px] md:text-[9px] tracking-[0.2em] text-[#ECEEDF]/30 uppercase select-none z-10 px-4 md:px-8 backdrop-blur-[2px] bg-[#0A0A08] ${className}`}
+      className={`w-full max-w-full mt-0 border-t border-black py-2.5 flex flex-row justify-between items-center text-[15px] md:text-[17px] font-vt323 text-[#6DBF82] bg-black select-none z-10 px-4 md:px-8 winamp-bevel ${className}`}
       data-testid="footer"
     >
-      <div className="flex flex-wrap gap-x-4 gap-y-1">
-        <span><span className="text-[#6DBF82]">LISTENERS:</span> <span className="text-[#ECEEDF]/60">{listenerCount}</span></span>
-        <span><span className="text-[#6DBF82]">UPTIME:</span> <span className="text-[#ECEEDF]/60">{formatUptime(uptimeSeconds)}</span></span>
+      <div className="flex items-center gap-3">
+        <span>LISTENERS: <span className="text-white">{listenerCount}</span></span>
+        <span className="text-[#6DBF82]/30 select-none">░</span>
+        <span>UPTIME: <span className="text-white">{formatUptime(uptimeSeconds)}</span></span>
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-1">
-        <span className="text-[#6DBF82]">EST. 2026</span>
-        <span className="text-[#6DBF82]">LONDON, UK</span>
+      <div className="flex items-center gap-3">
+        <span>EST. 2026</span>
+        <span className="text-[#6DBF82]/30 select-none">░</span>
+        <span>LONDON, UK</span>
       </div>
     </div>
   );

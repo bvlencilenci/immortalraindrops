@@ -49,7 +49,7 @@ export function NewsEntry({ item }: { item: NewsPostItem }) {
       </h2>
 
       {item.excerpt && (
-        <p className="text-sm tracking-normal leading-relaxed text-[#ECEEDF]/60 mt-2 font-sans normal-case">
+        <p className="text-sm tracking-normal leading-relaxed text-[#ECEEDF]/60 mt-2 font-playfair normal-case">
           {item.excerpt}
         </p>
       )}

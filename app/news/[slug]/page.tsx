@@ -77,7 +77,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
             </h1>
           </div>
 
-          <div className="prose prose-invert max-w-none text-[#ECEEDF]/80 text-sm leading-loose tracking-wider font-sans whitespace-pre-wrap">
+          <div className="prose prose-invert max-w-none text-[#ECEEDF]/80 text-sm leading-loose tracking-wider font-playfair whitespace-pre-wrap">
             {post.body}
           </div>
         </article>

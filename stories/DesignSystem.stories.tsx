@@ -85,10 +85,10 @@ function DesignSystemDoc() {
 
           <div className="border border-[#ECEEDF]/10 p-6">
             <span className="text-[9px] text-[#ECEEDF]/40 block mb-3">// SANS BODY / EXCERPT</span>
-            <p className="font-sans text-[13px] tracking-widest leading-relaxed lowercase first-letter:uppercase text-[#ECEEDF]/85">
+            <p className="font-playfair text-[13px] tracking-widest leading-relaxed lowercase first-letter:uppercase text-[#ECEEDF]/85">
               The digital audio gateway is now open. Broadcasting electronic experiments, drone waves, ambient recordings, and live performances.
             </p>
-            <span className="text-[10px] text-[#ECEEDF]/60 block mt-2">font-sans text-[13px] tracking-widest leading-relaxed</span>
+            <span className="text-[10px] text-[#ECEEDF]/60 block mt-2">font-playfair text-[13px] tracking-widest leading-relaxed</span>
           </div>
         </div>
       </section>
