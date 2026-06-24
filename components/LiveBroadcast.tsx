@@ -246,7 +246,7 @@ export default function LiveBroadcast({
           </div>
 
           {/* 2. VISUALIZER */}
-          <div className="flex-1 min-h-0 relative overflow-hidden w-full bg-black">
+          <div className="flex-1 min-h-0 relative overflow-hidden w-full bg-black flex items-center justify-center">
             <LiveVisualizer />
           </div>
 

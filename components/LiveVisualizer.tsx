@@ -190,7 +190,7 @@ export default function LiveVisualizer() {
   }, [radioAudioNode, currentlyPlayingId, isPlaying, analyserFromStore]);
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0 flex items-center justify-center">
       <canvas
         ref={canvasRef}
         className="w-full h-full block transition-opacity duration-1000"
