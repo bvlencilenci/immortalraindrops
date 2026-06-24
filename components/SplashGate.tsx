@@ -63,6 +63,19 @@ const SplashGate = () => {
     didPlayFirst.current = false;
     didPlaySecond.current = false;
     
+    // Force Howler to initialize its AudioContext
+    if (!Howler.ctx) {
+      try {
+        // eslint-disable-next-line no-new
+        new Howl({
+          src: ['data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'],
+          preload: true
+        });
+      } catch (e) {
+        console.warn('Failed to force Howler init in handleEnter:', e);
+      }
+    }
+
     // CRITICAL: Must be called synchronously within the onClick handler to bypass browser autoplay policies
     if (Howler.ctx && Howler.ctx.state === 'suspended') {
       Howler.ctx.resume();

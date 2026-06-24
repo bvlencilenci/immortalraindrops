@@ -281,7 +281,7 @@ const Header = () => {
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
       <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-16 px-6 transition-all duration-300 ease-in-out backdrop-blur-md header-grain ${
-        currentlyPlayingId === 'radio-stream' ? '' : 'border-b border-[#ECEEDF]/10'
+        currentlyPlayingId === 'radio-stream' ? '' : 'border-b border-[#6DBF82]/15'
       } ${isScrolled
         ? "bg-[#0A0A08]/60"
         : "bg-[#0A0A08]"
@@ -343,11 +343,11 @@ const Header = () => {
                   </Link>
                   <div className="flex flex-col justify-center gap-0 min-w-0">
                     <span className="font-sans text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
-                      {displayArtist || 'IMMORTAL RAINDROPS RADIO'}
+                      {displayTitle || 'IMMORTAL RAINDROPS RADIO'}
                     </span>
-                    {displayTitle && (
-                      <span className="font-sans text-sm text-[#ECEEDF]/40 lowercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
-                        {displayTitle}
+                    {displayArtist && (
+                      <span className="font-sans text-sm text-[#6DBF82] uppercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
+                        {displayArtist}
                       </span>
                     )}
                   </div>
@@ -355,10 +355,10 @@ const Header = () => {
               ) : showHeaderMetadata ? (
                 <div className="flex flex-col justify-center gap-0 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
                   <span className="font-sans text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
-                    {displayArtist}
-                  </span>
-                  <span className="font-sans text-sm text-[#ECEEDF]/40 lowercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
                     {displayTitle}
+                  </span>
+                  <span className="font-sans text-sm text-[#6DBF82] uppercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
+                    {displayArtist}
                   </span>
                 </div>
               ) : null
@@ -373,9 +373,9 @@ const Header = () => {
             <div className="relative self-center flex items-center">
               <Link
                 href="/submit"
-                className="hidden md:flex items-center justify-center font-sans text-xs text-[#ECEEDF] tracking-[0.1em] hover:text-white transition-colors uppercase whitespace-nowrap self-center"
+                className="hidden md:flex items-center justify-center font-sans text-sm text-[#6DBF82] tracking-[0.1em] hover:text-white transition-colors uppercase whitespace-nowrap self-center"
               >
-                [ SUBMIT ]
+                SUBMIT
               </Link>
             </div>
 
@@ -438,14 +438,14 @@ const Header = () => {
             </div>
 
             {/* Visual Track Layer (Pointer Events None) */}
-            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#ECEEDF]/20 group-hover/scrubber:h-[6px] transition-all duration-200 ease-out pointer-events-none">
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#6DBF82]/15 group-hover/scrubber:h-[6px] transition-all duration-200 ease-out pointer-events-none">
               {/* Progress Fill */}
               <div
-                className="h-full bg-[#ECEEDF] relative transition-all duration-200 ease-out"
+                className="h-full bg-[#6DBF82] relative transition-all duration-200 ease-out"
                 style={{ width: `${progressPercent}%` }}
               >
                 {/* Thumb (Right Edge of Progress) */}
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 group-hover/scrubber:w-4 group-hover/scrubber:h-4 bg-[#ECEEDF] rounded-full shadow-[0_0_10px_rgba(236,238,223,0.5)] transition-all duration-200 ease-out translate-x-1/2" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 group-hover/scrubber:w-4 group-hover/scrubber:h-4 bg-[#6DBF82] rounded-full shadow-[0_0_10px_rgba(109,191,130,0.5)] transition-all duration-200 ease-out translate-x-1/2" />
               </div>
             </div>
           </div>

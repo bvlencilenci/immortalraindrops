@@ -70,6 +70,19 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   }),
 
   enterApp: async () => {
+    // Force Howler to initialize its AudioContext
+    if (!Howler.ctx) {
+      try {
+        // eslint-disable-next-line no-new
+        new Howl({
+          src: ['data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'],
+          preload: true
+        });
+      } catch (e) {
+        console.warn('Failed to force Howler init:', e);
+      }
+    }
+
     if (Howler.ctx) {
       await Howler.ctx.resume();
     }
@@ -232,6 +245,19 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   },
 
   playLiveStream: async (url) => {
+    // Force Howler to initialize its AudioContext
+    if (!Howler.ctx) {
+      try {
+        // eslint-disable-next-line no-new
+        new Howl({
+          src: ['data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'],
+          preload: true
+        });
+      } catch (e) {
+        console.warn('Failed to force Howler init in playLiveStream:', e);
+      }
+    }
+
     if (Howler.ctx) {
       await Howler.ctx.resume();
     }
@@ -353,3 +379,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     }
   }
 }));
+
+if (typeof window !== 'undefined') {
+  (window as any).useAudioStore = useAudioStore;
+}
+

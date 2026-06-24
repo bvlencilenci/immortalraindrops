@@ -5,7 +5,6 @@ import { useAudioStore } from '../store/useAudioStore';
 import { supabase } from '../lib/supabase';
 import LiveVisualizer from './LiveVisualizer';
 import { type NewsPostItem } from './NewsEntry';
-import { StatusBadge } from './ui/StatusBadge';
 import { TrackHistoryItem } from './ui/TrackHistoryItem';
 import { Footer } from './ui/Footer';
 
@@ -127,7 +126,7 @@ export default function LiveBroadcast({
                       oldHistory[0].artist.toLowerCase() === data.artist.toLowerCase() &&
                       oldHistory[0].title.toLowerCase() === data.title.toLowerCase();
                     if (!isDup) {
-                      return [{ artist: data.artist, title: data.title }, ...oldHistory].slice(0, 5);
+                      return [{ artist: data.artist, title: data.title }, ...oldHistory].slice(0, 7);
                     }
                     return oldHistory;
                   });
@@ -204,7 +203,7 @@ export default function LiveBroadcast({
         {/* LEFT COLUMN: HISTORY */}
         <div className="glass-panel-left-wrap w-full md:w-64 shrink-0 flex flex-col">
           <div className="glass-panel-left w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase mb-3 whitespace-nowrap">
+            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 border-b border-[#6DBF82]/20 mb-3 whitespace-nowrap">
               HISTORY
             </h2>
           <div className="flex flex-col gap-4 overflow-y-auto max-h-[180px] md:max-h-[420px] pr-1 custom-scrollbar">
@@ -213,7 +212,7 @@ export default function LiveBroadcast({
                 NO HISTORY RECORDED
               </div>
             ) : (
-              playbackHistory.slice(0, 10).map((track, i) => {
+              playbackHistory.slice(0, 7).map((track, i) => {
                 const trackKey = `${track.artist.toLowerCase()} - ${track.title.toLowerCase()}`;
                 const audioUrl = trackAudioMap[trackKey];
 
@@ -239,13 +238,6 @@ export default function LiveBroadcast({
           <div className="absolute inset-0 opacity-40 z-0 pointer-events-none">
             <LiveVisualizer />
           </div>
-
-          {/* Status Badge */}
-          <StatusBadge
-            isLive={isLive}
-            broadcastMode={broadcastMode}
-            className="relative z-10"
-          />
 
           {/* Now Playing visual display pinned to the bottom left */}
           <div className="w-full flex flex-col items-start justify-end min-h-fit max-w-xl z-10 mt-auto pb-2 relative z-10 self-start">
@@ -278,7 +270,9 @@ export default function LiveBroadcast({
               <div className={`flex flex-col items-start text-left gap-1.5 w-full pt-4 px-2 ${
                 currentlyPlayingId === 'radio-stream' ? '' : 'border-t border-[#ECEEDF]/15'
               }`}>
-                <span className="text-[7px] tracking-[0.08em] text-[#ECEEDF]/20 uppercase select-none mb-2">NOW PLAYING</span>
+                <div className="text-[7px] tracking-[0.08em] text-[#6DBF82]/60 uppercase select-none mb-2">
+                  <strong className="font-bold">NOW PLAYING:</strong> <span className="font-normal">AUTOMATED BROADCAST</span>
+                </div>
                 <div className="text-2xl md:text-3xl font-black tracking-tight text-white text-left truncate w-full leading-none font-narrow">
                   {currentTitle}
                 </div>
@@ -295,7 +289,7 @@ export default function LiveBroadcast({
         {/* RIGHT COLUMN: NEWS */}
         <div className="glass-panel-right-wrap w-full md:w-64 shrink-0 flex flex-col">
           <div className="glass-panel-right w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase mb-3 whitespace-nowrap">
+            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 border-b border-[#6DBF82]/20 mb-3 whitespace-nowrap">
               NEWS
             </h2>
           <div className="flex flex-col gap-4 max-h-[180px] md:max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
@@ -341,12 +335,13 @@ export default function LiveBroadcast({
           className="absolute top-0 left-0 w-full h-5"
           viewBox="0 0 100 20"
           preserveAspectRatio="none"
+          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
         >
           <path
             d="M 0,10 L 15,12 L 30,18 L 50,11 L 70,16 L 85,12 L 100,10"
             fill="none"
-            stroke="rgba(236, 238, 223, 0.12)"
-            strokeWidth="1.5"
+            stroke="rgba(109, 191, 130, 0.25)"
+            strokeWidth="1.2"
             vectorEffect="non-scaling-stroke"
           />
         </svg>
@@ -356,12 +351,13 @@ export default function LiveBroadcast({
           className="absolute bottom-0 left-0 w-full h-5"
           viewBox="0 0 100 20"
           preserveAspectRatio="none"
+          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
         >
           <path
             d="M 0,10 L 12,8 L 28,2 L 45,9 L 65,3 L 80,8 L 100,10"
             fill="none"
-            stroke="rgba(236, 238, 223, 0.12)"
-            strokeWidth="1.5"
+            stroke="rgba(109, 191, 130, 0.25)"
+            strokeWidth="1.2"
             vectorEffect="non-scaling-stroke"
           />
         </svg>
@@ -371,12 +367,13 @@ export default function LiveBroadcast({
           className="absolute top-[10px] bottom-[10px] left-[-10px] h-[calc(100%-20px)] w-5"
           viewBox="0 0 20 100"
           preserveAspectRatio="none"
+          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
         >
           <path
             d="M 10,0 L 12,12 L 18,28 L 11,45 L 17,62 L 10,80 L 10,100"
             fill="none"
-            stroke="rgba(236, 238, 223, 0.12)"
-            strokeWidth="1.5"
+            stroke="rgba(109, 191, 130, 0.25)"
+            strokeWidth="1.2"
             vectorEffect="non-scaling-stroke"
           />
         </svg>
@@ -386,12 +383,13 @@ export default function LiveBroadcast({
           className="absolute top-[10px] bottom-[10px] right-[-10px] h-[calc(100%-20px)] w-5"
           viewBox="0 0 20 100"
           preserveAspectRatio="none"
+          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
         >
           <path
             d="M 10,0 L 8,20 L 2,40 L 9,65 L 3,85 L 10,100"
             fill="none"
-            stroke="rgba(236, 238, 223, 0.12)"
-            strokeWidth="1.5"
+            stroke="rgba(109, 191, 130, 0.25)"
+            strokeWidth="1.2"
             vectorEffect="non-scaling-stroke"
           />
         </svg>

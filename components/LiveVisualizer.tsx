@@ -29,6 +29,7 @@ export default function LiveVisualizer() {
   const radioAudioNode = useAudioStore((state) => state.radioAudioNode);
   const isPlaying = useAudioStore((state) => state.isPlaying);
   const currentlyPlayingId = useAudioStore((state) => state.currentlyPlayingId);
+  const analyserFromStore = useAudioStore((state) => state.analyser);
 
   const visualizerRef = useRef<any>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -36,17 +37,15 @@ export default function LiveVisualizer() {
 
   const initRef = useRef(false);
 
-  const isRadioPlaying = currentlyPlayingId === 'radio-stream' && isPlaying;
-
   useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const ctx = Howler.ctx;
-    if (!ctx) return;
+    const isRadio = currentlyPlayingId === 'radio-stream';
+    const ctx = isRadio ? radioAudioNode?.context : Howler.ctx;
 
-    if (ctx.state === 'suspended') {
-      ctx.resume().catch(() => { });
+    if (ctx && ctx.state === 'suspended' && 'resume' in ctx) {
+      (ctx as any).resume().catch(() => { });
     }
 
     const resizeCanvas = () => {
@@ -59,7 +58,13 @@ export default function LiveVisualizer() {
       visualizerRef.current?.setDimensions?.(canvas.width, canvas.height);
     };
 
-    resizeCanvas();
+    const resizeObserver = new ResizeObserver(() => {
+      resizeCanvas();
+    });
+
+    if (canvas.parentElement) {
+      resizeObserver.observe(canvas.parentElement);
+    }
 
     let visualizer: any;
     let butterchurn: any;
@@ -67,8 +72,8 @@ export default function LiveVisualizer() {
 
     const init = async () => {
       try {
-        if (!radioAudioNode) {
-          console.log('waiting for audio node...');
+        if (!ctx) {
+          console.log('waiting for audio context...');
           return;
         }
 
@@ -77,6 +82,9 @@ export default function LiveVisualizer() {
 
         const pixelRatio =
           window.innerWidth < 768 ? 0.75 : window.devicePixelRatio || 1;
+
+        // Force a resize right before creation to match parent bounds
+        resizeCanvas();
 
         butterchurn = (await import('butterchurn')).default;
         butterchurnPresets = (await import('butterchurn-presets')).default;
@@ -90,12 +98,17 @@ export default function LiveVisualizer() {
 
         visualizerRef.current = visualizer;
 
-        const analyser = Howler.ctx.createAnalyser();
-        analyser.fftSize = 1024;
-
-        const osc = Howler.ctx.createOscillator();
-        osc.connect(analyser);
-        osc.start();
+        let analyser: AnalyserNode;
+        if (isRadio && radioAudioNode) {
+          analyser = ctx.createAnalyser();
+          analyser.fftSize = 1024;
+          radioAudioNode.connect(analyser);
+        } else if (analyserFromStore) {
+          analyser = analyserFromStore;
+        } else {
+          analyser = ctx.createAnalyser();
+          analyser.fftSize = 256;
+        }
 
         visualizer.connectAudio(analyser);
 
@@ -141,7 +154,7 @@ export default function LiveVisualizer() {
         presetIntervalRef.current = setInterval(rotatePreset, 10000);
 
         const renderLoop = () => {
-          if (!document.hidden && visualizerRef.current && isRadioPlaying) {
+          if (!document.hidden && visualizerRef.current && isPlaying && currentlyPlayingId) {
             visualizerRef.current.render();
           }
 
@@ -160,11 +173,8 @@ export default function LiveVisualizer() {
 
     init();
 
-    const handleResize = () => resizeCanvas();
-    window.addEventListener('resize', handleResize);
-
     return () => {
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
 
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -177,7 +187,7 @@ export default function LiveVisualizer() {
       visualizerRef.current?.dispose?.();
       initRef.current = false;
     };
-  }, [radioAudioNode, isRadioPlaying]);
+  }, [radioAudioNode, currentlyPlayingId, isPlaying, analyserFromStore]);
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
@@ -186,30 +196,52 @@ export default function LiveVisualizer() {
         className="w-full h-full block transition-opacity duration-1000"
       />
 
+      {/* Edge darkening layer */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ zIndex: 5, boxShadow: 'inset 0 0 80px 30px rgba(10,10,8,0.92), inset 0 0 20px 8px rgba(10,10,8,0.6)' }}
+      />
+
+      {/* Top/bottom gradient layer */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ zIndex: 6, background: 'linear-gradient(to bottom, rgba(10,10,8,0.55) 0%, transparent 18%, transparent 72%, rgba(10,10,8,0.65) 100%)' }}
+      />
+
+      {/* Left/right gradient layer */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ zIndex: 7, background: 'linear-gradient(to right, rgba(10,10,8,0.45) 0%, transparent 12%, transparent 88%, rgba(10,10,8,0.45) 100%)' }}
+      />
+
       {/* Static border-cracks glass overlay */}
-      <div className="absolute inset-0 pointer-events-none z-10">
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 8 }}>
         <svg
-          className="w-full h-full block"
-          viewBox="0 0 1000 1000"
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 900 640"
           preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ filter: 'drop-shadow(0 0 3px rgba(236, 238, 223, 0.12))' }}
+          style={{ filter: 'drop-shadow(0 0 4px rgba(109,191,130,0.2))' }}
         >
-          <path
-            d="
-              M 0,0 L 20,20 L 45,35 L 65,65 M 20,20 L 35,10 L 50,8 M 45,35 L 38,55 L 32,70
-              M 1000,0 L 980,20 L 955,35 L 935,65 M 980,20 L 965,10 L 950,8 M 955,35 L 962,55 L 968,70
-              M 0,1000 L 20,980 L 45,965 L 65,935 M 20,980 L 35,990 L 50,992 M 45,965 L 38,945 L 32,930
-              M 1000,1000 L 980,980 L 955,965 L 935,935 M 980,980 L 965,990 L 950,992 M 955,965 L 962,945 L 968,930
-              M 500,0 L 510,25 L 495,50 L 505,75 M 510,25 L 530,35 L 545,40 M 495,50 L 475,60 L 460,65
-              M 500,1000 L 510,975 L 495,950 L 505,925 M 510,975 L 530,965 L 545,960 M 495,950 L 475,940 L 460,935
-              M 0,500 L 25,510 L 50,495 L 75,505 M 25,510 L 35,530 L 40,545 M 50,495 L 60,475 L 65,460
-              M 1000,500 L 975,510 L 950,495 L 925,505 M 975,510 L 965,530 L 960,545 M 950,495 L 940,475 L 935,460
-            "
-            stroke="rgba(236, 238, 223, 0.2)"
-            strokeWidth="0.8"
-            fill="none"
-          />
+          {/* Main radial cracks from top-left impact point */}
+          <path d="M 80 60 L 143 198 L 112 310" stroke="rgba(109,191,130,0.28)" strokeWidth="0.8" fill="none"/>
+          <path d="M 80 60 L 210 145 L 340 178" stroke="rgba(109,191,130,0.22)" strokeWidth="0.6" fill="none"/>
+          <path d="M 80 60 L 58 180 L 42 390" stroke="rgba(109,191,130,0.18)" strokeWidth="0.5" fill="none"/>
+          <path d="M 80 60 L 190 72 L 420 58" stroke="rgba(109,191,130,0.15)" strokeWidth="0.5" fill="none"/>
+
+          {/* Branch cracks off main radials */}
+          <path d="M 143 198 L 98 242 L 72 310" stroke="rgba(109,191,130,0.16)" strokeWidth="0.4" fill="none"/>
+          <path d="M 210 145 L 248 210 L 230 290" stroke="rgba(109,191,130,0.13)" strokeWidth="0.4" fill="none"/>
+          <path d="M 112 310 L 78 355 L 60 430" stroke="rgba(109,191,130,0.12)" strokeWidth="0.4" fill="none"/>
+
+          {/* Bottom-right corner cracks */}
+          <path d="M 900 640 L 760 548 L 680 490" stroke="rgba(109,191,130,0.2)" strokeWidth="0.7" fill="none"/>
+          <path d="M 900 640 L 820 580 L 900 520" stroke="rgba(109,191,130,0.14)" strokeWidth="0.5" fill="none"/>
+          <path d="M 760 548 L 700 590 L 640 640" stroke="rgba(109,191,130,0.12)" strokeWidth="0.4" fill="none"/>
+
+          {/* Concentric arc fragments near impact */}
+          <path d="M 42 140 Q 140 110 280 155" stroke="rgba(109,191,130,0.1)" strokeWidth="0.4" fill="none"/>
+          <path d="M 55 260 Q 160 220 310 248" stroke="rgba(109,191,130,0.08)" strokeWidth="0.35" fill="none"/>
         </svg>
       </div>
     </div>

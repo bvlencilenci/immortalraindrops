@@ -63,7 +63,7 @@ export async function POST(req: Request) {
         lastTrack.title?.toLowerCase() === title.toLowerCase();
 
       if (!isDuplicate) {
-        history = [{ artist, title }, ...history].slice(0, 5);
+        history = [{ artist, title }, ...history].slice(0, 7);
         playbackHistoryUpdate = history;
       }
     }

@@ -26,12 +26,12 @@ export function Footer({
       data-testid="footer"
     >
       <div className="flex flex-wrap gap-x-4 gap-y-1">
-        <span>LISTENERS: {listenerCount}</span>
-        <span>UPTIME: {formatUptime(uptimeSeconds)}</span>
+        <span><span className="text-[#6DBF82]">LISTENERS:</span> <span className="text-[#ECEEDF]/60">{listenerCount}</span></span>
+        <span><span className="text-[#6DBF82]">UPTIME:</span> <span className="text-[#ECEEDF]/60">{formatUptime(uptimeSeconds)}</span></span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
-        <span>EST. 2026</span>
-        <span>LONDON, UK</span>
+        <span className="text-[#6DBF82]">EST. 2026</span>
+        <span className="text-[#6DBF82]">LONDON, UK</span>
       </div>
     </div>
   );

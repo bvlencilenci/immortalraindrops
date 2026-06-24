@@ -36,6 +36,18 @@ export default function RadioPlayer() {
 
       audio.play().then(() => {
         // Expose source node for Butterchurn visualizer
+        if (!Howler.ctx) {
+          try {
+            // eslint-disable-next-line no-new
+            new Howl({
+              src: ['data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'],
+              preload: true
+            });
+          } catch (e) {
+            console.warn('Failed to force Howler init on audio.play resolve:', e);
+          }
+        }
+
         const ctx = Howler.ctx;
         if (ctx && !(audio as any)._sourceNode) {
           try {
