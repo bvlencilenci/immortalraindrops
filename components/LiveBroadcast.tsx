@@ -233,7 +233,7 @@ export default function LiveBroadcast({
         {/* ================= HISTORY (SYSTEM PANEL) ================= */}
         <div
           ref={historyRailRef}
-          className="w-72 relative flex flex-col overflow-visible"
+          className="hidden lg:flex w-72 relative flex-col overflow-visible"
         >
 
           <div
@@ -363,19 +363,19 @@ export default function LiveBroadcast({
         </div>
 
         {/* ================= CENTER ================= */}
-        <div className="flex-1 flex items-end justify-start p-10">
+        <div className="flex-1 flex items-stretch justify-center px-4 pt-24 pb-5 lg:items-end lg:justify-start lg:p-10">
 
-          <div className="w-[560px] h-[255px] p-8 bg-black/40 backdrop-blur-md border border-white/10 flex flex-col justify-center">
+          <div className="w-full min-h-[calc(100dvh-7.25rem)] p-7 bg-black/40 backdrop-blur-md border border-white/10 flex flex-col justify-center lg:w-[560px] lg:h-[255px] lg:min-h-0 lg:p-8">
 
-            <div className="text-[14px] tracking-[0.4em] text-lime-300">
+            <div className="text-[13px] lg:text-[14px] tracking-[0.36em] lg:tracking-[0.4em] text-lime-300">
               LIVE SIGNAL
             </div>
 
-            <div className="text-5xl font-bold mt-3 leading-[0.95] line-clamp-2 overflow-hidden">
+            <div className="text-[clamp(2.7rem,14vw,5rem)] lg:text-5xl font-bold mt-4 lg:mt-3 leading-[0.92] lg:leading-[0.95] line-clamp-4 lg:line-clamp-2 overflow-hidden">
               {broadcastMode === 'live' ? showTitle : title}
             </div>
 
-            <div className="text-xl opacity-80 mt-3 text-lime-300 truncate">
+            <div className="text-xl lg:text-xl opacity-80 mt-5 lg:mt-3 text-lime-300">
               {broadcastMode === 'live' ? djName : artist}
             </div>
 
@@ -385,7 +385,7 @@ export default function LiveBroadcast({
         {/* ================= NEWS (SYSTEM FEED) ================= */}
         <div
           ref={newsRailRef}
-          className="w-64 relative flex flex-col overflow-visible"
+          className="hidden lg:flex w-64 relative flex-col overflow-visible"
         >
 
           <div
@@ -506,7 +506,7 @@ export default function LiveBroadcast({
 
       </div>
 
-      <Footer listenerCount={listenerCount} uptimeSeconds={uptimeSeconds} />
+      <Footer listenerCount={listenerCount} uptimeSeconds={uptimeSeconds} className="hidden lg:flex" />
     </div>
   );
 }

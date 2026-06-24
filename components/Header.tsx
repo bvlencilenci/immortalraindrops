@@ -4,10 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
-import { NavigationLink } from './ui/NavigationLink';
 import { PlaybackControls } from './ui/PlaybackControls';
 import { VolumeController } from './ui/VolumeController';
 
@@ -57,7 +55,6 @@ const Header = () => {
   }
 
   const pathname = usePathname();
-  const [isScrolled, setIsScrolled] = useState(false);
   const prevVolumeRef = useRef(1.0);
 
   // Auth State
@@ -169,8 +166,7 @@ const Header = () => {
 
     const cleanupPromise = setupListener();
 
-    // 3. Keep existing scroll/key handlers
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    // 3. Keep existing key handlers
     const handleKeyDown = (e: KeyboardEvent) => {
       /* existing handler logic */
       const target = e.target as HTMLElement;
@@ -186,11 +182,9 @@ const Header = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeyDown);
       cleanupPromise.then(cleanup => cleanup());
     };
@@ -218,37 +212,9 @@ const Header = () => {
 
   return (
     <>
-      {/* --- MOBILE DYNAMIC ISLAND HEADER (< lg) --- */}
-      <motion.nav
-        layout
-        className="fixed top-0 left-0 right-0 z-[100] lg:hidden relative flex items-center justify-between overflow-hidden self-center whitespace-nowrap header-grain bg-black/20 backdrop-blur-[3px] border-b border-white/10"
-        initial={{
-          top: 0,
-          width: "100%",
-          maxWidth: "100%",
-          borderRadius: 0,
-          backgroundColor: "rgba(0,0,0,0.2)",
-          border: "none",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
-          boxShadow: "none",
-          backdropFilter: "blur(3px)",
-          padding: "1.25rem 1rem",
-          gap: "0.5rem"
-        }}
-        animate={{
-          top: 0,
-          width: "100%",
-          maxWidth: "100%",
-          borderRadius: 0,
-          backgroundColor: isScrolled ? "rgba(0,0,0,0.25)" : "rgba(0,0,0,0.2)",
-          border: "none",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
-          boxShadow: "none",
-          backdropFilter: "blur(3px)",
-          padding: isScrolled ? "0.75rem 1rem" : "1.25rem 1rem",
-          gap: isScrolled ? "0.5rem" : "0.5rem"
-        }}
-        transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+      {/* --- MOBILE HEADER (< lg) --- */}
+      <nav
+        className="fixed top-0 left-0 right-0 z-[100] lg:hidden relative flex h-20 items-center justify-between overflow-hidden whitespace-nowrap header-grain bg-black/20 backdrop-blur-[3px] border-b border-white/10 px-3"
       >
         <div
           className="absolute inset-0 z-0 pointer-events-none"
@@ -270,36 +236,54 @@ const Header = () => {
             `,
           }}
         />
-        {/* Left: LIVE */}
-        <NavigationLink
-          label="LIVE"
-          href="/live"
-          isActive={pathname === '/live'}
-          isLive={isLive || broadcastMode === 'automated'}
+        <PlaybackControls
+          isPlaying={isPlaying}
+          onPlayPause={(e) => {
+            e.stopPropagation();
+            if (!isPlayerActive) {
+              const streamUrl = process.env.NEXT_PUBLIC_RADIO_STREAM_URL || '';
+              if (streamUrl) {
+                playLiveStream(streamUrl);
+              }
+            } else {
+              togglePlay();
+            }
+          }}
+          isRadioStream
+          className="relative z-10 shrink-0 bg-black/15 border border-white/5 backdrop-blur-[3px] px-2 py-2 rounded-none"
         />
 
-        {/* Center: LOGO */}
+        <Link
+          href="/live"
+          className="relative z-10 flex items-center gap-1.5 bg-black/10 border border-white/5 backdrop-blur-[3px] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]"
+        >
+          {(isLive || broadcastMode === 'automated') && (
+            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+          )}
+          <span className={pathname === '/live' ? 'text-white' : 'text-[#ECEEDF]/80'}>LIVE</span>
+        </Link>
+
         <Link
           href="/"
-          className="relative z-10 shrink-0 flex items-center justify-center mx-1 bg-black/15 border border-white/5 backdrop-blur-[3px] px-3 rounded-none"
+          className="relative z-10 shrink-0 flex h-16 items-center justify-center bg-black/10 border-x border-white/10 backdrop-blur-[3px] px-4 rounded-none"
         >
           <img
             src="/logo.png"
             alt="Immortal Raindrops"
             width={52}
             height={52}
-            className="h-10 w-auto logo-breathe"
-            style={{ height: '52px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-2px)' }}
+            className="h-12 w-auto logo-breathe"
+            style={{ height: '54px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-1px)' }}
           />
         </Link>
 
-        {/* Right: ARCHIVE */}
-        <NavigationLink
-          label="ARCHIVE"
+        <Link
           href="/archive"
-          isActive={pathname === '/archive'}
-        />
-      </motion.nav>
+          className="relative z-10 bg-black/10 border border-white/5 backdrop-blur-[3px] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]/80"
+        >
+          ARCHIVE
+        </Link>
+      </nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
       <header
