@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import { Howler } from 'howler';
-// @ts-ignore
-import butterchurn from 'butterchurn';
-// @ts-ignore
-import butterchurnPresets from 'butterchurn-presets';
 
-// Curated list of presets matching the station identity (dark, brutalist, slow motion, abstract geometry, red accents, VHS/analog feeling)
+// @ts-ignore
+// ❌ REMOVED STATIC IMPORT (this causes Turbopack SSR crash)
+// import butterchurn from 'butterchurn';
+// import butterchurnPresets from 'butterchurn-presets';
+
 const CURATED_PRESET_NAMES = [
   '_Geiss - Artifact 01',
   '_Geiss - Desert Rose 2',
@@ -52,10 +52,11 @@ export default function LiveVisualizer() {
     }
 
     if (ctx.state === 'suspended') {
-      ctx.resume().catch((err) => console.warn('Failed to resume AudioContext in visualizer:', err));
+      ctx.resume().catch((err) =>
+        console.warn('Failed to resume AudioContext in visualizer:', err)
+      );
     }
 
-    // Set canvas sizes
     const resizeCanvas = () => {
       const parent = canvas.parentElement;
       if (parent) {
@@ -66,121 +67,114 @@ export default function LiveVisualizer() {
         }
       }
     };
+
     resizeCanvas();
 
-    // Initialize Butterchurn visualizer
     let visualizer: any;
-    try {
-      const isMobile = window.innerWidth < 768;
-      const pixelRatio = isMobile ? 0.75 : window.devicePixelRatio || 1;
+    let butterchurn: any;
+    let butterchurnPresets: any;
 
-      visualizer = butterchurn.createVisualizer(ctx, canvas, {
-        width: canvas.width,
-        height: canvas.height,
-        pixelRatio,
-        textureRatio: 1
-      });
-      visualizerRef.current = visualizer;
+    const init = async () => {
+      try {
+        const isMobile = window.innerWidth < 768;
+        const pixelRatio = isMobile ? 0.75 : window.devicePixelRatio || 1;
 
-      // Connect audio node to visualizer
-      visualizer.connectAudio(radioAudioNode);
-      
-      console.log('Butterchurn visualizer initialized successfully');
-      setIsActive(true);
-      setIsInitialized(true);
-    } catch (e) {
-      console.error('Failed to initialize Butterchurn visualizer:', e);
-      setIsActive(false);
-      setIsInitialized(false);
-      return;
-    }
+        // ✅ ONLY FIX: dynamic import (fixes SSR/Turbopack crash)
+        butterchurn = (await import('butterchurn')).default;
+        butterchurnPresets = (await import('butterchurn-presets')).default;
 
-    // Load presets
-    let curatedPresets: any[] = [];
-    try {
-      const allPresets = butterchurnPresets.getPresets();
-      CURATED_PRESET_NAMES.forEach((name) => {
-        if (allPresets[name]) {
-          curatedPresets.push(allPresets[name]);
-        }
-      });
+        visualizer = butterchurn.createVisualizer(ctx, canvas, {
+          width: canvas.width,
+          height: canvas.height,
+          pixelRatio,
+          textureRatio: 1
+        });
 
-      // Fallback if none found
-      if (curatedPresets.length === 0) {
-        const presetKeys = Object.keys(allPresets);
-        if (presetKeys.length > 0) {
-          // Get a random sample of 10-15 presets
+        visualizerRef.current = visualizer;
+
+        visualizer.connectAudio(radioAudioNode);
+
+        console.log('Butterchurn visualizer initialized successfully');
+        setIsActive(true);
+        setIsInitialized(true);
+
+        // -------------------------
+        // PRESETS (UNCHANGED LOGIC)
+        // -------------------------
+        let curatedPresets: any[] = [];
+        const allPresets = butterchurnPresets.getPresets();
+
+        CURATED_PRESET_NAMES.forEach((name) => {
+          if (allPresets[name]) {
+            curatedPresets.push(allPresets[name]);
+          }
+        });
+
+        if (curatedPresets.length === 0) {
+          const presetKeys = Object.keys(allPresets);
           const sampleSize = Math.min(15, Math.max(10, presetKeys.length));
+
           for (let i = 0; i < sampleSize; i++) {
             const randomIdx = Math.floor(Math.random() * presetKeys.length);
             curatedPresets.push(allPresets[presetKeys[randomIdx]]);
           }
         }
-      }
 
-      console.log(`Loaded ${curatedPresets.length} presets for rotation`);
-    } catch (e) {
-      console.error('Failed to load presets:', e);
-      curatedPresets = [];
-    }
+        console.log(`Loaded ${curatedPresets.length} presets for rotation`);
 
-    // Start with a random curated preset
-    let currentPresetIdx = 0;
-    if (curatedPresets.length > 0) {
-      currentPresetIdx = Math.floor(Math.random() * curatedPresets.length);
-      try {
-        visualizer.loadPreset(curatedPresets[currentPresetIdx], 0.0);
-        console.log(`Loaded preset at index ${currentPresetIdx}`);
+        let currentPresetIdx = 0;
+
+        if (curatedPresets.length > 0) {
+          currentPresetIdx = Math.floor(Math.random() * curatedPresets.length);
+          visualizer.loadPreset(curatedPresets[currentPresetIdx], 0.0);
+        }
+
+        const rotatePreset = () => {
+          if (curatedPresets.length > 1) {
+            currentPresetIdx = (currentPresetIdx + 1) % curatedPresets.length;
+            visualizer.loadPreset(curatedPresets[currentPresetIdx], 2.0);
+          }
+        };
+
+        presetIntervalRef.current = setInterval(rotatePreset, 10000);
+
+        const renderLoop = () => {
+          if (document.hidden) {
+            animationFrameRef.current = requestAnimationFrame(renderLoop);
+            return;
+          }
+
+          if (visualizerRef.current && isRadioPlaying) {
+            visualizerRef.current.render();
+          }
+
+          animationFrameRef.current = requestAnimationFrame(renderLoop);
+        };
+
+        renderLoop();
       } catch (e) {
-        console.error('Failed to load initial preset:', e);
-      }
-    }
-
-    // Preset rotation every 10 seconds with a 2 second blend
-    const rotatePreset = () => {
-      if (curatedPresets.length > 1) {
-        currentPresetIdx = (currentPresetIdx + 1) % curatedPresets.length;
-        try {
-          visualizer.loadPreset(curatedPresets[currentPresetIdx], 2.0);
-        } catch (e) {
-          console.error('Failed to load preset during rotation:', e);
-        }
+        console.error('Failed to initialize Butterchurn visualizer:', e);
+        setIsActive(false);
+        setIsInitialized(false);
       }
     };
-    presetIntervalRef.current = setInterval(rotatePreset, 10000);
 
-    // Animation render loop
-    const renderLoop = () => {
-      if (document.hidden) {
-        // Pause rendering when page is hidden to save CPU
-        animationFrameRef.current = requestAnimationFrame(renderLoop);
-        return;
-      }
+    init();
 
-      if (visualizerRef.current && isRadioPlaying) {
-        try {
-          visualizerRef.current.render();
-        } catch (e) {
-          console.error('Error during visualizer render:', e);
-        }
-      }
-      animationFrameRef.current = requestAnimationFrame(renderLoop);
-    };
-    renderLoop();
-
-    // Handle window resize
     const handleResize = () => resizeCanvas();
     window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
+
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+
       if (presetIntervalRef.current) {
         clearInterval(presetIntervalRef.current);
       }
-      // Clean up visualizer
+
       if (visualizerRef.current) {
         try {
           visualizerRef.current.dispose?.();
@@ -193,16 +187,16 @@ export default function LiveVisualizer() {
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
-      
-  <canvas
-    ref={canvasRef}
-    className={`w-full h-full block transition-opacity duration-1000 `}
-  />
-      {/* Fullscreen darkening overlay above visualizer to preserve readability */}
-      <div 
+      <canvas
+        ref={canvasRef}
+        className={`w-full h-full block transition-opacity duration-1000`}
+      />
+
+      <div
         className="absolute inset-0 bg-black/45 mix-blend-multiply"
         style={{
-          backgroundImage: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03))',
+          backgroundImage:
+            'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 0, 0.03))',
           backgroundSize: '100% 4px, 6px 100%',
         }}
       />
