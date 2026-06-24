@@ -25,11 +25,11 @@ export function NewsEntry({ item }: { item: NewsPostItem }) {
   };
 
   return (
-    <div className="flex flex-col gap-3 border-b border-[#ECEEDF]/10 pb-8 mb-8 font-mono text-[#ECEEDF] uppercase">
-      <div className="flex flex-row items-center gap-4 text-[10px] tracking-[0.2em] opacity-60">
-        <span>{formattedDate}</span>
-        <span>[ {item.type} ]</span>
-        {item.featured && <span className="text-[#FF0000] font-bold">[ FEATURED ]</span>}
+    <div className="flex flex-col gap-3 border-b border-[#ECEEDF]/10 pb-8 mb-8 text-[#ECEEDF] uppercase">
+      <div className="flex flex-row items-center gap-4 text-[10px] tracking-[0.2em] text-[#ECEEDF]/40 select-none">
+        <span>DISPATCH // {formattedDate}</span>
+        <span>// [ {item.type} ]</span>
+        {item.featured && <span className="text-red-500 font-bold">// [ FEATURED ]</span>}
       </div>
 
       {item.cover_image && (
@@ -42,14 +42,14 @@ export function NewsEntry({ item }: { item: NewsPostItem }) {
         </div>
       )}
 
-      <h2 className="text-xl md:text-2xl font-bold tracking-tighter leading-none hover:text-white transition-colors">
+      <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-wider leading-tight text-white transition-colors duration-100">
         <Link href={`/news/${item.slug}`}>
           {item.title}
         </Link>
       </h2>
 
       {item.excerpt && (
-        <p className="text-[13px] tracking-widest leading-relaxed opacity-85 mt-2 font-sans lowercase first-letter:uppercase">
+        <p className="text-sm tracking-normal leading-relaxed text-[#ECEEDF]/60 mt-2 font-sans normal-case">
           {item.excerpt}
         </p>
       )}

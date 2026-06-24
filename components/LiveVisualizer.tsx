@@ -195,9 +195,13 @@ export default function LiveVisualizer() {
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
       <canvas
         ref={canvasRef}
+<<<<<<< HEAD
         className={`w-full h-full block transition-opacity duration-1000 ${
           isActive && isRadioPlaying && isInitialized ? 'opacity-80' : 'opacity-0'
         }`}
+=======
+        className={`w-full h-full block transition-opacity duration-1000 ${isActive && isRadioPlaying ? 'opacity-100' : 'opacity-0'}`}
+>>>>>>> f749f32 (Design pass V3 — editorial redesign live, header, homepage)
       />
       {/* Fullscreen darkening overlay above visualizer to preserve readability */}
       <div 

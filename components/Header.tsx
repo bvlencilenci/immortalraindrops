@@ -4,9 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
+import { NavigationLink } from './ui/NavigationLink';
+import { PlaybackControls } from './ui/PlaybackControls';
+import { VolumeController } from './ui/VolumeController';
 
 const Header = () => {
   const {
@@ -54,7 +57,6 @@ const Header = () => {
 
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const prevVolumeRef = useRef(1.0);
 
   // Auth State
@@ -218,16 +220,16 @@ const Header = () => {
       {/* --- MOBILE DYNAMIC ISLAND HEADER (< lg) --- */}
       <motion.nav
         layout
-        className="sticky top-0 z-[100] lg:hidden flex items-center justify-between overflow-hidden self-center whitespace-nowrap"
+        className="sticky top-0 z-[100] lg:hidden flex items-center justify-between overflow-hidden self-center whitespace-nowrap header-grain"
         initial={{
           top: 0,
           width: "100%",
           maxWidth: "100%",
           borderRadius: 0,
-          backgroundColor: "#0F0E0E",
+          backgroundColor: "#0A0A08",
           border: "none",
           borderBottom: "1px solid rgba(255,255,255,0.1)",
-          padding: "1rem 1rem",
+          padding: "1.25rem 1rem",
           gap: "0.5rem"
         }}
         animate={{
@@ -235,7 +237,7 @@ const Header = () => {
           width: isScrolled ? "auto" : "100%",
           maxWidth: isScrolled ? "calc(100% - 32px)" : "100%",
           borderRadius: isScrolled ? 100 : 0,
-          backgroundColor: isScrolled ? "rgba(0,0,0,0.6)" : "#0F0E0E",
+          backgroundColor: isScrolled ? "rgba(0,0,0,0.6)" : "#0A0A08",
           border: isScrolled ? "1px solid rgba(255,255,255,0.1)" : "none",
           borderBottom: isScrolled ? "none" : "1px solid rgba(255,255,255,0.1)",
           boxShadow: isScrolled ? "0 8px 32px rgba(0, 0, 0, 0.4)" : "none",
@@ -246,14 +248,12 @@ const Header = () => {
         transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
       >
         {/* Left: LIVE */}
-        <Link href="/live" className="shrink-0 flex justify-center items-center font-mono text-[11px] xs:text-xs uppercase tracking-widest transition-colors duration-200 border border-transparent px-3 py-3 rounded-xl text-[#ECEEDF] hover:text-white">
-          <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>[</span>
-          <span className="flex items-center gap-1">
-            {(isLive || broadcastMode === 'automated') && <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />}
-            <span className={`mx-2 ${pathname === '/live' ? 'text-white' : ''} transition-colors duration-200`}>LIVE</span>
-          </span>
-          <span className={`${pathname === '/live' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>]</span>
-        </Link>
+        <NavigationLink
+          label="LIVE"
+          href="/live"
+          isActive={pathname === '/live'}
+          isLive={isLive || broadcastMode === 'automated'}
+        />
 
         {/* Center: LOGO */}
         <Link
@@ -263,36 +263,32 @@ const Header = () => {
           <img
             src="/logo.png"
             alt="Immortal Raindrops"
-            width={711}
-            height={1024}
-            className="h-10 w-auto opacity-90 hover:opacity-100 transition-opacity"
-            style={{ height: '40px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
+            width={52}
+            height={52}
+            className="h-10 w-auto logo-breathe"
+            style={{ height: '52px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-2px)' }}
           />
         </Link>
 
         {/* Right: ARCHIVE */}
-        <Link href="/archive" className="shrink-0 flex justify-center items-center font-mono text-[11px] xs:text-xs uppercase tracking-widest transition-colors duration-200 border border-transparent px-3 py-3 rounded-xl text-[#ECEEDF] hover:text-white">
-          <span className={`${pathname === '/archive' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>[</span>
-          <span className={`mx-2 ${pathname === '/archive' ? 'text-white' : ''} transition-colors duration-200`}>ARCHIVE</span>
-          <span className={`${pathname === '/archive' ? 'font-bold text-white' : 'font-light text-[#ECEEDF]/70'} transition-all duration-200`}>]</span>
-        </Link>
+        <NavigationLink
+          label="ARCHIVE"
+          href="/archive"
+          isActive={pathname === '/archive'}
+        />
       </motion.nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
-      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-[11.1vh] px-4 transition-all duration-300 ease-in-out backdrop-blur-md ${isScrolled
-        ? "bg-black/40 border-b border-[#ECEEDF]/10"
-        : "bg-black"
+      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-14 px-6 transition-all duration-300 ease-in-out backdrop-blur-md header-grain ${isScrolled
+        ? "bg-[#0A0A08]/60 border-b border-[#ECEEDF]/10"
+        : "bg-[#0A0A08]"
         }`}>
 
         {/* Side Elements (Flex) */}
         <div className="w-full h-full flex items-center justify-between">
 
           {/* BLOCK 1: Left - Station Identity */}
-          <div
-            className="flex items-center justify-start shrink-0 gap-6 z-30"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
+          <div className="flex items-center justify-start shrink-0 gap-4 z-30 group/left">
             {/* Center: LOGO (Image) */}
             <Link
               href="/"
@@ -301,78 +297,75 @@ const Header = () => {
               <img
                 src="/logo.png"
                 alt="Immortal Raindrops"
-                width={711}
-                height={1024}
-                className="h-12 w-auto"
-                style={{ height: '48px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
+                width={44}
+                height={44}
+                className="h-12 w-auto logo-breathe"
+                style={{ height: '44px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-2.5px)' }}
               />
             </Link>
 
-            {/* Vertical Separator */}
-            <div className="w-[1px] h-8 bg-[#ECEEDF]/20 shrink-0" />
-
             {/* Navigation links (Desktop) that reveal on hover */}
             <div className="flex items-center">
-              <AnimatePresence>
-                {isHovered && (
-                  <motion.div
-                    key="nav-links"
-                    initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: "auto", opacity: 1 }}
-                    exit={{ width: 0, opacity: 0 }}
-                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap pr-4"
-                  >
-                    <Link href="/archive" className="text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
-                    <Link href="/live" className="flex items-center gap-1.5 text-[#ECEEDF] text-[15px] tracking-[0.3em] font-mono hover:text-white transition-colors bg-transparent uppercase">
-                      {(isLive || broadcastMode === 'automated') && <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />}
-                      LIVE
-                    </Link>
-                  </motion.div>
+              <div
+                className="flex items-center gap-x-6 overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out max-w-0 opacity-0 group-hover/left:max-w-[340px] group-hover/left:opacity-100 group-hover/left:pr-4"
+              >
+                <Link href="/archive" className="text-[#ECEEDF] text-sm tracking-[0.1em] font-sans hover:text-white transition-colors bg-transparent uppercase">ARCHIVE</Link>
+                {/* Only show LIVE nav link if radio is NOT currently playing */}
+                {currentlyPlayingId !== 'radio-stream' && !isLive && (
+                  <Link href="/live" className="flex items-center gap-1.5 text-[#ECEEDF] text-sm tracking-[0.1em] font-sans hover:text-white transition-colors bg-transparent uppercase">
+                    LIVE
+                  </Link>
                 )}
-              </AnimatePresence>
+              </div>
             </div>
 
             {/* Divider and Station Info / Track Metadata */}
             {(currentlyPlayingId === 'radio-stream' || isLive || showHeaderMetadata) && (
-              <div className="flex flex-col justify-center max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
-                {pathname === '/submit' ? (
-                  <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-none tracking-widest whitespace-nowrap">
+              pathname === '/submit' ? (
+                <div className="flex items-center max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
+                  <span className="font-sans text-sm text-[#ECEEDF] uppercase font-bold leading-none tracking-[0.25em] whitespace-nowrap">
                     SUBMISSION MODE
                   </span>
-                ) : (currentlyPlayingId === 'radio-stream' || (!currentlyPlayingId && isLive)) ? (
-                  <>
-                    <div className="flex items-center gap-1.5 font-mono text-[9px] font-bold text-red-500 tracking-[0.2em] uppercase leading-none">
-                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                      LIVE
-                    </div>
-                    <span className="font-mono text-[12px] text-[#ECEEDF]/70 uppercase font-bold leading-none tracking-wider whitespace-nowrap mt-1.5">
-                      IMMORTAL RAINDROPS RADIO
+                </div>
+              ) : (currentlyPlayingId === 'radio-stream' || (!currentlyPlayingId && isLive)) ? (
+                <div className="flex flex-row items-center gap-4 max-w-[300px] lg:max-w-[450px] whitespace-nowrap overflow-hidden min-w-0">
+                  <Link href="/live" className="flex items-center gap-1.5 font-sans text-[11px] font-bold text-red-500 tracking-[0.08em] uppercase leading-none shrink-0 hover:text-red-400 transition-colors">
+                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                    LIVE
+                  </Link>
+                  <div className="flex flex-col justify-center gap-0 min-w-0">
+                    <span className="font-sans text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
+                      {displayArtist || 'IMMORTAL RAINDROPS RADIO'}
                     </span>
-                  </>
-                ) : showHeaderMetadata ? (
-                  <>
-                    <span className="font-mono text-[13px] text-[#ECEEDF] uppercase font-bold leading-tight truncate whitespace-nowrap">
-                      {displayArtist}
-                    </span>
-                    <span className="font-mono text-[13px] text-[#ECEEDF]/60 lowercase leading-tight truncate whitespace-nowrap mt-0.5">
-                      {displayTitle}
-                    </span>
-                  </>
-                ) : null}
-              </div>
+                    {displayTitle && (
+                      <span className="font-sans text-sm text-[#ECEEDF]/40 lowercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
+                        {displayTitle}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : showHeaderMetadata ? (
+                <div className="flex flex-col justify-center gap-0 max-w-[250px] lg:max-w-[400px] whitespace-nowrap overflow-hidden min-w-0">
+                  <span className="font-sans text-base text-[#ECEEDF]/90 uppercase font-bold leading-tight tracking-[0.08em] truncate whitespace-nowrap">
+                    {displayArtist}
+                  </span>
+                  <span className="font-sans text-sm text-[#ECEEDF]/40 lowercase leading-tight tracking-[0.06em] truncate whitespace-nowrap">
+                    {displayTitle}
+                  </span>
+                </div>
+              ) : null
             )}
           </div>
 
           {/* BLOCK 3: Right - Volume Controls */}
-          <div className="flex items-center justify-end z-40 gap-8">
+          <div className="flex flex-row items-center justify-end z-40 gap-6 h-full">
 
 
-            {/* SUBMIT BUTTON (Desktop) */}
-            <div className="relative">
+             {/* SUBMIT BUTTON (Desktop) */}
+            <div className="relative self-center flex items-center">
               <Link
                 href="/submit"
-                className="hidden md:flex items-center justify-center font-mono text-[15px] text-[#ECEEDF] tracking-[0.2em] hover:text-white transition-colors uppercase whitespace-nowrap"
+                className="hidden md:flex items-center justify-center font-sans text-xs text-[#ECEEDF] tracking-[0.1em] hover:text-white transition-colors uppercase whitespace-nowrap self-center"
               >
                 [ SUBMIT ]
               </Link>
@@ -380,109 +373,35 @@ const Header = () => {
 
             {/* VOLUME CONTROLS */}
             {isPlayerActive && (
-              <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className="flex items-center gap-4">
-                  <button
-                    className="flex items-center justify-center"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      adjustVolume(volume > 0 ? 0 : 0.5);
-                    }}
-                  >
-                    <img
-                      src={getVolumeIcon()}
-                      alt="Volume"
-                      className="w-5 h-5 invert opacity-80"
-                    />
-                  </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      adjustVolume(parseFloat(e.target.value));
-                    }}
-                    className="w-[120px] h-[2px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[10px] [&::-webkit-slider-thumb]:w-[10px] [&::-webkit-slider-thumb]:bg-[#ECEEDF] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-none outline-none opacity-80 hover:opacity-100 transition-opacity"
-                    style={{
-                      background: `linear-gradient(to right, #ECEEDF ${volume * 100}%, rgba(236,238,223,0.1) ${volume * 100}%)`
-                    }}
-                  />
-                </div>
-                <span className="w-[120px] text-center font-mono text-[12px] text-[#ECEEDF]/60 tracking-widest leading-none tabular-nums truncate mt-1">
-                  {currentlyPlayingId === 'radio-stream'
-                    ? '--:-- / --:--'
-                    : `${formatTime(seek)} / ${formatTime(duration)}`}
-                </span>
-              </div>
+              <VolumeController
+                volume={volume}
+                onVolumeChange={adjustVolume}
+                seek={seek}
+                duration={duration}
+                isRadioStream={currentlyPlayingId === 'radio-stream'}
+                className="self-center"
+              />
             )}
           </div>
         </div>
 
         {/* BLOCK 2: Center - Player Buttons (Absolute Center Pivot) */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-4 z-50">
-          {isPlayerActive && (
-            <>
-              <button
-                onClick={(e) => {
-                  if (currentlyPlayingId === 'radio-stream') return;
-                  e.stopPropagation();
-                  skipBack();
-                }}
-                className={`flex items-center justify-center whitespace-nowrap transition-opacity ${
-                  currentlyPlayingId === 'radio-stream'
-                    ? 'opacity-20 pointer-events-none'
-                    : 'hover:opacity-50'
-                }`}
-                title="Previous / Restart"
-                disabled={currentlyPlayingId === 'radio-stream'}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-8 h-8" fill="#ECEEDF">
-                  <path d="M199.81,34a16,16,0,0,0-16.24.43L64,109.23V40a8,8,0,0,0-16,0V216a8,8,0,0,0,16,0V146.77l119.57,74.78A15.95,15.95,0,0,0,208,208.12V47.88A15.86,15.86,0,0,0,199.81,34ZM192,208,64.16,128,192,48.07Z" />
-                </svg>
-              </button>
-              <div> {/* Pivot Point */}
-                <button
-                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                  className="hover:opacity-50 transition-opacity flex items-center justify-center whitespace-nowrap"
-                  title={isPlaying ? "Pause" : "Play"}
-                >
-                  <img
-                    src={isPlaying ? "/pause.svg" : "/play.svg"}
-                    alt={isPlaying ? "Pause" : "Play"}
-                    className="w-10 h-10 invert"
-                  />
-                </button>
-              </div>
-              <button
-                onClick={(e) => {
-                  if (currentlyPlayingId === 'radio-stream') return;
-                  e.stopPropagation();
-                  skipTrack();
-                }}
-                className={`flex items-center justify-center whitespace-nowrap transition-opacity ${
-                  currentlyPlayingId === 'radio-stream'
-                    ? 'opacity-20 pointer-events-none'
-                    : 'hover:opacity-50'
-                }`}
-                title="Skip"
-                disabled={currentlyPlayingId === 'radio-stream'}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="w-8 h-8" fill="#ECEEDF">
-                  <path d="M200,32a8,8,0,0,0-8,8v69.23L72.43,34.45A15.95,15.95,0,0,0,48,47.88V208.12a16,16,0,0,0,24.43,13.43L192,146.77V216a8,8,0,0,0,16,0V40A8,8,0,0,0,200,32ZM64,207.93V48.05l127.84,80Z" />
-                </svg>
-              </button>
-            </>
-          )}
-        </div>
+        {isPlayerActive && (
+          <PlaybackControls
+            isPlaying={isPlaying}
+            onPlayPause={(e) => { e.stopPropagation(); togglePlay(); }}
+            onSkipBack={(e) => { e.stopPropagation(); skipBack(); }}
+            onSkipForward={(e) => { e.stopPropagation(); skipTrack(); }}
+            isRadioStream={currentlyPlayingId === 'radio-stream'}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
+          />
+        )}
 
         {/* BLOCK 4: Full-Width Scrubber/Border Line (Outside Padded Wrapper) - Desktop Only */}
         {isPlayerActive && (
           currentlyPlayingId === 'radio-stream' ? (
             /* Live mode: Solid full-width 2px line at the bottom, non-interactive */
-            <div className="hidden md:block absolute bottom-0 left-0 right-0 w-full h-[2px] bg-[#ECEEDF] z-[60] pointer-events-none" />
+            <div className="hidden md:block absolute bottom-0 left-0 right-0 w-full h-[2px] bg-[#ECEEDF]/40 z-[60] pointer-events-none" />
           ) : (
             /* Archive mode: Interactive scrubber */
             <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">

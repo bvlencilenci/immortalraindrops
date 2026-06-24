@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { NewsEntry, type NewsPostItem } from './NewsEntry';
+import { NewsCard, type NewsPostItem } from './ui/NewsCard';
 
 export function NewsFeed({ posts }: { posts: NewsPostItem[] }) {
   return (
@@ -31,7 +31,7 @@ export function NewsFeed({ posts }: { posts: NewsPostItem[] }) {
               }
             }}
           >
-            <NewsEntry item={post} />
+            <NewsCard item={post} />
           </motion.div>
         ))}
         {posts.length === 0 && (

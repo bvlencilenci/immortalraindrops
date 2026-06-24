@@ -4,6 +4,19 @@ import Header from '../components/Header';
 import SplashGate from '../components/SplashGate';
 import RadioPlayer from '../components/RadioPlayer';
 import { createClient } from '@/lib/supabase-server';
+import { Archivo, Archivo_Narrow } from 'next/font/google';
+
+const archivo = Archivo({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700', '900'],
+  variable: '--font-archivo',
+});
+
+const archivoNarrow = Archivo_Narrow({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-archivo-narrow',
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const supabase = await createClient();
@@ -42,7 +55,7 @@ export default async function RootLayout({
   const { data: settings } = await supabase.from('system_settings').select('footer_text, maintenance_mode').eq('id', 1).single();
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${archivo.variable} ${archivoNarrow.variable}`}>
       <body className="antialiased min-h-screen flex flex-col bg-black selection:bg-[#ECEEDF] selection:text-black">
         <SplashGate />
         <div className="flex-1 w-full flex flex-col bg-black relative">

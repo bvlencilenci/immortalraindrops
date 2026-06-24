@@ -10,9 +10,10 @@ interface ArchiveGridProps {
   isAdmin?: boolean;
   onDelete?: (tileId: string, index: number, audioExt: string, imageExt: string) => void;
   onEdit?: (track: Track) => void;
+  compact?: boolean;
 }
 
-const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit }: ArchiveGridProps) => {
+const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact }: ArchiveGridProps) => {
   const setPlaylist = useAudioStore((state) => state.setPlaylist);
 
   useEffect(() => {
@@ -20,7 +21,7 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit }: ArchiveGridProps) =>
   }, [tracks, setPlaylist]);
 
   return (
-    <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-0 pt-0 pb-32 group/grid">
+    <div className="flex-1 w-full flex flex-col pt-4 pb-32 max-w-7xl mx-auto px-4 md:px-8">
       {tracks.map((track) => (
         <Tile
           key={track.id}
@@ -39,6 +40,7 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit }: ArchiveGridProps) =>
           release_date={track.release_date}
           duration={track.duration}
           created_at={track.created_at || new Date().toISOString()}
+          compact={compact}
         />
       ))}
     </div>

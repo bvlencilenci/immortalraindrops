@@ -11,6 +11,7 @@ interface TileProps extends Track {
   isAdmin?: boolean;
   onDelete?: () => void;
   onEdit?: () => void;
+  compact?: boolean;
 }
 
 const Tile = (props: TileProps) => {
@@ -27,7 +28,10 @@ const Tile = (props: TileProps) => {
     isAdmin,
     onDelete,
     onEdit,
-    vote_count
+    vote_count,
+    release_date,
+    duration,
+    compact
   } = props;
 
   const {
@@ -346,124 +350,78 @@ const Tile = (props: TileProps) => {
     <div
       ref={tileRef}
       onClick={handleInteraction}
-      className="relative w-full aspect-square overflow-hidden group border-r last:border-r-0 cursor-pointer bg-black"
+      className={`w-full flex items-center justify-between border-b border-[#ECEEDF]/10 py-3 px-2 md:px-4 transition-colors duration-100 cursor-pointer select-none ${
+        isActive ? 'bg-[#ECEEDF]/5' : 'bg-black hover:bg-[#ECEEDF]/5'
+      }`}
     >
-      {/* 1. Visual Base: Video, Canvas, or Image */}
-      {isVideo ? (
-        // Video Handling
-        <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center overflow-hidden">
-          {/* Background Layer (Only shown if NOT nearly square) */}
-          {!isNearlySquare && (
-            <video
-              ref={bgVideoRef}
-              src={imageUrl}
-              className="absolute inset-0 w-full h-full object-cover z-0 blur-2xl opacity-40 scale-110"
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              crossOrigin="anonymous"
-              autoPlay={isActive && isPlayingStore}
-            />
-          )}
-          {/* Foreground Layer */}
-          <video
-            ref={videoRef}
+      <div className="flex items-center gap-4 min-w-0">
+        {/* Track Index */}
+        <span className="text-[10px] text-[#ECEEDF]/35 font-bold tracking-widest w-6 shrink-0 select-none">
+          {((tile_index || 0) + 1).toString().padStart(2, '0')}
+        </span>
+
+        {/* Thumbnail */}
+        <div className={`${compact ? 'w-8 h-8' : 'w-12 h-12'} bg-black/40 border border-[#ECEEDF]/10 flex-shrink-0 rounded-sm overflow-hidden flex items-center justify-center relative`}>
+          <img
             src={imageUrl}
-            onLoadedMetadata={handleMediaLoad}
-            className={`relative z-10 w-full h-full ${isNearlySquare ? 'object-cover' : 'object-contain'}`}
-            loop
-            muted={!isActive || !!activeFullscreenUrl}
-            playsInline
-            preload="metadata"
+            alt=""
+            className="w-full h-full object-cover grayscale"
             crossOrigin="anonymous"
-            autoPlay={isActive && isPlayingStore}
+            loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         </div>
-      ) : (
-        // Image / Visualizer Handling
-        <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center overflow-hidden">
-          {/* Background Blur (Only if NOT nearly square) */}
-          {!isNearlySquare && (
-            <img
-              src={imageUrl}
-              className="absolute inset-0 w-full h-full object-cover z-0 blur-2xl opacity-40 scale-110"
-              alt=""
-              crossOrigin="anonymous"
-              aria-hidden="true"
-            />
-          )}
 
-          {isActive && isPlayingStore ? (
-            <canvas
-              ref={canvasRef}
-              className="relative z-10 w-full h-full object-cover hidden md:block" // Visualizer always fills
-            />
-          ) : (
-            <img
-              src={imageUrl}
-              onLoad={handleMediaLoad}
-              className={`relative z-10 w-full h-full ${isNearlySquare ? 'object-cover' : 'object-contain'}`}
-              alt={title}
-              crossOrigin="anonymous"
-              loading="lazy"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-          )}
+        {/* Play/Pause state symbol */}
+        {isActive && isPlayingStore && (
+          <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse flex-shrink-0" />
+        )}
+
+        {/* Artist & Title */}
+        <div className={`flex flex-col ${compact ? '' : 'md:flex-row md:items-baseline md:gap-3'} min-w-0`}>
+          <span className={`font-bold text-xs ${compact ? '' : 'md:text-sm'} text-[#ECEEDF] uppercase tracking-wider truncate`}>
+            {artist || 'UNKNOWN ARTIST'}
+          </span>
+          <span className="font-light text-xs text-[#ECEEDF]/60 lowercase tracking-wider truncate">
+            {title || 'UNKNOWN TRACK'}
+          </span>
         </div>
-      )}
-
-      {/* 2. Text Protection & Hover Layer */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-transparent opacity-100 group-hover:bg-black/40 transition-all duration-300 z-10 pointer-events-none" />
-
-      {/* FULLSCREEN BUTTON (Video Only) */}
-      {isVideo && (
-        <button
-          onClick={handleFullscreen}
-          className="absolute bottom-6 right-6 z-50 p-2 rounded-sm lg:invisible lg:group-hover:visible visible opacity-100 lg:opacity-0 lg:group-hover/grid:opacity-0 lg:group-hover:opacity-100 pointer-events-auto lg:pointer-events-none lg:group-hover:pointer-events-auto duration-0 group-hover:duration-300 transition-all ease-in-out flex items-center justify-center text-white bg-white/10 backdrop-blur-md border border-white/20 shadow-xl shadow-black/50 lg:bg-transparent lg:border-none lg:backdrop-blur-none"
-        >
-          <img src="/fullscreen.svg" className="w-[32px] h-[32px] invert opacity-90" alt="Fullscreen" />
-        </button>
-      )}
-
-      {/* 3. Metadata */}
-      <div className="absolute top-[24px] left-[12px] md:top-[32px] md:left-[20px] flex flex-col z-20 pointer-events-none pr-4">
-        <span className="text-[clamp(12px,4vw,15px)] font-mono text-[#ECEEDF] lowercase leading-none tracking-normal">
-          {artist || '—'}
-        </span>
-        <span className="text-[clamp(18px,6vw,28px)] uppercase font-bold leading-none tracking-tighter mt-1 text-[#ECEEDF] drop-shadow-md">
-          {title || '—'}
-        </span>
       </div>
 
-      {/* 5. VOTING CONTROLS */}
-      <div className="absolute bottom-3 right-3 z-40 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-      </div>
-
-      {isAdmin && (
-        <div className="absolute top-4 right-4 z-50 flex gap-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit?.();
-            }}
-            className="bg-[#ECEEDF]/10 hover:bg-[#ECEEDF]/20 text-[#ECEEDF] text-[10px] font-mono px-3 py-1 rounded-sm backdrop-blur-md transition-all border border-[#ECEEDF]/20"
-          >
-            [ EDIT ]
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (confirm(`DELETE TILE ${tile_id}? This is permanent.`)) {
-                onDelete?.();
-              }
-            }}
-            className="bg-red-600/80 hover:bg-red-600 text-white text-[10px] font-mono px-3 py-1 rounded-sm backdrop-blur-md transition-all border border-red-400/50"
-          >
-            [ REMOVE ]
-          </button>
+      <div className={`${compact ? 'hidden' : 'flex'} items-center gap-6 flex-shrink-0`}>
+        {/* Genre / Date / Duration */}
+        <div className="hidden sm:flex items-center gap-4 text-[10px] text-[#ECEEDF]/40 tracking-wider">
+          {genre && <span className="border border-[#ECEEDF]/15 px-1.5 py-0.5 uppercase text-[9px]">{genre}</span>}
+          {release_date && <span>{new Date(release_date).getFullYear()}</span>}
+          {duration && <span>{duration}</span>}
         </div>
-      )}
+
+        {/* Admin actions */}
+        {isAdmin && (
+          <div className="flex gap-2 z-50">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
+              className="bg-[#ECEEDF]/10 hover:bg-[#ECEEDF]/20 text-[#ECEEDF] text-[9px] font-mono px-2.5 py-1 rounded-sm border border-[#ECEEDF]/20 transition-colors duration-100 cursor-pointer"
+            >
+              EDIT
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`DELETE TRACK ${title}?`)) {
+                  onDelete?.();
+                }
+              }}
+              className="bg-red-950/40 hover:bg-red-900 text-red-300 text-[9px] font-mono px-2.5 py-1 rounded-sm border border-red-500/20 transition-colors duration-100 cursor-pointer"
+            >
+              REMOVE
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
