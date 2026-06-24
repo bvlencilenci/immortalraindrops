@@ -203,7 +203,7 @@ export default function LiveBroadcast({
         {/* LEFT COLUMN: HISTORY */}
         <div className="glass-panel-left-wrap w-full md:w-64 shrink-0 flex flex-col">
           <div className="glass-panel-left w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 border-b border-[#6DBF82]/20 mb-3 whitespace-nowrap">
+            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 mb-3 whitespace-nowrap">
               HISTORY
             </h2>
           <div className="flex flex-col gap-4 overflow-y-auto max-h-[180px] md:max-h-[420px] pr-1 custom-scrollbar">
@@ -227,6 +227,7 @@ export default function LiveBroadcast({
               })
             )}
           </div>
+          <div className="absolute inset-y-0 right-0 w-16 pointer-events-none z-10" style={{ background: 'linear-gradient(to right, transparent, rgba(10,10,8,0.85))' }} />
         </div>
       </div>
 
@@ -234,6 +235,8 @@ export default function LiveBroadcast({
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
         <div className="glass-center-panel w-full flex-1 bg-black p-6 md:p-8 flex flex-col items-center justify-between gap-12 text-center min-h-[320px] md:min-h-[420px] relative overflow-hidden select-none">
+          <div className="absolute inset-y-0 left-0 w-12 pointer-events-none z-10" style={{ background: 'linear-gradient(to right, rgba(10,10,8,0.7), transparent)' }} />
+          <div className="absolute inset-y-0 right-0 w-12 pointer-events-none z-10" style={{ background: 'linear-gradient(to left, rgba(10,10,8,0.7), transparent)' }} />
           {/* generative waves visualizer constrained to center column */}
           <div className="absolute inset-0 opacity-40 z-0 pointer-events-none">
             <LiveVisualizer />
@@ -289,7 +292,7 @@ export default function LiveBroadcast({
         {/* RIGHT COLUMN: NEWS */}
         <div className="glass-panel-right-wrap w-full md:w-64 shrink-0 flex flex-col">
           <div className="glass-panel-right w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 border-b border-[#6DBF82]/20 mb-3 whitespace-nowrap">
+            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 mb-3 whitespace-nowrap">
               NEWS
             </h2>
           <div className="flex flex-col gap-4 max-h-[180px] md:max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
@@ -325,6 +328,7 @@ export default function LiveBroadcast({
               ))
             )}
           </div>
+          <div className="absolute inset-y-0 left-0 w-16 pointer-events-none z-10" style={{ background: 'linear-gradient(to left, transparent, rgba(10,10,8,0.85))' }} />
         </div>
       </div>
 
