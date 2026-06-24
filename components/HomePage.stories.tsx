@@ -192,10 +192,8 @@ export const Live: Story = {
       { artist: 'Actress', title: 'Hubble' },
     ],
     recentTracks: [
-      { id: '1', title: 'Archangel', artist: 'Burial', tile_id: 'tile-1', audio_ext: 'mp3' },
-      { id: '2', title: 'She Just Likes to Fight', artist: 'Four Tet', tile_id: 'tile-2', audio_ext: 'mp3' },
-      { id: '3', title: 'LesAlpx', artist: 'Floating Points', tile_id: 'tile-3', audio_ext: 'mp3' },
-    ],
+      { id: '1', title: 'Archangel', artist: 'Burial', tile_id: 'tile-1', audio_ext: 'mp3' }
+    ] as any,
     news: mockNews,
   }
 }

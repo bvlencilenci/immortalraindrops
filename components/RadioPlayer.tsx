@@ -25,7 +25,7 @@ export default function RadioPlayer() {
       if (!audio.src || audio.src !== streamUrl) {
         audio.src = streamUrl;
       }
-      
+
       // Force reload to sync with live stream and avoid buffer lag
       audio.load();
 
