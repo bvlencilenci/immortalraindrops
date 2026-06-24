@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import { supabase } from '../lib/supabase';
 import LiveVisualizer from './LiveVisualizer';
@@ -56,6 +56,35 @@ export default function LiveBroadcast({
   // Dynamic statistics states for footer
   const [listenerCount, setListenerCount] = useState(0);
   const [uptimeSeconds, setUptimeSeconds] = useState(0);
+
+  const [maxTracksFit, setMaxTracksFit] = useState(7);
+  const historyContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = historyContainerRef.current;
+    if (!container) return;
+
+    const calculateFit = () => {
+      const containerHeight = container.clientHeight;
+      if (containerHeight <= 0) return;
+
+      const itemHeight = 57; // 40px cover + 16px padding + 1px border
+      const gap = 16; // gap-4 is 16px
+      const count = Math.floor((containerHeight + gap) / (itemHeight + gap));
+      setMaxTracksFit(Math.max(1, count));
+    };
+
+    calculateFit();
+
+    const resizeObserver = new ResizeObserver(() => {
+      calculateFit();
+    });
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   const { currentlyPlayingId, isPlaying } = useAudioStore();
 
@@ -206,13 +235,13 @@ export default function LiveBroadcast({
             <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#6DBF82]/70 uppercase pb-2 mb-3 whitespace-nowrap">
               HISTORY
             </h2>
-          <div className="flex flex-col gap-4 overflow-y-auto max-h-[180px] md:max-h-[420px] pr-1 custom-scrollbar">
+          <div ref={historyContainerRef} className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden pr-1">
             {playbackHistory.length === 0 ? (
               <div className="text-[8px] md:text-[9px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
                 NO HISTORY RECORDED
               </div>
             ) : (
-              playbackHistory.slice(0, 7).map((track, i) => {
+              playbackHistory.slice(0, maxTracksFit).map((track, i) => {
                 const trackKey = `${track.artist.toLowerCase()} - ${track.title.toLowerCase()}`;
                 const audioUrl = trackAudioMap[trackKey];
 
