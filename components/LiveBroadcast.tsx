@@ -196,16 +196,17 @@ export default function LiveBroadcast({
   const showLiveIndicator = isLive || broadcastMode === 'automated';
 
   return (
-    <div className="relative w-full flex-1 flex flex-col items-center justify-between min-h-0 bg-[#0A0A08] border border-[#ECEEDF]/10 grain overflow-hidden px-2 md:px-4 py-8">
+    <div className="relative w-full flex-1 flex flex-col items-stretch justify-between min-h-0 bg-[#0A0A08] grain overflow-hidden">
 
       {/* Main columns container */}
-      <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-stretch z-10 my-auto border border-[#ECEEDF]/8 backdrop-blur-[4px] bg-black/20 min-h-0 overflow-hidden">
+      <div className="w-full flex-1 flex flex-col md:flex-row items-stretch z-10 backdrop-blur-[4px] bg-transparent min-h-0 overflow-hidden">
 
         {/* LEFT COLUMN: HISTORY */}
-        <div className="w-full md:w-64 shrink-0 backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-          <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase border-b border-[#ECEEDF]/15 mb-3 whitespace-nowrap">
-            HISTORY
-          </h2>
+        <div className="glass-panel-left-wrap w-full md:w-64 shrink-0 flex flex-col">
+          <div className="glass-panel-left w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
+            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase mb-3 whitespace-nowrap">
+              HISTORY
+            </h2>
           <div className="flex flex-col gap-4 overflow-y-auto max-h-[180px] md:max-h-[420px] pr-1 custom-scrollbar">
             {playbackHistory.length === 0 ? (
               <div className="text-[8px] md:text-[9px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
@@ -228,9 +229,12 @@ export default function LiveBroadcast({
             )}
           </div>
         </div>
+      </div>
+
+
 
         {/* CENTER COLUMN: MAIN BROADCAST STATION */}
-        <div className="w-full flex-1 bg-transparent p-6 md:p-8 flex flex-col items-center justify-between gap-12 text-center min-h-[320px] md:min-h-[420px] relative overflow-hidden select-none">
+        <div className="glass-center-panel w-full flex-1 bg-black p-6 md:p-8 flex flex-col items-center justify-between gap-12 text-center min-h-[320px] md:min-h-[420px] relative overflow-hidden select-none">
           {/* generative waves visualizer constrained to center column */}
           <div className="absolute inset-0 opacity-40 z-0 pointer-events-none">
             <LiveVisualizer />
@@ -243,38 +247,42 @@ export default function LiveBroadcast({
             className="relative z-10"
           />
 
-          {/* Now Playing visual display pinned to the bottom */}
-          <div className="w-full flex flex-col items-center justify-center min-h-fit max-w-xl z-10 mt-auto pb-2 relative z-10">
+          {/* Now Playing visual display pinned to the bottom left */}
+          <div className="w-full flex flex-col items-start justify-end min-h-fit max-w-xl z-10 mt-auto pb-2 relative z-10 self-start">
             {broadcastMode === 'live' ? (
-              <div className="flex flex-col gap-2 w-full items-center border-t border-[#ECEEDF]/15 pt-4">
+              <div className={`flex flex-col gap-2 w-full items-start pt-4 px-2 text-left ${
+                currentlyPlayingId === 'radio-stream' ? '' : 'border-t border-[#ECEEDF]/15'
+              }`}>
                 <span className="text-[7px] tracking-[0.08em] text-[#ECEEDF]/20 uppercase select-none mb-2">LIVE TRANSMISSION // DJ</span>
-                <span className="text-2xl md:text-3xl font-black tracking-tight text-white truncate block px-2 leading-none w-full font-narrow">
+                <span className="text-2xl md:text-3xl font-black tracking-tight text-white truncate block leading-none w-full font-narrow">
                   {showTitle || 'NIGHT TRANSMISSION'}
                 </span>
-                <span className="text-[11px] tracking-[0.3em] text-[#ECEEDF]/40 font-light mt-1 mix-blend-normal uppercase truncate block px-2 leading-none w-full font-narrow">
+                <span className="text-[11px] tracking-[0.3em] text-[#ECEEDF]/40 font-light mt-1 mix-blend-normal uppercase truncate block leading-none w-full font-narrow">
                   {djName || 'VOID OPERATOR'}
                 </span>
                 {djLocation && (
-                  <div className="text-center mt-1">
+                  <div className="text-left mt-1">
                     <span className="text-[8px] tracking-[0.25em] text-[#ECEEDF]/25 uppercase select-none">LOCATION: </span>
-                    <span className="text-[9px] tracking-[0.15em] uppercase text-[#ECEEDF]/60 truncate px-1">
+                    <span className="text-[9px] tracking-[0.15em] uppercase text-[#ECEEDF]/60 truncate">
                       {djLocation}
                     </span>
                   </div>
                 )}
                 {djDescription && (
-                  <p className="text-[9px] text-[#ECEEDF]/40 tracking-wider uppercase leading-relaxed mt-1 px-4 break-words text-center w-full truncate">
+                  <p className="text-[9px] text-[#ECEEDF]/40 tracking-wider uppercase leading-relaxed mt-1 break-words text-left w-full truncate">
                     {djDescription}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center text-center gap-1.5 w-full border-t border-[#ECEEDF]/15 pt-4">
+              <div className={`flex flex-col items-start text-left gap-1.5 w-full pt-4 px-2 ${
+                currentlyPlayingId === 'radio-stream' ? '' : 'border-t border-[#ECEEDF]/15'
+              }`}>
                 <span className="text-[7px] tracking-[0.08em] text-[#ECEEDF]/20 uppercase select-none mb-2">NOW PLAYING</span>
-                <div className="text-2xl md:text-3xl font-black tracking-tight text-white px-2 text-center truncate w-full leading-none font-narrow">
+                <div className="text-2xl md:text-3xl font-black tracking-tight text-white text-left truncate w-full leading-none font-narrow">
                   {currentTitle}
                 </div>
-                <div className="text-[11px] tracking-[0.3em] text-[#ECEEDF]/40 font-light mt-1 mix-blend-normal uppercase text-center truncate w-full leading-none font-narrow">
+                <div className="text-[11px] tracking-[0.3em] text-[#ECEEDF]/40 font-light mt-1 mix-blend-normal uppercase text-left truncate w-full leading-none font-narrow">
                   {currentArtist}
                 </div>
               </div>
@@ -282,15 +290,18 @@ export default function LiveBroadcast({
           </div>
         </div>
 
+
+
         {/* RIGHT COLUMN: NEWS */}
-        <div className="w-full md:w-64 shrink-0 backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
-          <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase border-b border-[#ECEEDF]/15 mb-3 whitespace-nowrap">
-            NEWS
-          </h2>
+        <div className="glass-panel-right-wrap w-full md:w-64 shrink-0 flex flex-col">
+          <div className="glass-panel-right w-full h-full backdrop-blur-md bg-[#ECEEDF]/[0.02] p-6 md:p-8 flex flex-col gap-3 relative overflow-hidden">
+            <h2 className="text-[8px] tracking-[0.08em] font-normal text-[#ECEEDF]/20 uppercase mb-3 whitespace-nowrap">
+              NEWS
+            </h2>
           <div className="flex flex-col gap-4 max-h-[180px] md:max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
             {newsPosts.length === 0 ? (
               <div className="text-[8px] md:text-[9px] text-[#ECEEDF]/20 uppercase tracking-widest py-4">
-                NO DISPATCHES RECORDED
+                NO UPDATES ATM
               </div>
             ) : (
               newsPosts.map((post) => (
@@ -321,6 +332,70 @@ export default function LiveBroadcast({
             )}
           </div>
         </div>
+      </div>
+
+      {/* Connected Glass Shatter Border Overlay */}
+      <div className="glass-border-overlay">
+        {/* Top Border */}
+        <svg
+          className="absolute top-0 left-0 w-full h-5"
+          viewBox="0 0 100 20"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 0,10 L 15,12 L 30,18 L 50,11 L 70,16 L 85,12 L 100,10"
+            fill="none"
+            stroke="rgba(236, 238, 223, 0.12)"
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+
+        {/* Bottom Border */}
+        <svg
+          className="absolute bottom-0 left-0 w-full h-5"
+          viewBox="0 0 100 20"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 0,10 L 12,8 L 28,2 L 45,9 L 65,3 L 80,8 L 100,10"
+            fill="none"
+            stroke="rgba(236, 238, 223, 0.12)"
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+
+        {/* Left Border */}
+        <svg
+          className="absolute top-[10px] bottom-[10px] left-[-10px] h-[calc(100%-20px)] w-5"
+          viewBox="0 0 20 100"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 10,0 L 12,12 L 18,28 L 11,45 L 17,62 L 10,80 L 10,100"
+            fill="none"
+            stroke="rgba(236, 238, 223, 0.12)"
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+
+        {/* Right Border */}
+        <svg
+          className="absolute top-[10px] bottom-[10px] right-[-10px] h-[calc(100%-20px)] w-5"
+          viewBox="0 0 20 100"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 10,0 L 8,20 L 2,40 L 9,65 L 3,85 L 10,100"
+            fill="none"
+            stroke="rgba(236, 238, 223, 0.12)"
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      </div>
 
       </div>
 
@@ -328,6 +403,7 @@ export default function LiveBroadcast({
       <Footer
         listenerCount={listenerCount}
         uptimeSeconds={uptimeSeconds}
+        hideBorder={currentlyPlayingId === 'radio-stream'}
       />
     </div>
   );

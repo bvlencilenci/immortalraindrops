@@ -28,7 +28,8 @@ const Header = () => {
     streamTitle,
     isLive,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    seekTo
+    seekTo,
+    playLiveStream
   } = useAudioStore();
 
   let displayArtist = '';
@@ -228,7 +229,7 @@ const Header = () => {
           borderRadius: 0,
           backgroundColor: "#0A0A08",
           border: "none",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          borderBottom: currentlyPlayingId === 'radio-stream' ? "none" : "1px solid rgba(255,255,255,0.1)",
           padding: "1.25rem 1rem",
           gap: "0.5rem"
         }}
@@ -239,7 +240,7 @@ const Header = () => {
           borderRadius: isScrolled ? 100 : 0,
           backgroundColor: isScrolled ? "rgba(0,0,0,0.6)" : "#0A0A08",
           border: isScrolled ? "1px solid rgba(255,255,255,0.1)" : "none",
-          borderBottom: isScrolled ? "none" : "1px solid rgba(255,255,255,0.1)",
+          borderBottom: isScrolled || currentlyPlayingId === 'radio-stream' ? "none" : "1px solid rgba(255,255,255,0.1)",
           boxShadow: isScrolled ? "0 8px 32px rgba(0, 0, 0, 0.4)" : "none",
           backdropFilter: isScrolled ? "blur(20px) saturate(180%)" : "none",
           padding: isScrolled ? "0.75rem 1rem" : "1.25rem 1rem",
@@ -279,8 +280,10 @@ const Header = () => {
       </motion.nav>
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
-      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-14 px-6 transition-all duration-300 ease-in-out backdrop-blur-md header-grain ${isScrolled
-        ? "bg-[#0A0A08]/60 border-b border-[#ECEEDF]/10"
+      <header className={`hidden lg:flex sticky top-0 z-[100] w-full h-16 px-6 transition-all duration-300 ease-in-out backdrop-blur-md header-grain ${
+        currentlyPlayingId === 'radio-stream' ? '' : 'border-b border-[#ECEEDF]/10'
+      } ${isScrolled
+        ? "bg-[#0A0A08]/60"
         : "bg-[#0A0A08]"
         }`}>
 
@@ -289,20 +292,25 @@ const Header = () => {
 
           {/* BLOCK 1: Left - Station Identity */}
           <div className="flex items-center justify-start shrink-0 gap-4 z-30 group/left">
-            {/* Center: LOGO (Image) */}
-            <Link
-              href="/"
+            {/* Playback Controls (now on Left) */}
+            <PlaybackControls
+              isPlaying={isPlaying}
+              onPlayPause={(e) => {
+                e.stopPropagation();
+                if (!isPlayerActive) {
+                  const streamUrl = process.env.NEXT_PUBLIC_RADIO_STREAM_URL || '';
+                  if (streamUrl) {
+                    playLiveStream(streamUrl);
+                  }
+                } else {
+                  togglePlay();
+                }
+              }}
+              onSkipBack={(e) => { e.stopPropagation(); skipBack(); }}
+              onSkipForward={(e) => { e.stopPropagation(); skipTrack(); }}
+              isRadioStream={!isPlayerActive || currentlyPlayingId === 'radio-stream'}
               className="shrink-0 flex items-center justify-center"
-            >
-              <img
-                src="/logo.png"
-                alt="Immortal Raindrops"
-                width={44}
-                height={44}
-                className="h-12 w-auto logo-breathe"
-                style={{ height: '44px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-2.5px)' }}
-              />
-            </Link>
+            />
 
             {/* Navigation links (Desktop) that reveal on hover */}
             <div className="flex items-center">
@@ -385,64 +393,62 @@ const Header = () => {
           </div>
         </div>
 
-        {/* BLOCK 2: Center - Player Buttons (Absolute Center Pivot) */}
-        {isPlayerActive && (
-          <PlaybackControls
-            isPlaying={isPlaying}
-            onPlayPause={(e) => { e.stopPropagation(); togglePlay(); }}
-            onSkipBack={(e) => { e.stopPropagation(); skipBack(); }}
-            onSkipForward={(e) => { e.stopPropagation(); skipTrack(); }}
-            isRadioStream={currentlyPlayingId === 'radio-stream'}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
+        {/* BLOCK 2: Center - Logo (Absolute Center Pivot) */}
+        <Link
+          href="/"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 shrink-0 flex items-center justify-center"
+        >
+          <img
+            src="/logo.png"
+            alt="Immortal Raindrops"
+            width={52}
+            height={52}
+            className="h-12 w-auto logo-breathe"
+            style={{ height: '52px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-2px)' }}
           />
-        )}
+        </Link>
 
         {/* BLOCK 4: Full-Width Scrubber/Border Line (Outside Padded Wrapper) - Desktop Only */}
-        {isPlayerActive && (
-          currentlyPlayingId === 'radio-stream' ? (
-            /* Live mode: Solid full-width 2px line at the bottom, non-interactive */
-            <div className="hidden md:block absolute bottom-0 left-0 right-0 w-full h-[2px] bg-[#ECEEDF]/40 z-[60] pointer-events-none" />
-          ) : (
-            /* Archive mode: Interactive scrubber */
-            <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">
-              {/* Interaction Layer (Invisible Input - Massive Hitbox) */}
-              <div className="absolute bottom-[-18px] left-0 w-full h-[48px] z-50">
-                <input
-                  type="range"
-                  min="0"
-                  max={duration || 100}
-                  step="0.1"
-                  value={seek}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    seekTo(parseFloat(e.target.value));
-                  }}
-                  className="w-full h-full cursor-pointer focus-visible:outline-none appearance-none"
-                  aria-label="Playback position"
-                  style={{
-                    accentColor: 'transparent',
-                    background: 'transparent',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    appearance: 'none',
-                    opacity: 0
-                  }}
-                />
-              </div>
+        {isPlayerActive && currentlyPlayingId !== 'radio-stream' && (
+          /* Archive mode: Interactive scrubber */
+          <div className="hidden md:flex absolute bottom-0 left-0 right-0 w-full h-[12px] hover:h-[24px] overflow-visible items-end z-[60] group/scrubber transition-all duration-200 ease-out">
+            {/* Interaction Layer (Invisible Input - Massive Hitbox) */}
+            <div className="absolute bottom-[-18px] left-0 w-full h-[48px] z-50">
+              <input
+                type="range"
+                min="0"
+                max={duration || 100}
+                step="0.1"
+                value={seek}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  seekTo(parseFloat(e.target.value));
+                }}
+                className="w-full h-full cursor-pointer focus-visible:outline-none appearance-none"
+                aria-label="Playback position"
+                style={{
+                  accentColor: 'transparent',
+                  background: 'transparent',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none',
+                  opacity: 0
+                }}
+              />
+            </div>
 
-              {/* Visual Track Layer (Pointer Events None) */}
-              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#ECEEDF]/20 group-hover/scrubber:h-[6px] transition-all duration-200 ease-out pointer-events-none">
-                {/* Progress Fill */}
-                <div
-                  className="h-full bg-[#ECEEDF] relative transition-all duration-200 ease-out"
-                  style={{ width: `${progressPercent}%` }}
-                >
-                  {/* Thumb (Right Edge of Progress) */}
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 group-hover/scrubber:w-4 group-hover/scrubber:h-4 bg-[#ECEEDF] rounded-full shadow-[0_0_10px_rgba(236,238,223,0.5)] transition-all duration-200 ease-out translate-x-1/2" />
-                </div>
+            {/* Visual Track Layer (Pointer Events None) */}
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#ECEEDF]/20 group-hover/scrubber:h-[6px] transition-all duration-200 ease-out pointer-events-none">
+              {/* Progress Fill */}
+              <div
+                className="h-full bg-[#ECEEDF] relative transition-all duration-200 ease-out"
+                style={{ width: `${progressPercent}%` }}
+              >
+                {/* Thumb (Right Edge of Progress) */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 group-hover/scrubber:w-4 group-hover/scrubber:h-4 bg-[#ECEEDF] rounded-full shadow-[0_0_10px_rgba(236,238,223,0.5)] transition-all duration-200 ease-out translate-x-1/2" />
               </div>
             </div>
-          )
+          </div>
         )}
       </header>
     </>
