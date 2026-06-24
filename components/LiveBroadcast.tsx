@@ -328,72 +328,7 @@ export default function LiveBroadcast({
         </div>
       </div>
 
-      {/* Connected Glass Shatter Border Overlay */}
-      <div className="glass-border-overlay">
-        {/* Top Border */}
-        <svg
-          className="absolute top-0 left-0 w-full h-5"
-          viewBox="0 0 100 20"
-          preserveAspectRatio="none"
-          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
-        >
-          <path
-            d="M 0,10 L 15,12 L 30,18 L 50,11 L 70,16 L 85,12 L 100,10"
-            fill="none"
-            stroke="rgba(109, 191, 130, 0.25)"
-            strokeWidth="1.2"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
 
-        {/* Bottom Border */}
-        <svg
-          className="absolute bottom-0 left-0 w-full h-5"
-          viewBox="0 0 100 20"
-          preserveAspectRatio="none"
-          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
-        >
-          <path
-            d="M 0,10 L 12,8 L 28,2 L 45,9 L 65,3 L 80,8 L 100,10"
-            fill="none"
-            stroke="rgba(109, 191, 130, 0.25)"
-            strokeWidth="1.2"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-
-        {/* Left Border */}
-        <svg
-          className="absolute top-[10px] bottom-[10px] left-[-10px] h-[calc(100%-20px)] w-5"
-          viewBox="0 0 20 100"
-          preserveAspectRatio="none"
-          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
-        >
-          <path
-            d="M 10,0 L 12,12 L 18,28 L 11,45 L 17,62 L 10,80 L 10,100"
-            fill="none"
-            stroke="rgba(109, 191, 130, 0.25)"
-            strokeWidth="1.2"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-
-        {/* Right Border */}
-        <svg
-          className="absolute top-[10px] bottom-[10px] right-[-10px] h-[calc(100%-20px)] w-5"
-          viewBox="0 0 20 100"
-          preserveAspectRatio="none"
-          style={{ filter: 'drop-shadow(0 0 5px rgba(109, 191, 130, 0.45))' }}
-        >
-          <path
-            d="M 10,0 L 8,20 L 2,40 L 9,65 L 3,85 L 10,100"
-            fill="none"
-            stroke="rgba(109, 191, 130, 0.25)"
-            strokeWidth="1.2"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      </div>
 
       </div>
 

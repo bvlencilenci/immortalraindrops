@@ -199,19 +199,19 @@ export default function LiveVisualizer() {
       {/* Edge darkening layer */}
       <div 
         className="absolute inset-0 pointer-events-none" 
-        style={{ zIndex: 5, boxShadow: 'inset 0 0 80px 30px rgba(10,10,8,0.92), inset 0 0 20px 8px rgba(10,10,8,0.6)' }}
+        style={{ zIndex: 5, boxShadow: 'inset 0 0 160px 15px rgba(10,10,8,0.95), inset 0 0 60px 0px rgba(10,10,8,0.6)' }}
       />
 
       {/* Top/bottom gradient layer */}
       <div 
         className="absolute inset-0 pointer-events-none" 
-        style={{ zIndex: 6, background: 'linear-gradient(to bottom, rgba(10,10,8,0.55) 0%, transparent 18%, transparent 72%, rgba(10,10,8,0.65) 100%)' }}
+        style={{ zIndex: 6, background: 'linear-gradient(to bottom, rgba(10,10,8,0.55) 0%, transparent 25%, transparent 75%, rgba(10,10,8,0.65) 100%)' }}
       />
 
       {/* Left/right gradient layer */}
       <div 
         className="absolute inset-0 pointer-events-none" 
-        style={{ zIndex: 7, background: 'linear-gradient(to right, rgba(10,10,8,0.45) 0%, transparent 12%, transparent 88%, rgba(10,10,8,0.45) 100%)' }}
+        style={{ zIndex: 7, background: 'linear-gradient(to right, rgba(10,10,8,0.45) 0%, transparent 20%, transparent 80%, rgba(10,10,8,0.45) 100%)' }}
       />
 
       {/* Static border-cracks glass overlay */}
