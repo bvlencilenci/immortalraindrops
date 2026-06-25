@@ -148,7 +148,7 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact, variant = 'de
         <div className="grid shrink-0 grid-cols-[44px_1fr_72px] border-b border-white/10 px-3 py-2 text-[9px] uppercase tracking-[0.24em] text-[#ECEEDF]/35 md:grid-cols-[64px_82px_1fr_240px_86px] md:px-4">
           <span>No.</span>
           <span className="hidden md:block">Visual</span>
-          <span>Transmission</span>
+          <span>Track</span>
           <span className="hidden md:block">Metadata</span>
           <span className="text-right">Play</span>
         </div>

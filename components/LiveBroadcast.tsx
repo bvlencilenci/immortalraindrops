@@ -365,7 +365,7 @@ export default function LiveBroadcast({
         {/* ================= CENTER ================= */}
         <div className="flex-1 flex items-stretch justify-center px-4 pt-24 pb-5 lg:items-end lg:justify-start lg:p-10">
 
-          <div className="w-full h-[340px] p-7 bg-black/40 backdrop-blur-md border border-white/10 flex flex-col justify-center lg:w-[560px] lg:h-[255px] lg:p-8">
+          <div className="w-full h-[340px] p-7 bg-black/40 backdrop-blur-md border border-white/10 flex flex-col justify-center lg:w-[560px] lg:h-[190px] lg:p-8">
 
             <div className="text-[13px] lg:text-[14px] tracking-[0.36em] lg:tracking-[0.4em] text-lime-300">
               Now playing: Curated Playlist

@@ -288,7 +288,7 @@ export default async function Home() {
         />
 
         <div className="relative z-10 flex min-h-dvh flex-col gap-4 overflow-y-auto px-3 pb-8 pt-[calc(5.75rem+env(safe-area-inset-top))] md:px-6 lg:grid lg:h-dvh lg:grid-cols-[260px_minmax(0,880px)_240px] lg:items-start lg:justify-center lg:gap-6 lg:overflow-hidden lg:px-10 lg:pb-12 lg:pt-28">
-          <aside className="home-unstable-panel group/home-panel relative shrink-0 overflow-hidden border border-white/[0.055] bg-black/22 p-5 backdrop-blur-md transition-colors duration-500 hover:bg-black/28 lg:h-[calc(100dvh-13rem)]">
+          <aside className="order-3 lg:order-none home-unstable-panel group/home-panel relative shrink-0 overflow-hidden border border-white/[0.055] bg-black/22 p-5 backdrop-blur-md transition-colors duration-500 hover:bg-black/28 lg:h-[calc(100dvh-13rem)]">
             <div className="home-glass-region home-glass-region-a" />
             <div className="home-glass-region home-glass-region-b" />
             <div className="home-local-grain" />
@@ -385,7 +385,7 @@ export default async function Home() {
             </div>
           </aside>
 
-          <section className="relative min-h-[520px] flex-1 overflow-hidden border border-white/[0.07] bg-black/36 backdrop-blur-md lg:h-[calc(100dvh-13rem)] lg:min-h-0">
+          <section className="order-1 lg:order-none relative min-h-[520px] flex-1 overflow-hidden border border-white/[0.07] bg-black/36 backdrop-blur-md lg:h-[calc(100dvh-13rem)] lg:min-h-0">
             <svg className="absolute -inset-x-2 -inset-y-2 h-[calc(100%+16px)] w-[calc(100%+16px)] pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
               <path d="M 4 0 H 42 M 56 0 H 100 M 100 0 V 28 M 100 72 V 100 M 100 100 H 78 M 22 100 H 0 M 0 100 V 64 M 0 36 V 0" fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
               <path d="M 3 7 H 18 M 82 93 H 97" fill="none" stroke="rgba(125,255,178,0.12)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
@@ -490,7 +490,7 @@ export default async function Home() {
             </div>
           </section>
 
-          <aside className="home-unstable-panel group/home-panel relative shrink-0 overflow-hidden border border-white/[0.055] bg-black/22 p-5 backdrop-blur-md transition-colors duration-500 hover:bg-black/28 lg:h-[calc(100dvh-13rem)]">
+          <aside className="order-2 lg:order-none home-unstable-panel group/home-panel relative shrink-0 overflow-hidden border border-white/[0.055] bg-black/22 p-5 backdrop-blur-md transition-colors duration-500 hover:bg-black/28 lg:h-[calc(100dvh-13rem)]">
             <div className="home-glass-region home-glass-region-c" />
             <div className="home-glass-region home-glass-region-d" />
             <div className="home-local-grain" />

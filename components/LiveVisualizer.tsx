@@ -330,8 +330,8 @@ export default function LiveVisualizer() {
       />
 
       {/* Edge darkening layer */}
-      <div 
-        className="absolute inset-0 pointer-events-none" 
+      <div
+        className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 5,
           boxShadow: `inset 0 0 160px 15px rgba(10,10,8,${Math.min(1, 0.95 * overlayStrength)}), inset 0 0 60px 0px rgba(10,10,8,${Math.min(1, 0.6 * overlayStrength)})`
@@ -339,8 +339,8 @@ export default function LiveVisualizer() {
       />
 
       {/* Top/bottom gradient layer */}
-      <div 
-        className="absolute inset-0 pointer-events-none" 
+      <div
+        className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 6,
           background: `linear-gradient(to bottom, rgba(10,10,8,${Math.min(1, 0.55 * overlayStrength)}) 0%, transparent 25%, transparent 75%, rgba(10,10,8,${Math.min(1, 0.65 * overlayStrength)}) 100%)`
@@ -348,8 +348,8 @@ export default function LiveVisualizer() {
       />
 
       {/* Left/right gradient layer */}
-      <div 
-        className="absolute inset-0 pointer-events-none" 
+      <div
+        className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 7,
           background: `linear-gradient(to right, rgba(10,10,8,${Math.min(1, 0.45 * overlayStrength)}) 0%, transparent 20%, transparent 80%, rgba(10,10,8,${Math.min(1, 0.45 * overlayStrength)}) 100%)`
@@ -366,24 +366,24 @@ export default function LiveVisualizer() {
           style={{ filter: 'drop-shadow(0 0 4px rgba(109,191,130,0.2))' }}
         >
           {/* Main radial cracks from top-left impact point */}
-          <path d="M 80 60 L 143 198 L 112 310" stroke="rgba(109,191,130,0.28)" strokeWidth="0.8" fill="none"/>
-          <path d="M 80 60 L 210 145 L 340 178" stroke="rgba(109,191,130,0.22)" strokeWidth="0.6" fill="none"/>
-          <path d="M 80 60 L 58 180 L 42 390" stroke="rgba(109,191,130,0.18)" strokeWidth="0.5" fill="none"/>
-          <path d="M 80 60 L 190 72 L 420 58" stroke="rgba(109,191,130,0.15)" strokeWidth="0.5" fill="none"/>
+          <path d="M 80 60 L 143 198 L 112 310" stroke="rgba(109,191,130,0.28)" strokeWidth="0.8" fill="none" />
+          <path d="M 80 60 L 210 145 L 340 178" stroke="rgba(109,191,130,0.22)" strokeWidth="0.6" fill="none" />
+          <path d="M 80 60 L 58 180 L 42 390" stroke="rgba(109,191,130,0.18)" strokeWidth="0.5" fill="none" />
+          <path d="M 80 60 L 190 72 L 420 58" stroke="rgba(109,191,130,0.15)" strokeWidth="0.5" fill="none" />
 
           {/* Branch cracks off main radials */}
-          <path d="M 143 198 L 98 242 L 72 310" stroke="rgba(109,191,130,0.16)" strokeWidth="0.4" fill="none"/>
-          <path d="M 210 145 L 248 210 L 230 290" stroke="rgba(109,191,130,0.13)" strokeWidth="0.4" fill="none"/>
-          <path d="M 112 310 L 78 355 L 60 430" stroke="rgba(109,191,130,0.12)" strokeWidth="0.4" fill="none"/>
+          <path d="M 143 198 L 98 242 L 72 310" stroke="rgba(109,191,130,0.16)" strokeWidth="0.4" fill="none" />
+          <path d="M 210 145 L 248 210 L 230 290" stroke="rgba(109,191,130,0.13)" strokeWidth="0.4" fill="none" />
+          <path d="M 112 310 L 78 355 L 60 430" stroke="rgba(109,191,130,0.12)" strokeWidth="0.4" fill="none" />
 
           {/* Bottom-right corner cracks */}
-          <path d="M 900 640 L 760 548 L 680 490" stroke="rgba(109,191,130,0.2)" strokeWidth="0.7" fill="none"/>
-          <path d="M 900 640 L 820 580 L 900 520" stroke="rgba(109,191,130,0.14)" strokeWidth="0.5" fill="none"/>
-          <path d="M 760 548 L 700 590 L 640 640" stroke="rgba(109,191,130,0.12)" strokeWidth="0.4" fill="none"/>
+          <path d="M 900 640 L 760 548 L 680 490" stroke="rgba(109,191,130,0.2)" strokeWidth="0.7" fill="none" />
+          <path d="M 900 640 L 820 580 L 900 520" stroke="rgba(109,191,130,0.14)" strokeWidth="0.5" fill="none" />
+          <path d="M 760 548 L 700 590 L 640 640" stroke="rgba(109,191,130,0.12)" strokeWidth="0.4" fill="none" />
 
           {/* Concentric arc fragments near impact */}
-          <path d="M 42 140 Q 140 110 280 155" stroke="rgba(109,191,130,0.1)" strokeWidth="0.4" fill="none"/>
-          <path d="M 55 260 Q 160 220 310 248" stroke="rgba(109,191,130,0.08)" strokeWidth="0.35" fill="none"/>
+          <path d="M 42 140 Q 140 110 280 155" stroke="rgba(109,191,130,0.1)" strokeWidth="0.4" fill="none" />
+          <path d="M 55 260 Q 160 220 310 248" stroke="rgba(109,191,130,0.08)" strokeWidth="0.35" fill="none" />
         </svg>
       </div>
     </div>
