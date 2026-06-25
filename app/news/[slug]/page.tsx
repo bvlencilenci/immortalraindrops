@@ -23,7 +23,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
   }
 
   // Double-check publication status for public visitors
-  if (!post.published || (post.published_at && new Date(post.published_at) > new Date())) {
+  if (post.status !== 'published' || (post.published_at && new Date(post.published_at) > new Date())) {
     return notFound();
   }
 
@@ -78,7 +78,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
           </div>
 
           <div className="prose prose-invert max-w-none text-[#ECEEDF]/80 text-sm leading-loose tracking-wider font-playfair whitespace-pre-wrap">
-            {post.body}
+            {post.content || post.body}
           </div>
         </article>
       </div>

@@ -8,15 +8,22 @@ export interface NewsPost {
   title: string;
   slug: string;
   excerpt?: string;
-  body: string;
-  type: 'news' | 'release' | 'event' | 'editorial';
+  content: string;
+  status: 'draft' | 'published';
+  pinned?: boolean;
+  published_at?: string | null;
+  body?: string;
+  type?: 'news' | 'release' | 'event' | 'editorial';
   cover_image?: string;
   featured?: boolean;
   published?: boolean;
-  published_at?: string;
   created_at?: string;
   updated_at?: string;
 }
+
+const getErrorMessage = (error: unknown) => (
+  error instanceof Error ? error.message : 'Unknown error'
+);
 
 // Helper: Verify Admin Role
 async function verifyAdmin() {
@@ -46,8 +53,8 @@ export async function getAdminNewsPosts() {
 
     if (error) throw error;
     return { success: true, posts: data };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error) };
   }
 }
 
@@ -55,6 +62,14 @@ export async function createNewsPost(post: NewsPost) {
   try {
     await verifyAdmin();
     const supabase = await createClient();
+
+    if (post.pinned) {
+      await supabase
+        .from('news_posts')
+        .update({ pinned: false, featured: false })
+        .eq('pinned', true);
+    }
+
     const { data, error } = await supabase
       .from('news_posts')
       .insert([
@@ -62,12 +77,15 @@ export async function createNewsPost(post: NewsPost) {
           title: post.title,
           slug: post.slug,
           excerpt: post.excerpt || null,
-          body: post.body,
-          type: post.type,
+          content: post.content,
+          status: post.status,
+          pinned: post.pinned || false,
+          published_at: post.status === 'published' ? (post.published_at || new Date().toISOString()) : (post.published_at || null),
+          body: post.content,
+          type: post.type || 'news',
           cover_image: post.cover_image || null,
-          featured: post.featured || false,
-          published: post.published || false,
-          published_at: post.published ? (post.published_at || new Date().toISOString()) : (post.published_at || null),
+          featured: post.pinned || false,
+          published: post.status === 'published',
         }
       ])
       .select()
@@ -77,8 +95,8 @@ export async function createNewsPost(post: NewsPost) {
     revalidatePath('/news');
     revalidatePath('/');
     return { success: true, post: data };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error) };
   }
 }
 
@@ -87,10 +105,33 @@ export async function updateNewsPost(id: string, post: Partial<NewsPost>) {
     await verifyAdmin();
     const supabase = await createClient();
 
-    const updates: Record<string, any> = { ...post };
+    const updates: Record<string, unknown> = { ...post };
     delete updates.id;
     delete updates.created_at;
+
+    if (typeof post.content === 'string') {
+      updates.body = post.content;
+    }
+
+    if (post.status) {
+      updates.published = post.status === 'published';
+      if (post.status === 'published' && !updates.published_at) {
+        updates.published_at = new Date().toISOString();
+      }
+    }
+
+    if (typeof post.pinned === 'boolean') {
+      updates.featured = post.pinned;
+    }
+
     updates.updated_at = new Date().toISOString();
+
+    if (post.pinned) {
+      await supabase
+        .from('news_posts')
+        .update({ pinned: false, featured: false })
+        .neq('id', id);
+    }
 
     const { data, error } = await supabase
       .from('news_posts')
@@ -104,8 +145,8 @@ export async function updateNewsPost(id: string, post: Partial<NewsPost>) {
     revalidatePath(`/news/${data.slug}`);
     revalidatePath('/');
     return { success: true, post: data };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error) };
   }
 }
 
@@ -123,7 +164,7 @@ export async function deleteNewsPost(id: string, slug?: string) {
     if (slug) revalidatePath(`/news/${slug}`);
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error) };
   }
 }

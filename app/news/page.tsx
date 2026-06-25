@@ -9,9 +9,11 @@ export default async function NewsIndexPage() {
   const { data: posts, error } = await supabase
     .from('news_posts')
     .select('*')
-    .eq('published', true)
-    .lte('published_at', new Date().toISOString())
-    .order('published_at', { ascending: false });
+    .eq('status', 'published')
+    .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`)
+    .order('pinned', { ascending: false })
+    .order('published_at', { ascending: false })
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching news:', error);
@@ -69,9 +71,9 @@ export default async function NewsIndexPage() {
                       <span className="border border-[#ECEEDF]/20 px-2 py-0.5 text-[9px]">
                         [{post.type}]
                       </span>
-                      {post.featured && (
+                      {post.pinned && (
                         <span className="text-[#FF0000] text-[9px] font-bold">
-                          [FEATURED]
+                          [PINNED]
                         </span>
                       )}
                     </div>

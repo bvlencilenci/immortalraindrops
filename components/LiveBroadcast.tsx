@@ -325,7 +325,7 @@ export default function LiveBroadcast({
           >
 
             <div className="text-[13px] font-bold tracking-[0.32em] text-[#7dffb2]/88 mb-5 pb-4 border-b border-white/[0.08]">
-              HISTORY ARCHIVE
+              LAST PLAYED
             </div>
 
             <div className="flex flex-col gap-0">
@@ -476,8 +476,8 @@ export default function LiveBroadcast({
             }}
           >
 
-            <div className="text-[13px] font-bold tracking-[0.32em] text-[#7dffb2]/78 mb-5 pb-4 border-b border-white/[0.08]">
-              NEWS SIGNAL
+            <div className="text-[13px] font-bold tracking-[0.32em] text-[#7dffb2]/88 mb-5 pb-4 border-b border-white/[0.08]">
+              NEWS & UPDATES
             </div>
 
             <div className="flex flex-col gap-0">

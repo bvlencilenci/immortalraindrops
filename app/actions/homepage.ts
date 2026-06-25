@@ -35,6 +35,48 @@ export async function getHomepageSettings() {
   return data;
 }
 
+export async function getHomepageMediaSettings() {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('homepage_instagram_image_url, homepage_instagram_image_alt')
+      .eq('id', 1)
+      .single();
+
+    if (error) throw error;
+    return { success: true, settings: data };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateHomepageMediaSettings(payload: {
+  homepage_instagram_image_url?: string | null;
+  homepage_instagram_image_alt?: string | null;
+}) {
+  try {
+    await verifyAdmin();
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from('system_settings')
+      .update({
+        homepage_instagram_image_url: payload.homepage_instagram_image_url || null,
+        homepage_instagram_image_alt: payload.homepage_instagram_image_alt || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', 1);
+
+    if (error) throw error;
+    revalidatePath('/');
+    revalidatePath('/godmode');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
 export async function updateHomepageSettings(payload: {
   hero_mode: 'featured_release' | 'featured_news' | 'featured_artist' | 'custom';
   featured_release_id?: string | null;

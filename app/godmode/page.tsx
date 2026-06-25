@@ -7,7 +7,6 @@ import SubmissionReview from '@/components/admin/SubmissionReview';
 import UserList from '@/components/admin/UserList';
 import SystemSettings from '@/components/admin/SystemSettings';
 import NewsManager from '@/components/admin/NewsManager';
-import HomepageManager from '@/components/admin/HomepageManager';
 import BroadcastControls from '@/components/admin/BroadcastControls';
 import ArchiveManager from '@/components/admin/ArchiveManager';
 
@@ -17,7 +16,7 @@ export default function GodModePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState<'submissions' | 'archive' | 'users' | 'system' | 'broadcast'>('submissions');
+  const [activeTab, setActiveTab] = useState<'submissions' | 'archive' | 'news' | 'users' | 'system' | 'broadcast'>('submissions');
 
   const [needsLogin, setNeedsLogin] = useState(false);
   const [login, setLogin] = useState('');
@@ -149,6 +148,7 @@ export default function GodModePage() {
   const tabs = [
     { id: 'submissions', label: 'SUBMISSIONS' },
     { id: 'archive', label: 'ARCHIVE' },
+    { id: 'news', label: 'NEWS' },
     { id: 'playlist', label: 'PLAYLIST', href: '/godmode/playlist' },
     { id: 'broadcast', label: 'BROADCAST' },
     { id: 'users', label: 'USERS' },
@@ -195,6 +195,7 @@ export default function GodModePage() {
       <div className="flex-1 mt-6">
         {activeTab === 'submissions' && <SubmissionReview />}
         {activeTab === 'archive' && <ArchiveManager />}
+        {activeTab === 'news' && <NewsManager />}
         {activeTab === 'broadcast' && <BroadcastControls />}
         {activeTab === 'users' && <UserList />}
         {activeTab === 'system' && <SystemSettings />}
@@ -211,4 +212,3 @@ export default function GodModePage() {
     </main>
   );
 }
-
