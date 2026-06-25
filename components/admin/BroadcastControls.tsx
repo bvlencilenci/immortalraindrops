@@ -27,6 +27,40 @@ interface TrackSuggestion {
   audio_url: string | null;
 }
 
+interface BroadcastSettingsRow {
+  broadcast_mode?: string | null;
+  dj_name?: string | null;
+  show_title?: string | null;
+  dj_location?: string | null;
+  dj_description?: string | null;
+  visualizer_enabled?: boolean | null;
+  visualizer_preset_names?: string[] | null;
+  visualizer_rotation_seconds?: number | null;
+  visualizer_blend_seconds?: number | null;
+  visualizer_pixel_ratio_mobile?: number | null;
+  visualizer_pixel_ratio_desktop?: number | null;
+  visualizer_overlay_strength?: number | null;
+}
+
+const getErrorMessage = (err: unknown, fallback: string) =>
+  err instanceof Error ? err.message : fallback;
+
+const DEFAULT_VISUALIZER_PRESETS = [
+  '_Geiss - Artifact 01',
+  '_Geiss - Desert Rose 2',
+  'Cope - The Neverending Explosion of Red Liquid Fire',
+  'martin - reflections on black tiles',
+  'shifter - dark tides bdrv mix 2',
+  'martin - castle in the air',
+  'Flexi - what is the matrix',
+  'Flexi - infused with the spiral',
+  'martin - stormy sea (2010 update)',
+  'yin - 191 - Temporal singularities',
+  '_Aderrasi - Wanderer in Curved Space - mash0000 - faclempt kibitzing meshuggana schmaltz (Geiss color mix)',
+  'Eo.S. + Phat - cubetrace - v2',
+  'Unchained & Rovastar - Wormhole Pillars (Hall of Shadows mix)'
+];
+
 export default function BroadcastControls() {
   const [status, setStatus] = useState<string>('CONNECTING...');
   const [nowPlaying, setNowPlaying] = useState<string>('—');
@@ -41,6 +75,16 @@ export default function BroadcastControls() {
   const [djLocation, setDjLocation] = useState('');
   const [djDescription, setDjDescription] = useState('');
   const [isUpdatingMode, setIsUpdatingMode] = useState(false);
+
+  // Butterchurn visualizer settings state
+  const [visualizerEnabled, setVisualizerEnabled] = useState(true);
+  const [visualizerPresetNames, setVisualizerPresetNames] = useState(DEFAULT_VISUALIZER_PRESETS.join('\n'));
+  const [visualizerRotationSeconds, setVisualizerRotationSeconds] = useState(10);
+  const [visualizerBlendSeconds, setVisualizerBlendSeconds] = useState(2);
+  const [visualizerPixelRatioMobile, setVisualizerPixelRatioMobile] = useState(0.75);
+  const [visualizerPixelRatioDesktop, setVisualizerPixelRatioDesktop] = useState(1);
+  const [visualizerOverlayStrength, setVisualizerOverlayStrength] = useState(1);
+  const [isSavingVisualizer, setIsSavingVisualizer] = useState(false);
 
   // Queue state
   const [queue, setQueue] = useState<QueuedTrack[]>([]);
@@ -147,21 +191,48 @@ export default function BroadcastControls() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const { data, error } = await supabase
-          .from('system_settings')
-          .select('broadcast_mode, dj_name, show_title, dj_location, dj_description')
-          .eq('id', 1)
-          .single();
-
-        if (error) throw error;
-        if (data) {
+        const applySettings = (data: BroadcastSettingsRow) => {
           setBroadcastMode((data.broadcast_mode || 'automated') as 'automated' | 'live');
           setDjName(data.dj_name || '');
           setShowTitle(data.show_title || '');
           setDjLocation(data.dj_location || '');
           setDjDescription(data.dj_description || '');
+          setVisualizerEnabled(data.visualizer_enabled ?? true);
+          setVisualizerPresetNames(
+            Array.isArray(data.visualizer_preset_names) && data.visualizer_preset_names.length > 0
+              ? data.visualizer_preset_names.join('\n')
+              : DEFAULT_VISUALIZER_PRESETS.join('\n')
+          );
+          setVisualizerRotationSeconds(Number(data.visualizer_rotation_seconds ?? 10));
+          setVisualizerBlendSeconds(Number(data.visualizer_blend_seconds ?? 2));
+          setVisualizerPixelRatioMobile(Number(data.visualizer_pixel_ratio_mobile ?? 0.75));
+          setVisualizerPixelRatioDesktop(Number(data.visualizer_pixel_ratio_desktop ?? 1));
+          setVisualizerOverlayStrength(Number(data.visualizer_overlay_strength ?? 1));
+        };
+
+        const { data, error } = await supabase
+          .from('system_settings')
+          .select('broadcast_mode, dj_name, show_title, dj_location, dj_description, visualizer_enabled, visualizer_preset_names, visualizer_rotation_seconds, visualizer_blend_seconds, visualizer_pixel_ratio_mobile, visualizer_pixel_ratio_desktop, visualizer_overlay_strength')
+          .eq('id', 1)
+          .single();
+
+        if (error) {
+          console.warn('Visualizer columns unavailable, loading broadcast settings only:', error.message);
+          const fallback = await supabase
+            .from('system_settings')
+            .select('broadcast_mode, dj_name, show_title, dj_location, dj_description')
+            .eq('id', 1)
+            .single();
+
+          if (fallback.error) throw fallback.error;
+          if (fallback.data) applySettings(fallback.data);
+          return;
         }
-      } catch (err: any) {
+
+        if (data) {
+          applySettings(data);
+        }
+      } catch (err: unknown) {
         console.error('Failed to load initial broadcast settings:', err);
       }
     };
@@ -188,10 +259,43 @@ export default function BroadcastControls() {
       } else {
         flashError(res.error || 'Failed to update broadcast configuration');
       }
-    } catch (err: any) {
-      flashError(err.message || 'Error saving settings');
+    } catch (err: unknown) {
+      flashError(getErrorMessage(err, 'Error saving settings'));
     } finally {
       setIsUpdatingMode(false);
+    }
+  };
+
+  const handleSaveVisualizerSettings = async () => {
+    setIsSavingVisualizer(true);
+    setError(null);
+
+    const presetNames = visualizerPresetNames
+      .split('\n')
+      .map((name) => name.trim())
+      .filter(Boolean);
+
+    try {
+      const { error } = await supabase
+        .from('system_settings')
+        .update({
+          visualizer_enabled: visualizerEnabled,
+          visualizer_preset_names: presetNames,
+          visualizer_rotation_seconds: Math.max(1, Math.round(Number(visualizerRotationSeconds) || 10)),
+          visualizer_blend_seconds: Math.max(0, Number(visualizerBlendSeconds) || 0),
+          visualizer_pixel_ratio_mobile: Math.max(0.25, Number(visualizerPixelRatioMobile) || 0.75),
+          visualizer_pixel_ratio_desktop: Math.max(0.25, Number(visualizerPixelRatioDesktop) || 1),
+          visualizer_overlay_strength: Math.max(0, Number(visualizerOverlayStrength) || 0),
+        })
+        .eq('id', 1);
+
+      if (error) throw error;
+
+      flashAction('VISUALIZER CONFIG SAVED');
+    } catch (err: unknown) {
+      flashError(getErrorMessage(err, 'Error saving visualizer settings'));
+    } finally {
+      setIsSavingVisualizer(false);
     }
   };
 
@@ -449,6 +553,110 @@ export default function BroadcastControls() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* BUTTERCHURN VISUALIZER */}
+      <div className="border border-[#ECEEDF]/10 bg-[#ECEEDF]/[0.02] p-6 group hover:border-[#ECEEDF]/20 transition-colors">
+        <h3 className="text-[#ECEEDF] text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 mb-6 group-hover:opacity-100 transition-opacity">
+          BUTTERCHURN VISUALIZER
+        </h3>
+
+        <div className="flex flex-col gap-5">
+          <label className="flex items-center gap-3 text-xs uppercase tracking-wider cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={visualizerEnabled}
+              onChange={(e) => setVisualizerEnabled(e.target.checked)}
+              className="accent-[#ECEEDF] cursor-pointer"
+            />
+            <span>ENABLE VISUALIZER</span>
+          </label>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">
+              PRESET NAMES (ONE PER LINE)
+            </label>
+            <textarea
+              value={visualizerPresetNames}
+              onChange={(e) => setVisualizerPresetNames(e.target.value)}
+              rows={8}
+              className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF] resize-y"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">ROTATION SECONDS</label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={visualizerRotationSeconds}
+                onChange={(e) => setVisualizerRotationSeconds(Number(e.target.value))}
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">BLEND SECONDS</label>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={visualizerBlendSeconds}
+                onChange={(e) => setVisualizerBlendSeconds(Number(e.target.value))}
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">OVERLAY STRENGTH</label>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={visualizerOverlayStrength}
+                onChange={(e) => setVisualizerOverlayStrength(Number(e.target.value))}
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">MOBILE PIXEL RATIO</label>
+              <input
+                type="number"
+                min="0.25"
+                step="0.05"
+                value={visualizerPixelRatioMobile}
+                onChange={(e) => setVisualizerPixelRatioMobile(Number(e.target.value))}
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-widest text-[#ECEEDF]/40">DESKTOP PIXEL RATIO</label>
+              <input
+                type="number"
+                min="0.25"
+                step="0.05"
+                value={visualizerPixelRatioDesktop}
+                onChange={(e) => setVisualizerPixelRatioDesktop(Number(e.target.value))}
+                className="w-full bg-black/40 border border-[#ECEEDF]/20 px-3 py-2 text-[11px] text-[#ECEEDF] font-mono focus:outline-none focus:border-[#ECEEDF]"
+              />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveVisualizerSettings}
+            disabled={isSavingVisualizer}
+            className="w-full py-3 text-[10px] uppercase tracking-[0.2em] font-bold border border-[#ECEEDF]/20 bg-black/40 text-[#ECEEDF] hover:bg-[#ECEEDF] hover:text-black hover:border-[#ECEEDF] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {isSavingVisualizer ? 'SAVING...' : 'SAVE VISUALIZER CONFIG'}
+          </button>
+        </div>
       </div>
 
       {/* DJ BROADCAST */}

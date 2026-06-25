@@ -14,12 +14,17 @@
 :root {
   --background: #020203;
   --foreground: #f2f2f2;
+  color-scheme: dark;
 
   --neon-lime: #b6ff2e;
   --neon-pink: #ff2bd6;
   --neon-blue: #2ee6ff;
   --acid-yellow: #fff86b;
   --danger-red: #ff3b3b;
+}
+
+html {
+  background: #000;
 }
 
 /* Fonts */

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { Viewport } from 'next';
 import './globals.css';
 import Header from '../components/Header';
 import SplashGate from '../components/SplashGate';
@@ -50,6 +51,10 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+export const viewport: Viewport = {
+  themeColor: '#000000',
+};
+
 export default async function RootLayout({
   children,
 }: {
@@ -64,14 +69,14 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${archivo.variable} ${archivoNarrow.variable}`}>
-      <body className="antialiased h-screen flex flex-col bg-black selection:bg-[#ECEEDF] selection:text-black overflow-hidden">
+      <body className="antialiased min-h-dvh flex flex-col bg-black selection:bg-[#ECEEDF] selection:text-black overflow-hidden">
         <SplashGate />
 
         <div className="flex-1 w-full flex flex-col bg-black relative min-h-0 overflow-hidden">
           <RadioPlayer />
           <Header />
 
-          <div className="flex-1 w-full flex flex-col min-h-0 overflow-hidden">
+          <div className="flex-1 w-full flex flex-col min-h-0 overflow-x-hidden overflow-y-auto lg:overflow-hidden">
             {children}
           </div>
 

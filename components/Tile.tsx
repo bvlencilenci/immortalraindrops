@@ -12,6 +12,7 @@ interface TileProps extends Track {
   onDelete?: () => void;
   onEdit?: () => void;
   compact?: boolean;
+  archiveVariant?: boolean;
 }
 
 const Tile = (props: TileProps) => {
@@ -31,7 +32,8 @@ const Tile = (props: TileProps) => {
     vote_count,
     release_date,
     duration,
-    compact
+    compact,
+    archiveVariant
   } = props;
 
   const {
@@ -50,7 +52,7 @@ const Tile = (props: TileProps) => {
   const extImage = image_ext || 'jpg';
 
   // Strict R2 Routing (User Requested)
-  let audioUrl = `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
+  const audioUrl = `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
   let imageUrl = `${r2BaseUrl}/${tile_id}/visual.${extImage}`;
 
   const isVideo = media_type === 'video';
@@ -189,12 +191,13 @@ const Tile = (props: TileProps) => {
     setActiveFullscreenVideo(imageUrl, time);
   };
 
-  const handleMediaLoad = (e: any) => {
+  const handleMediaLoad = (e: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement>) => {
     let ratio = 1;
-    if (e.target.videoWidth) {
-      ratio = e.target.videoWidth / e.target.videoHeight;
-    } else if (e.target.naturalWidth) {
-      ratio = e.target.naturalWidth / e.target.naturalHeight;
+    const target = e.currentTarget;
+    if (target instanceof HTMLVideoElement && target.videoWidth) {
+      ratio = target.videoWidth / target.videoHeight;
+    } else if (target instanceof HTMLImageElement && target.naturalWidth) {
+      ratio = target.naturalWidth / target.naturalHeight;
     }
     setAspectRatio(ratio);
     // Threshold: 0.95 to 1.05 is "close enough" to square to force fill
@@ -344,6 +347,110 @@ const Tile = (props: TileProps) => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  if (archiveVariant) {
+    const displayIndex = ((tile_index || 0) + 1).toString().padStart(2, '0');
+    const displayYear = release_date ? new Date(release_date).getFullYear() : null;
+
+    return (
+      <div
+        ref={tileRef}
+        onClick={handleInteraction}
+        className={`group relative grid w-full cursor-pointer select-none grid-cols-[44px_1fr_72px] items-center border-b border-white/[0.07] px-3 py-3 transition-colors duration-100 md:grid-cols-[64px_82px_1fr_240px_86px] md:px-4 md:py-3.5 ${
+          isActive ? 'bg-lime-300/[0.08]' : 'bg-black/[0.12] hover:bg-white/[0.04]'
+        }`}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.06]"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0.16) 0px,
+                rgba(255,255,255,0.16) 1px,
+                transparent 1px,
+                transparent 6px
+              )
+            `,
+          }}
+        />
+
+        <span className="relative z-10 text-[10px] font-mono tracking-widest text-lime-300/55 tabular-nums">
+          {displayIndex}
+        </span>
+
+        <div className="relative z-10 hidden h-12 w-12 overflow-hidden border border-white/10 bg-black/35 md:flex">
+          <img
+            src={imageUrl}
+            alt=""
+            className="h-full w-full object-cover grayscale contrast-125 opacity-80 transition-opacity duration-150 group-hover:opacity-100"
+            crossOrigin="anonymous"
+            loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+          <div className="absolute inset-0 bg-lime-300/[0.03] mix-blend-screen" />
+        </div>
+
+        <div className="relative z-10 min-w-0 pr-3">
+          <div className="flex items-center gap-2">
+            {isActive && isPlayingStore && (
+              <span className="h-1.5 w-1.5 shrink-0 animate-pulse bg-red-500" />
+            )}
+            <span className="truncate text-[15px] font-bold leading-tight text-[#fffbea]/95 md:text-[16px]">
+              {title || 'UNKNOWN TRACK'}
+            </span>
+          </div>
+          <div className="mt-1 truncate text-[12px] leading-tight text-lime-300/75">
+            {artist || 'UNKNOWN ARTIST'}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[9px] uppercase tracking-[0.18em] text-[#ECEEDF]/38 md:hidden">
+            {genre && <span>{genre}</span>}
+            {displayYear && <span>{displayYear}</span>}
+            {duration && <span>{duration}</span>}
+          </div>
+        </div>
+
+        <div className="relative z-10 hidden items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-[#ECEEDF]/42 md:flex">
+          {genre && <span className="border border-white/10 bg-black/20 px-2 py-1">{genre}</span>}
+          {displayYear && <span>{displayYear}</span>}
+          {duration && <span>{duration}</span>}
+        </div>
+
+        <div className="relative z-10 flex items-center justify-end gap-2">
+          <span className={`border border-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
+            isActive && isPlayingStore ? 'bg-red-500/15 text-red-300' : 'bg-black/25 text-[#ECEEDF]/70 group-hover:text-lime-300'
+          }`}>
+            {isActive && isPlayingStore ? 'PAUSE' : 'PLAY'}
+          </span>
+        </div>
+
+        {isAdmin && (
+          <div className="relative z-20 col-span-3 mt-3 flex gap-2 border-t border-white/[0.06] pt-3 md:col-span-5">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
+              className="border border-[#ECEEDF]/20 bg-black/35 px-2.5 py-1 text-[9px] font-mono text-[#ECEEDF] transition-colors duration-100 hover:bg-[#ECEEDF]/15"
+            >
+              EDIT
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`DELETE TRACK ${title}?`)) {
+                  onDelete?.();
+                }
+              }}
+              className="border border-red-500/20 bg-red-950/35 px-2.5 py-1 text-[9px] font-mono text-red-300 transition-colors duration-100 hover:bg-red-900"
+            >
+              REMOVE
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
 
   return (

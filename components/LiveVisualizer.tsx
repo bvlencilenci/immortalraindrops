@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import { Howler } from 'howler';
+import { supabase } from '../lib/supabase';
 
-// @ts-ignore
 // import butterchurn from 'butterchurn';
 // import butterchurnPresets from 'butterchurn-presets';
 
@@ -24,6 +24,83 @@ const CURATED_PRESET_NAMES = [
   'Unchained & Rovastar - Wormhole Pillars (Hall of Shadows mix)'
 ];
 
+interface VisualizerSettings {
+  enabled: boolean;
+  presetNames: string[];
+  rotationSeconds: number;
+  blendSeconds: number;
+  pixelRatioMobile: number;
+  pixelRatioDesktop: number;
+  overlayStrength: number;
+}
+
+type ButterchurnPreset = Record<string, unknown>;
+
+interface ButterchurnVisualizerInstance {
+  setDimensions?: (width: number, height: number) => void;
+  connectAudio: (analyser: AnalyserNode) => void;
+  loadPreset: (preset: ButterchurnPreset, blendDuration: number) => void;
+  render: () => void;
+  dispose?: () => void;
+}
+
+interface ButterchurnModule {
+  createVisualizer: (
+    context: BaseAudioContext,
+    canvas: HTMLCanvasElement,
+    options: {
+      width: number;
+      height: number;
+      pixelRatio: number;
+      textureRatio: number;
+    }
+  ) => ButterchurnVisualizerInstance;
+}
+
+interface ButterchurnPresetsModule {
+  getPresets: () => Record<string, ButterchurnPreset>;
+}
+
+interface VisualizerSettingsRow {
+  visualizer_enabled?: boolean | null;
+  visualizer_preset_names?: string[] | null;
+  visualizer_rotation_seconds?: number | null;
+  visualizer_blend_seconds?: number | null;
+  visualizer_pixel_ratio_mobile?: number | null;
+  visualizer_pixel_ratio_desktop?: number | null;
+  visualizer_overlay_strength?: number | null;
+}
+
+const DEFAULT_VISUALIZER_SETTINGS: VisualizerSettings = {
+  enabled: true,
+  presetNames: CURATED_PRESET_NAMES,
+  rotationSeconds: 10,
+  blendSeconds: 2,
+  pixelRatioMobile: 0.75,
+  pixelRatioDesktop: 1,
+  overlayStrength: 1,
+};
+
+const applyVisualizerSettings = (settings: Partial<VisualizerSettings>): VisualizerSettings => ({
+  enabled: settings.enabled ?? DEFAULT_VISUALIZER_SETTINGS.enabled,
+  presetNames: settings.presetNames?.length ? settings.presetNames : DEFAULT_VISUALIZER_SETTINGS.presetNames,
+  rotationSeconds: Math.max(1, Number(settings.rotationSeconds ?? DEFAULT_VISUALIZER_SETTINGS.rotationSeconds)),
+  blendSeconds: Math.max(0, Number(settings.blendSeconds ?? DEFAULT_VISUALIZER_SETTINGS.blendSeconds)),
+  pixelRatioMobile: Math.max(0.25, Number(settings.pixelRatioMobile ?? DEFAULT_VISUALIZER_SETTINGS.pixelRatioMobile)),
+  pixelRatioDesktop: Math.max(0.25, Number(settings.pixelRatioDesktop ?? DEFAULT_VISUALIZER_SETTINGS.pixelRatioDesktop)),
+  overlayStrength: Math.max(0, Number(settings.overlayStrength ?? DEFAULT_VISUALIZER_SETTINGS.overlayStrength)),
+});
+
+const normalizeSettingsPayload = (data: VisualizerSettingsRow | null): VisualizerSettings => applyVisualizerSettings({
+  enabled: data?.visualizer_enabled ?? undefined,
+  presetNames: Array.isArray(data?.visualizer_preset_names) ? data.visualizer_preset_names.filter(Boolean) : undefined,
+  rotationSeconds: data?.visualizer_rotation_seconds ?? undefined,
+  blendSeconds: data?.visualizer_blend_seconds ?? undefined,
+  pixelRatioMobile: data?.visualizer_pixel_ratio_mobile ?? undefined,
+  pixelRatioDesktop: data?.visualizer_pixel_ratio_desktop ?? undefined,
+  overlayStrength: data?.visualizer_overlay_strength ?? undefined,
+});
+
 export default function LiveVisualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const radioAudioNode = useAudioStore((state) => state.radioAudioNode);
@@ -31,13 +108,54 @@ export default function LiveVisualizer() {
   const currentlyPlayingId = useAudioStore((state) => state.currentlyPlayingId);
   const analyserFromStore = useAudioStore((state) => state.analyser);
 
-  const visualizerRef = useRef<any>(null);
+  const visualizerRef = useRef<ButterchurnVisualizerInstance | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const presetIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const initRef = useRef(false);
+  const [settings, setSettings] = useState<VisualizerSettings>(DEFAULT_VISUALIZER_SETTINGS);
 
   useEffect(() => {
+    const loadSettings = async () => {
+      const { data, error } = await supabase
+        .from('system_settings')
+        .select('visualizer_enabled, visualizer_preset_names, visualizer_rotation_seconds, visualizer_blend_seconds, visualizer_pixel_ratio_mobile, visualizer_pixel_ratio_desktop, visualizer_overlay_strength')
+        .eq('id', 1)
+        .single();
+
+      if (error) {
+        console.warn('Visualizer settings unavailable, using defaults:', error.message);
+        return;
+      }
+
+      setSettings(normalizeSettingsPayload(data as VisualizerSettingsRow | null));
+    };
+
+    loadSettings();
+
+    const channel = supabase
+      .channel('live-visualizer-settings')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'system_settings',
+          filter: 'id=eq.1',
+        },
+        (payload) => {
+          setSettings(normalizeSettingsPayload(payload.new as VisualizerSettingsRow));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!settings.enabled) return;
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -45,7 +163,7 @@ export default function LiveVisualizer() {
     const ctx = isRadio ? radioAudioNode?.context : Howler.ctx;
 
     if (ctx && ctx.state === 'suspended' && 'resume' in ctx) {
-      (ctx as any).resume().catch(() => { });
+      (ctx as AudioContext).resume().catch(() => { });
     }
 
     const resizeCanvas = () => {
@@ -66,9 +184,9 @@ export default function LiveVisualizer() {
       resizeObserver.observe(canvas.parentElement);
     }
 
-    let visualizer: any;
-    let butterchurn: any;
-    let butterchurnPresets: any;
+    let visualizer: ButterchurnVisualizerInstance;
+    let butterchurn: ButterchurnModule;
+    let butterchurnPresets: ButterchurnPresetsModule;
 
     const init = async () => {
       try {
@@ -81,13 +199,13 @@ export default function LiveVisualizer() {
         if (initRef.current) return;
 
         const pixelRatio =
-          window.innerWidth < 768 ? 0.75 : window.devicePixelRatio || 1;
+          window.innerWidth < 768 ? settings.pixelRatioMobile : settings.pixelRatioDesktop;
 
         // Force a resize right before creation to match parent bounds
         resizeCanvas();
 
-        butterchurn = (await import('butterchurn')).default;
-        butterchurnPresets = (await import('butterchurn-presets')).default;
+        butterchurn = (await import('butterchurn')).default as ButterchurnModule;
+        butterchurnPresets = (await import('butterchurn-presets')).default as ButterchurnPresetsModule;
 
         visualizer = butterchurn.createVisualizer(ctx, canvas, {
           width: canvas.width,
@@ -115,10 +233,10 @@ export default function LiveVisualizer() {
         // -------------------------
         // PRESETS
         // -------------------------
-        let curatedPresets: any[] = [];
+        const curatedPresets: ButterchurnPreset[] = [];
         const allPresets = butterchurnPresets.getPresets();
 
-        CURATED_PRESET_NAMES.forEach((name) => {
+        settings.presetNames.forEach((name) => {
           if (allPresets[name]) curatedPresets.push(allPresets[name]);
         });
 
@@ -147,11 +265,11 @@ export default function LiveVisualizer() {
 
           visualizer.loadPreset(
             curatedPresets[currentPresetIdx],
-            2.0
+            settings.blendSeconds
           );
         };
 
-        presetIntervalRef.current = setInterval(rotatePreset, 10000);
+        presetIntervalRef.current = setInterval(rotatePreset, settings.rotationSeconds * 1000);
 
         const renderLoop = () => {
           if (!document.hidden && visualizerRef.current && isPlaying && currentlyPlayingId) {
@@ -187,7 +305,22 @@ export default function LiveVisualizer() {
       visualizerRef.current?.dispose?.();
       initRef.current = false;
     };
-  }, [radioAudioNode, currentlyPlayingId, isPlaying, analyserFromStore]);
+  }, [
+    radioAudioNode,
+    currentlyPlayingId,
+    isPlaying,
+    analyserFromStore,
+    settings.enabled,
+    settings.presetNames,
+    settings.rotationSeconds,
+    settings.blendSeconds,
+    settings.pixelRatioMobile,
+    settings.pixelRatioDesktop,
+  ]);
+
+  if (!settings.enabled) return null;
+
+  const overlayStrength = settings.overlayStrength;
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0 flex items-center justify-center">
@@ -199,19 +332,28 @@ export default function LiveVisualizer() {
       {/* Edge darkening layer */}
       <div 
         className="absolute inset-0 pointer-events-none" 
-        style={{ zIndex: 5, boxShadow: 'inset 0 0 160px 15px rgba(10,10,8,0.95), inset 0 0 60px 0px rgba(10,10,8,0.6)' }}
+        style={{
+          zIndex: 5,
+          boxShadow: `inset 0 0 160px 15px rgba(10,10,8,${Math.min(1, 0.95 * overlayStrength)}), inset 0 0 60px 0px rgba(10,10,8,${Math.min(1, 0.6 * overlayStrength)})`
+        }}
       />
 
       {/* Top/bottom gradient layer */}
       <div 
         className="absolute inset-0 pointer-events-none" 
-        style={{ zIndex: 6, background: 'linear-gradient(to bottom, rgba(10,10,8,0.55) 0%, transparent 25%, transparent 75%, rgba(10,10,8,0.65) 100%)' }}
+        style={{
+          zIndex: 6,
+          background: `linear-gradient(to bottom, rgba(10,10,8,${Math.min(1, 0.55 * overlayStrength)}) 0%, transparent 25%, transparent 75%, rgba(10,10,8,${Math.min(1, 0.65 * overlayStrength)}) 100%)`
+        }}
       />
 
       {/* Left/right gradient layer */}
       <div 
         className="absolute inset-0 pointer-events-none" 
-        style={{ zIndex: 7, background: 'linear-gradient(to right, rgba(10,10,8,0.45) 0%, transparent 20%, transparent 80%, rgba(10,10,8,0.45) 100%)' }}
+        style={{
+          zIndex: 7,
+          background: `linear-gradient(to right, rgba(10,10,8,${Math.min(1, 0.45 * overlayStrength)}) 0%, transparent 20%, transparent 80%, rgba(10,10,8,${Math.min(1, 0.45 * overlayStrength)}) 100%)`
+        }}
       />
 
       {/* Static border-cracks glass overlay */}

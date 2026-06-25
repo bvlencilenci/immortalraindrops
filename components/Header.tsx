@@ -214,12 +214,14 @@ const Header = () => {
     <>
       {/* --- MOBILE HEADER (< lg) --- */}
       <nav
-        className="fixed top-0 left-0 right-0 z-[100] lg:hidden relative flex h-20 items-center justify-between overflow-hidden whitespace-nowrap header-grain bg-black/20 backdrop-blur-[3px] border-b border-white/10 px-3"
+        className="fixed top-0 left-0 right-0 z-[100] lg:hidden relative flex h-[calc(5rem+env(safe-area-inset-top))] items-center justify-between overflow-hidden whitespace-nowrap header-grain bg-transparent border-b border-white/10 px-3 pt-[env(safe-area-inset-top)]"
       >
         <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.38), rgba(0,0,0,0.16), rgba(0,0,0,0.28))',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.54) 0%, rgba(0,0,0,0.28) 58%, rgba(0,0,0,0.04) 100%)',
           }}
         />
         <div
@@ -250,12 +252,12 @@ const Header = () => {
             }
           }}
           isRadioStream
-          className="relative z-10 shrink-0 bg-black/15 border border-white/5 backdrop-blur-[3px] px-2 py-2 rounded-none"
+          className="relative z-10 shrink-0 bg-transparent border border-white/[0.035] px-2 py-2 rounded-none"
         />
 
         <Link
           href="/live"
-          className="relative z-10 flex items-center gap-1.5 bg-black/10 border border-white/5 backdrop-blur-[3px] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]"
+          className="relative z-10 flex items-center gap-1.5 bg-transparent border border-white/[0.035] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]"
         >
           {(isLive || broadcastMode === 'automated') && (
             <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
@@ -265,7 +267,7 @@ const Header = () => {
 
         <Link
           href="/"
-          className="relative z-10 shrink-0 flex h-16 items-center justify-center bg-black/10 border-x border-white/10 backdrop-blur-[3px] px-4 rounded-none"
+          className="relative z-10 shrink-0 flex h-16 items-center justify-center bg-black/[0.04] backdrop-blur-[3px] px-4 rounded-none"
         >
           <img
             src="/logo.png"
@@ -279,7 +281,7 @@ const Header = () => {
 
         <Link
           href="/archive"
-          className="relative z-10 bg-black/10 border border-white/5 backdrop-blur-[3px] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]/80"
+          className="relative z-10 bg-transparent border border-white/[0.035] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]/80"
         >
           ARCHIVE
         </Link>
@@ -287,17 +289,15 @@ const Header = () => {
 
       {/* --- DESKTOP HEADER (Visible >= lg) --- */}
       <header
-        className="hidden lg:flex fixed top-0 left-0 right-0 z-[100] w-full h-20 min-h-[76px] px-6 py-4 transition-all duration-300 ease-in-out header-grain relative overflow-hidden bg-black/20 backdrop-blur-[3px] border-b border-white/10"
-        style={{
-          backdropFilter: 'blur(3px)',
-          WebkitBackdropFilter: 'blur(3px)',
-        }}
+        className="hidden lg:flex fixed top-0 left-0 right-0 z-[100] w-full h-20 min-h-[76px] px-6 py-4 transition-all duration-300 ease-in-out header-grain relative overflow-hidden bg-transparent border-b border-white/10"
       >
 
         <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.38), rgba(0,0,0,0.16), rgba(0,0,0,0.28))',
+            backdropFilter: 'blur(9px)',
+            WebkitBackdropFilter: 'blur(9px)',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.56) 0%, rgba(0,0,0,0.28) 58%, rgba(0,0,0,0.04) 100%)',
           }}
         />
         <div
@@ -319,7 +319,7 @@ const Header = () => {
         <div className="relative z-10 w-full h-full flex items-center justify-between">
 
           {/* BLOCK 1: Left - Station Identity */}
-          <div className="relative z-10 flex items-center justify-start shrink-0 gap-4 group/left bg-black/20 border border-white/5 backdrop-blur-[3px] px-3 h-12 rounded-none shadow-none">
+          <div className="relative z-10 flex items-center justify-start shrink-0 gap-4 group/left bg-transparent px-3 h-12 rounded-none shadow-none">
             {/* Playback Controls (now on Left) */}
             <PlaybackControls
               isPlaying={isPlaying}
@@ -394,14 +394,14 @@ const Header = () => {
           </div>
 
           {/* BLOCK 3: Right - Volume Controls */}
-          <div className="relative z-10 flex flex-row items-center justify-end gap-6 h-12 bg-black/20 border border-white/5 backdrop-blur-[3px] px-3 rounded-none shadow-none">
+          <div className="relative z-10 flex flex-row items-center justify-end gap-6 h-12 bg-transparent px-3 rounded-none shadow-none">
 
 
              {/* SUBMIT BUTTON (Desktop) */}
-            <div className="relative self-center flex items-center">
+            <div className="relative self-center flex h-9 items-center">
               <Link
                 href="/submit"
-                className="hidden md:flex items-center justify-center font-playfair text-sm text-lime-300 tracking-[0.1em] hover:text-white transition-colors uppercase whitespace-nowrap self-center"
+                className="hidden md:flex h-full items-center justify-center font-playfair text-[20px] leading-none text-lime-300 tracking-[0.14em] hover:text-white transition-colors uppercase whitespace-nowrap"
               >
                 SUBMIT
               </Link>
@@ -424,7 +424,7 @@ const Header = () => {
         {/* BLOCK 2: Center - Logo (Absolute Center Pivot) */}
         <Link
           href="/"
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 shrink-0 flex h-[64px] items-center justify-center bg-black/10 border-x border-white/10 backdrop-blur-[3px] px-6 rounded-none shadow-none"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 shrink-0 flex h-[64px] items-center justify-center bg-black/[0.04] backdrop-blur-[3px] px-6 rounded-none shadow-none"
         >
           <img
             src="/logo.png"

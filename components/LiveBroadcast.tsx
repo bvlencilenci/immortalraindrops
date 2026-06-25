@@ -324,7 +324,7 @@ export default function LiveBroadcast({
             }}
           >
 
-            <div className="text-[10px] font-semibold tracking-[0.34em] text-[#7dffb2]/78 mb-8 pb-4 border-b border-white/[0.07]">
+            <div className="text-[13px] font-bold tracking-[0.32em] text-[#7dffb2]/88 mb-5 pb-4 border-b border-white/[0.08]">
               HISTORY ARCHIVE
             </div>
 
@@ -334,7 +334,7 @@ export default function LiveBroadcast({
                 <div
                   key={`${normalizeTrackKey(t)}-${i}`}
                   className="relative flex gap-3.5 leading-tight py-4 border-b border-white/[0.04] last:border-b-0"
-                  style={{ opacity: Math.max(0.5, 1 - i * 0.06) }}
+                  style={{ opacity: Math.max(0.56, 0.92 - i * 0.045) }}
                 >
 
                   <div className="w-5 pt-[3px] text-[10px] font-mono text-[#f5ff63]/46 tracking-wider shrink-0 tabular-nums">
@@ -365,10 +365,10 @@ export default function LiveBroadcast({
         {/* ================= CENTER ================= */}
         <div className="flex-1 flex items-stretch justify-center px-4 pt-24 pb-5 lg:items-end lg:justify-start lg:p-10">
 
-          <div className="w-full h-[440px] p-7 bg-black/40 backdrop-blur-md border border-white/10 flex flex-col justify-center lg:w-[560px] lg:h-[255px] lg:p-8">
+          <div className="w-full h-[340px] p-7 bg-black/40 backdrop-blur-md border border-white/10 flex flex-col justify-center lg:w-[560px] lg:h-[255px] lg:p-8">
 
             <div className="text-[13px] lg:text-[14px] tracking-[0.36em] lg:tracking-[0.4em] text-lime-300">
-              LIVE SIGNAL
+              Now playing: Curated Playlist
             </div>
 
             <div className="text-[clamp(2.7rem,14vw,5rem)] lg:text-5xl font-bold mt-4 lg:mt-3 leading-[0.92] lg:leading-[0.95] line-clamp-4 lg:line-clamp-2 overflow-hidden">
@@ -476,7 +476,7 @@ export default function LiveBroadcast({
             }}
           >
 
-            <div className="text-[10px] font-semibold tracking-[0.34em] text-cyan-100/68 mb-8 pb-4 border-b border-white/[0.07]">
+            <div className="text-[13px] font-bold tracking-[0.32em] text-[#7dffb2]/78 mb-5 pb-4 border-b border-white/[0.08]">
               NEWS SIGNAL
             </div>
 
