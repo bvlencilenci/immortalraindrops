@@ -86,7 +86,7 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact, variant = 'de
           }}
         />
 
-        <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="relative z-10 flex flex-col gap-3">
           <div className="max-w-3xl">
             <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.38em] text-lime-300">
               ARCHIVE / IMMORTAL RAINDROPS
@@ -97,10 +97,6 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact, variant = 'de
             <p className="mt-2 max-w-xl text-[12px] leading-relaxed text-[#ECEEDF]/62 md:text-sm">
               Whatever we&apos;ve been making recently and don&apos;t cringe sharing
             </p>
-          </div>
-
-          <div className="border border-white/10 bg-black/25 px-3 py-2 text-left backdrop-blur-[3px] md:text-right">
-            <div className="mt-1 text-3xl font-bold leading-none text-lime-300">{tracks.length}</div>
           </div>
         </div>
       </section>

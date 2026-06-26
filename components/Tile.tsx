@@ -52,8 +52,13 @@ const Tile = (props: TileProps) => {
   const extImage = image_ext || 'jpg';
 
   // Strict R2 Routing (User Requested)
-  const audioUrl = `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
-  let imageUrl = `${r2BaseUrl}/${tile_id}/visual.${extImage}`;
+  const isSubmissionTile = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(tile_id);
+  const audioUrl = isSubmissionTile
+    ? `${r2BaseUrl}/submissions/${tile_id}/audio.${extAudio}`
+    : `${r2BaseUrl}/${tile_id}/audio.${extAudio}`;
+  let imageUrl = isSubmissionTile
+    ? `${r2BaseUrl}/submissions/${tile_id}/image.${extImage}`
+    : `${r2BaseUrl}/${tile_id}/visual.${extImage}`;
 
   const isVideo = media_type === 'video';
 

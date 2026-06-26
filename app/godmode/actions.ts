@@ -27,6 +27,23 @@ const s3 = new S3Client({
   responseChecksumValidation: 'WHEN_REQUIRED',
 });
 
+async function getNextTrackTileIndex() {
+  const { data, error } = await supabaseAdmin
+    .from('tracks')
+    .select('tile_index')
+    .order('tile_index', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return typeof data?.tile_index === 'number' ? data.tile_index + 1 : 1;
+}
+
+function normalizeTrackMediaType(value?: string | null): 'song' | 'dj set' | 'video' | 'image' {
+  if (value === 'dj set' || value === 'video' || value === 'image') return value;
+  return 'song';
+}
+
 // Helper: Verify Admin Role
 async function verifyAdmin() {
   const cookieStore = await cookies();
@@ -402,21 +419,50 @@ export async function approveToArchive(submissionId: string) {
       ? sub.image_url.split('.').pop()?.toLowerCase() || null
       : null;
 
-    // 3. Use the submission's own id as the tile_id (stable unique identifier)
-    const { data: inserted, error: insertErr } = await supabaseAdmin
+    const trackPayload = {
+      title: sub.title,
+      artist: sub.artist_name || 'UNKNOWN ARTIST',
+      genre: sub.genre || null,
+      media_type: normalizeTrackMediaType(sub.media_type),
+      audio_ext: audioExt || 'mp3',
+      image_ext: imageExt || 'jpg',
+      release_date: new Date().toISOString().slice(0, 10),
+    };
+
+    const { data: existingTrack, error: existingErr } = await supabaseAdmin
       .from('tracks')
-      .insert([{
-        title: sub.title,
-        artist: sub.artist_name || null,
-        genre: sub.genre || null,
-        media_type: sub.media_type || 'song',
-        tile_id: sub.id,          // reuse submission UUID as tile reference
-        audio_ext: audioExt,
-        image_ext: imageExt,
-      }])
-      .select()
-      .single();
-    if (insertErr) throw insertErr;
+      .select('id')
+      .eq('tile_id', sub.id)
+      .maybeSingle();
+
+    if (existingErr) throw existingErr;
+
+    let trackId = existingTrack?.id;
+
+    if (existingTrack) {
+      const { error: updateErr } = await supabaseAdmin
+        .from('tracks')
+        .update(trackPayload)
+        .eq('id', existingTrack.id);
+
+      if (updateErr) throw updateErr;
+    } else {
+      const tileIndex = await getNextTrackTileIndex();
+
+      // 3. Use the submission's own id as the tile_id (stable unique identifier)
+      const { data: inserted, error: insertErr } = await supabaseAdmin
+        .from('tracks')
+        .insert([{
+          ...trackPayload,
+          tile_id: sub.id,
+          tile_index: tileIndex,
+        }])
+        .select('id')
+        .single();
+
+      if (insertErr) throw insertErr;
+      trackId = inserted?.id;
+    }
 
     // 4. Mark submission as approved
     await supabaseAdmin
@@ -425,7 +471,7 @@ export async function approveToArchive(submissionId: string) {
       .eq('id', submissionId);
 
     revalidatePath('/godmode');
-    return { success: true, trackId: inserted?.id };
+    return { success: true, trackId };
   } catch (err: any) {
     return { success: false, error: err.message };
   }
@@ -653,5 +699,3 @@ export async function updateBroadcastSettings(settings: {
     return { success: false, error: err.message };
   }
 }
-
-

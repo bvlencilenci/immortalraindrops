@@ -10,13 +10,19 @@ import NewsManager from '@/components/admin/NewsManager';
 import BroadcastControls from '@/components/admin/BroadcastControls';
 import ArchiveManager from '@/components/admin/ArchiveManager';
 
+type GodmodeTab = 'submissions' | 'archive' | 'news' | 'users' | 'system' | 'broadcast';
+type GodmodeTabConfig = {
+  id: GodmodeTab | 'playlist';
+  label: string;
+  href?: string;
+};
+
 export default function GodModePage() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState<'submissions' | 'archive' | 'news' | 'users' | 'system' | 'broadcast'>('submissions');
+  const [activeTab, setActiveTab] = useState<GodmodeTab>('submissions');
 
   const [needsLogin, setNeedsLogin] = useState(false);
   const [login, setLogin] = useState('');
@@ -40,7 +46,6 @@ export default function GodModePage() {
         .single();
 
       if (profile?.is_godmode) {
-        setIsAuthenticated(true);
         setNeedsLogin(false);
         setLoading(false);
       } else {
@@ -61,7 +66,7 @@ export default function GodModePage() {
 
     // If it's not an email, lookup by username
     if (!login.includes('@')) {
-      const { data, error: lookupError } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('email')
         .eq('username', login)
@@ -87,7 +92,7 @@ export default function GodModePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center p-4">
+      <main className="fixed inset-0 z-[80] flex h-dvh min-h-dvh items-center justify-center overflow-y-auto bg-black p-4">
         <div className="text-[#ECEEDF] font-mono animate-pulse tracking-widest uppercase text-xs">
           SYSTEM_CHECK...
         </div>
@@ -97,7 +102,7 @@ export default function GodModePage() {
 
   if (needsLogin) {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center p-4 font-mono">
+      <main className="fixed inset-0 z-[80] flex h-dvh min-h-dvh items-center justify-center overflow-y-auto bg-black p-4 font-mono">
         <form onSubmit={handleLogin} className="w-full max-w-sm flex flex-col gap-6 p-8 border border-[#ECEEDF]/20 bg-black/50 backdrop-blur-md">
           <div className="text-center text-[#ECEEDF] tracking-[0.2em] uppercase text-xl font-bold mb-4">
             SYSTEM_LOGIN
@@ -137,7 +142,7 @@ export default function GodModePage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center p-4">
+      <main className="fixed inset-0 z-[80] flex h-dvh min-h-dvh items-center justify-center overflow-y-auto bg-black p-4">
         <div className="text-red-500 font-mono tracking-widest uppercase text-xs border border-red-900/50 p-4 bg-red-900/10">
           {error}
         </div>
@@ -145,7 +150,7 @@ export default function GodModePage() {
     );
   }
 
-  const tabs = [
+  const tabs: GodmodeTabConfig[] = [
     { id: 'submissions', label: 'SUBMISSIONS' },
     { id: 'archive', label: 'ARCHIVE' },
     { id: 'news', label: 'NEWS' },
@@ -156,7 +161,7 @@ export default function GodModePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-black flex flex-col pt-32 px-4 md:px-12 pb-12 overflow-x-hidden">
+    <main className="fixed inset-0 z-[80] flex h-dvh min-h-dvh flex-col overflow-y-auto overflow-x-hidden bg-black px-4 pb-12 pt-32 md:px-12">
 
       {/* Admin Header */}
       <div className="flex flex-col gap-6 mb-8 md:gap-8 md:mb-12">
@@ -176,7 +181,7 @@ export default function GodModePage() {
                   if ('href' in tab && tab.href) {
                     router.push(tab.href);
                   } else {
-                    setActiveTab(tab.id as any);
+                    setActiveTab(tab.id as GodmodeTab);
                   }
                 }}
                 className={`font-mono text-[10px] uppercase tracking-[0.3em] px-4 py-3 md:px-6 md:py-3 transition-all border whitespace-nowrap ${activeTab === tab.id
