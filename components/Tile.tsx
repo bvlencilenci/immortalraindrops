@@ -13,6 +13,7 @@ interface TileProps extends Track {
   onEdit?: () => void;
   compact?: boolean;
   archiveVariant?: boolean;
+  archiveDisplayIndex?: number;
 }
 
 const Tile = (props: TileProps) => {
@@ -33,7 +34,8 @@ const Tile = (props: TileProps) => {
     release_date,
     duration,
     compact,
-    archiveVariant
+    archiveVariant,
+    archiveDisplayIndex
   } = props;
 
   const {
@@ -354,14 +356,14 @@ const Tile = (props: TileProps) => {
   }, []);
 
   if (archiveVariant) {
-    const displayIndex = ((tile_index || 0) + 1).toString().padStart(2, '0');
+    const displayIndex = String(archiveDisplayIndex ?? tile_index ?? 0).padStart(2, '0');
     const displayYear = release_date ? new Date(release_date).getFullYear() : null;
 
     return (
       <div
         ref={tileRef}
         onClick={handleInteraction}
-        className={`group relative grid w-full cursor-pointer select-none grid-cols-[44px_1fr_72px] items-center border-b border-white/[0.07] px-3 py-3 transition-colors duration-100 md:grid-cols-[64px_82px_1fr_240px_86px] md:px-4 md:py-3.5 ${
+        className={`group relative grid w-full cursor-pointer select-none grid-cols-[44px_1fr_72px] items-center border-b border-white/[0.07] px-3 py-3 transition-colors duration-100 md:grid-cols-[64px_82px_1fr_92px_92px_86px] md:px-4 md:py-3.5 ${
           isActive ? 'bg-lime-300/[0.08]' : 'bg-black/[0.12] hover:bg-white/[0.04]'
         }`}
       >
@@ -409,16 +411,17 @@ const Tile = (props: TileProps) => {
             {artist || 'UNKNOWN ARTIST'}
           </div>
           <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[9px] uppercase tracking-[0.18em] text-[#ECEEDF]/38 md:hidden">
-            {genre && <span>{genre}</span>}
-            {displayYear && <span>{displayYear}</span>}
-            {duration && <span>{duration}</span>}
+            <span>{displayYear || '----'}</span>
+            <span>{duration || '--:--'}</span>
           </div>
         </div>
 
-        <div className="relative z-10 hidden items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-[#ECEEDF]/42 md:flex">
-          {genre && <span className="border border-white/10 bg-black/20 px-2 py-1">{genre}</span>}
-          {displayYear && <span>{displayYear}</span>}
-          {duration && <span>{duration}</span>}
+        <div className="relative z-10 hidden text-[10px] uppercase tracking-[0.18em] text-[#ECEEDF]/42 md:block">
+          {displayYear || '----'}
+        </div>
+
+        <div className="relative z-10 hidden text-[10px] uppercase tracking-[0.18em] text-[#ECEEDF]/42 md:block">
+          {duration || '--:--'}
         </div>
 
         <div className="relative z-10 flex items-center justify-end gap-2">
@@ -430,7 +433,7 @@ const Tile = (props: TileProps) => {
         </div>
 
         {isAdmin && (
-          <div className="relative z-20 col-span-3 mt-3 flex gap-2 border-t border-white/[0.06] pt-3 md:col-span-5">
+          <div className="relative z-20 col-span-3 mt-3 flex gap-2 border-t border-white/[0.06] pt-3 md:col-span-6">
             <button
               onClick={(e) => {
                 e.stopPropagation();

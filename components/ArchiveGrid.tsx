@@ -17,28 +17,21 @@ interface ArchiveGridProps {
 const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact, variant = 'default' }: ArchiveGridProps) => {
   const setPlaylist = useAudioStore((state) => state.setPlaylist);
   const [query, setQuery] = useState('');
-  const [genre, setGenre] = useState('ALL');
 
   useEffect(() => {
     setPlaylist(tracks);
   }, [tracks, setPlaylist]);
 
-  const genres = useMemo(
-    () => Array.from(new Set(tracks.map((track) => track.genre).filter(Boolean))).sort(),
-    [tracks]
-  );
-
   const filteredTracks = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return tracks.filter((track) => {
-      const matchesGenre = genre === 'ALL' || track.genre === genre;
-      const haystack = `${track.title || ''} ${track.artist || ''} ${track.genre || ''}`.toLowerCase();
+      const haystack = `${track.title || ''} ${track.artist || ''}`.toLowerCase();
       const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
 
-      return matchesGenre && matchesQuery;
+      return matchesQuery;
     });
-  }, [tracks, query, genre]);
+  }, [tracks, query]);
 
   if (variant !== 'archive') {
     return (
@@ -102,10 +95,10 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact, variant = 'de
       </section>
 
       <section className="shrink-0 border border-white/10 bg-black/25 p-2.5 backdrop-blur-md md:p-3">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_240px]">
+        <div className="grid grid-cols-1 gap-3">
           <div className="flex flex-col gap-2">
             <label className="text-[9px] uppercase tracking-[0.28em] text-[#ECEEDF]/45">
-              SEARCH TITLE / ARTIST / GENRE
+              SEARCH TITLE / ARTIST
             </label>
             <input
               value={query}
@@ -114,43 +107,26 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact, variant = 'de
               className="w-full border border-white/10 bg-black/35 px-3 py-2 text-[12px] uppercase tracking-[0.12em] text-[#ECEEDF] outline-none backdrop-blur-[2px] placeholder:text-[#ECEEDF]/25 focus:border-lime-300/50"
             />
           </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-[9px] uppercase tracking-[0.28em] text-[#ECEEDF]/45">
-              GENRE FILTER
-            </label>
-            <select
-              value={genre}
-              onChange={(event) => setGenre(event.target.value)}
-              className="w-full border border-white/10 bg-black/35 px-3 py-2 text-[12px] uppercase tracking-[0.12em] text-[#ECEEDF] outline-none backdrop-blur-[2px] focus:border-lime-300/50"
-            >
-              <option value="ALL">ALL GENRES</option>
-              {genres.map((item) => (
-                <option key={item || 'UNKNOWN'} value={item || ''}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <div className="mt-3 flex items-center justify-between border-t border-white/[0.07] pt-2 text-[10px] uppercase tracking-[0.22em] text-[#ECEEDF]/45">
           <span>{filteredTracks.length} TRACKS AVAILABLE</span>
-          <span>{genre === 'ALL' ? 'UNFILTERED' : genre}</span>
+          <span>{query ? 'FILTERED' : 'UNFILTERED'}</span>
         </div>
       </section>
 
       <section className="flex h-[330px] flex-none flex-col overflow-hidden border border-white/10 bg-black/20 backdrop-blur-md md:h-[320px]">
-        <div className="grid shrink-0 grid-cols-[44px_1fr_72px] border-b border-white/10 px-3 py-2 text-[9px] uppercase tracking-[0.24em] text-[#ECEEDF]/35 md:grid-cols-[64px_82px_1fr_240px_86px] md:px-4">
+        <div className="grid shrink-0 grid-cols-[44px_1fr_72px] border-b border-white/10 px-3 py-2 text-[9px] uppercase tracking-[0.24em] text-[#ECEEDF]/35 md:grid-cols-[64px_82px_1fr_92px_92px_86px] md:px-4">
           <span>No.</span>
           <span className="hidden md:block">Visual</span>
           <span>Track</span>
-          <span className="hidden md:block">Metadata</span>
+          <span className="hidden md:block">Year</span>
+          <span className="hidden md:block">Length</span>
           <span className="text-right">Play</span>
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          {filteredTracks.map((track) => (
+          {filteredTracks.map((track, index) => (
             <Tile
               key={track.id}
               id={track.id}
@@ -170,6 +146,7 @@ const ArchiveGrid = ({ tracks, isAdmin, onDelete, onEdit, compact, variant = 'de
               created_at={track.created_at || new Date().toISOString()}
               compact={compact}
               archiveVariant
+              archiveDisplayIndex={index + 1}
             />
           ))}
         </div>

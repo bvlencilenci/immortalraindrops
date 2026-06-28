@@ -410,6 +410,7 @@ export async function approveToArchive(submissionId: string) {
       .eq('id', submissionId)
       .single();
     if (fetchErr || !sub) throw new Error(fetchErr?.message || 'Submission not found');
+    if (!sub.audio_url) throw new Error('Submission has no audio file and cannot be added to the audio archive.');
 
     // 2. Extract file extensions from R2 paths (e.g. "audio/uuid.mp3" → "mp3")
     const audioExt = sub.audio_url

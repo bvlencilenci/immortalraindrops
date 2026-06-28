@@ -9,6 +9,23 @@ import { User } from '@supabase/supabase-js';
 import { PlaybackControls } from './ui/PlaybackControls';
 import { VolumeController } from './ui/VolumeController';
 
+type PlaybackHistoryItem = {
+  artist?: string | null;
+  title?: string | null;
+};
+
+type HeaderSystemSettings = {
+  is_live: boolean | null;
+  stream_title: string | null;
+  broadcast_mode?: string | null;
+  site_title?: string | null;
+  playback_history?: PlaybackHistoryItem[] | null;
+};
+
+const getHeaderStreamTitle = (settings: HeaderSystemSettings) => {
+  return settings.stream_title || 'OFFLINE';
+};
+
 const Header = () => {
   const {
     trackTitle,
@@ -56,6 +73,7 @@ const Header = () => {
 
   const pathname = usePathname();
   const prevVolumeRef = useRef(1.0);
+  const wasLiveRef = useRef(false);
 
   // Auth State
   const [user, setUser] = useState<User | null>(null);
@@ -99,40 +117,43 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    // 1. Initial Fetch of Live State & System Settings
+    const applySettings = (settings: HeaderSystemSettings) => {
+      const nextIsLive = !!settings.is_live;
+      const nextStreamTitle = getHeaderStreamTitle(settings);
+
+      const audioState = useAudioStore.getState();
+      if (!audioState.currentlyPlayingId || audioState.currentlyPlayingId === 'radio-stream') {
+        audioState.setLiveState(nextIsLive, nextStreamTitle);
+      } else {
+        useAudioStore.setState({ streamTitle: nextStreamTitle });
+      }
+      wasLiveRef.current = nextIsLive;
+
+      if (settings.broadcast_mode) {
+        setBroadcastMode(settings.broadcast_mode as 'automated' | 'live');
+      }
+
+      if (settings.site_title) {
+        setSiteTitle(settings.site_title);
+      }
+    };
+
     const fetchSettings = async () => {
-      const { supabase } = await import('../lib/supabase');
-      // Live State
-      const { data: liveData } = await supabase
+      const { data } = await supabase
         .from('system_settings')
-        .select('is_live, stream_title, broadcast_mode')
+        .select('is_live, stream_title, playback_history, broadcast_mode, site_title')
         .eq('id', 1)
         .single();
 
-      if (liveData) {
-        useAudioStore.getState().setLiveState(liveData.is_live, liveData.stream_title);
-        setBroadcastMode((liveData.broadcast_mode || 'automated') as 'automated' | 'live');
-      }
-
-      // System Settings (Title)
-      const { data: systemData } = await supabase
-        .from('system_settings')
-        .select('site_title')
-        .eq('id', 1)
-        .single();
-
-      if (systemData?.site_title) {
-        setSiteTitle(systemData.site_title);
-      }
+      if (data) applySettings(data as HeaderSystemSettings);
     };
 
     fetchSettings();
 
     // 2. Realtime Listener
     const setupListener = async () => {
-      const { supabase } = await import('../lib/supabase');
       const channel = supabase
-        .channel('site_settings_changes')
+        .channel('header_system_settings_changes')
         .on(
           'postgres_changes',
           {
@@ -142,16 +163,14 @@ const Header = () => {
             filter: 'id=eq.1'
           },
           (payload) => {
-            const newData = payload.new as { is_live: boolean; stream_title: string; broadcast_mode?: string };
-            useAudioStore.getState().setLiveState(newData.is_live, newData.stream_title);
-            if (newData.broadcast_mode) {
-              setBroadcastMode(newData.broadcast_mode as 'automated' | 'live');
-            }
+            const newData = payload.new as HeaderSystemSettings;
+            const wasLive = wasLiveRef.current;
+            applySettings(newData);
 
             // Optional: If going live, pause any archive playback so user can switch? 
             // Or let them stay on archive until they click LIVE. 
             // User requested: "Store Sync: When is_live becomes true, trigger a 'pause' on the useAudioStore"
-            if (newData.is_live) {
+            if (!wasLive && newData.is_live) {
               useAudioStore.getState().howl?.pause();
               // Note: We don't force them to /live, but we pause archive so they notice.
             }
@@ -165,6 +184,7 @@ const Header = () => {
     };
 
     const cleanupPromise = setupListener();
+    const settingsPoll = window.setInterval(fetchSettings, 8000);
 
     // 3. Keep existing key handlers
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -186,6 +206,7 @@ const Header = () => {
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.clearInterval(settingsPoll);
       cleanupPromise.then(cleanup => cleanup());
     };
   }, [togglePlay, adjustVolume]);
