@@ -216,6 +216,10 @@ const Header = () => {
 
   const isPlayerActive = !!currentlyPlayingId;
   const progressPercent = (duration > 0) ? (seek / duration) * 100 : 0;
+  const mobileActionHref = pathname === '/archive' ? '/submit' : '/archive';
+  const mobileActionLabel = pathname === '/archive' ? 'SUBMIT' : 'ARCHIVE';
+  const mobileTitle = displayTitle || (isLive ? 'IMMORTAL RAINDROPS RADIO' : 'OFFLINE');
+  const mobileArtist = displayArtist || (isLive ? 'LIVE SIGNAL' : 'NO SIGNAL');
 
   const formatTime = (time: number) => {
     if (isNaN(time) || time === 0) return "--:--";
@@ -235,14 +239,14 @@ const Header = () => {
     <>
       {/* --- MOBILE HEADER (< lg) --- */}
       <nav
-        className="fixed top-0 left-0 right-0 z-[100] lg:hidden relative flex h-[calc(5rem+env(safe-area-inset-top))] items-center justify-between overflow-hidden whitespace-nowrap header-grain bg-transparent border-b border-white/10 px-3 pt-[env(safe-area-inset-top)]"
+        className="fixed left-0 right-0 top-0 z-[100] grid h-[calc(4.25rem+env(safe-area-inset-top))] grid-cols-[44px_minmax(0,1fr)_78px] items-center gap-3 overflow-hidden whitespace-nowrap border-b border-white/10 bg-transparent px-3 pt-[env(safe-area-inset-top)] header-grain lg:hidden"
       >
         <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.54) 0%, rgba(0,0,0,0.28) 58%, rgba(0,0,0,0.04) 100%)',
+            backdropFilter: 'blur(7px)',
+            WebkitBackdropFilter: 'blur(7px)',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.26) 62%, rgba(0,0,0,0.04) 100%)',
           }}
         />
         <div
@@ -259,52 +263,46 @@ const Header = () => {
             `,
           }}
         />
-        <PlaybackControls
-          isPlaying={isPlaying}
-          onPlayPause={(e) => {
-            e.stopPropagation();
-            if (!isPlayerActive) {
-              const streamUrl = process.env.NEXT_PUBLIC_RADIO_STREAM_URL || '';
-              if (streamUrl) {
-                playLiveStream(streamUrl);
-              }
-            } else {
-              togglePlay();
-            }
-          }}
-          isRadioStream
-          className="relative z-10 shrink-0 bg-transparent border border-white/[0.035] px-2 py-2 rounded-none"
-        />
-
-        <Link
-          href="/live"
-          className="relative z-10 flex items-center gap-1.5 bg-transparent border border-white/[0.035] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]"
-        >
-          {(isLive || broadcastMode === 'automated') && (
-            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-          )}
-          <span className={pathname === '/live' ? 'text-white' : 'text-[#ECEEDF]/80'}>LIVE</span>
-        </Link>
 
         <Link
           href="/"
-          className="relative z-10 shrink-0 flex h-16 items-center justify-center bg-black/[0.04] backdrop-blur-[3px] px-4 rounded-none"
+          className="relative z-10 flex h-11 min-w-0 shrink-0 items-center justify-start"
         >
           <img
             src="/logo.png"
             alt="Immortal Raindrops"
             width={52}
             height={52}
-            className="h-12 w-auto logo-breathe"
-            style={{ height: '54px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen', transform: 'translateY(-1px)' }}
+            className="h-10 w-auto logo-breathe"
+            style={{ height: '42px', width: 'auto', filter: 'invert(1)', mixBlendMode: 'screen' }}
           />
         </Link>
 
         <Link
-          href="/archive"
-          className="relative z-10 bg-transparent border border-white/[0.035] px-2.5 py-2 rounded-none font-playfair text-[12px] font-bold uppercase tracking-[0.12em] text-[#ECEEDF]/80"
+          href="/live"
+          className="relative z-10 flex min-w-0 flex-col justify-center overflow-hidden"
         >
-          ARCHIVE
+          <div className="flex min-w-0 items-center gap-2">
+            {(isLive || broadcastMode === 'automated') && (
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500 animate-pulse" />
+            )}
+            <span className="shrink-0 font-playfair text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-red-400">
+              LIVE
+            </span>
+            <span className="min-w-0 truncate font-playfair text-[13px] font-bold uppercase leading-tight tracking-[0.08em] text-[#ECEEDF]/92">
+              {mobileTitle}
+            </span>
+          </div>
+          <span className="mt-1 min-w-0 truncate font-playfair text-[11px] uppercase leading-tight tracking-[0.06em] text-lime-300/80">
+            {mobileArtist}
+          </span>
+        </Link>
+
+        <Link
+          href={mobileActionHref}
+          className="relative z-10 min-w-0 truncate text-right font-playfair text-[11px] font-bold uppercase tracking-[0.12em] text-lime-300/85"
+        >
+          {mobileActionLabel}
         </Link>
       </nav>
 

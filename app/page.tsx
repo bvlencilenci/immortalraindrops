@@ -256,7 +256,7 @@ export default async function Home() {
         `}
       </style>
 
-      <main className="relative min-h-dvh w-full overflow-hidden bg-black text-[#ECEEDF] font-mono">
+      <main className="relative min-h-dvh w-full overflow-y-auto overflow-x-hidden bg-black text-[#ECEEDF] font-mono lg:overflow-hidden">
         <div className="fixed inset-0 z-0 opacity-85 scale-110 pointer-events-none">
           <LiveVisualizer />
         </div>
@@ -287,7 +287,7 @@ export default async function Home() {
           }}
         />
 
-        <div className="relative z-10 flex min-h-dvh flex-col gap-4 overflow-y-auto px-3 pb-8 pt-[calc(5.75rem+env(safe-area-inset-top))] md:px-6 lg:grid lg:h-dvh lg:grid-cols-[260px_minmax(0,880px)_240px] lg:items-start lg:justify-center lg:gap-6 lg:overflow-hidden lg:px-10 lg:pb-12 lg:pt-28">
+        <div className="relative z-10 flex min-h-dvh flex-col gap-4 overflow-visible px-3 pb-10 pt-[calc(5.75rem+env(safe-area-inset-top))] md:px-6 md:pb-12 md:pt-[calc(6.25rem+env(safe-area-inset-top))] lg:-mt-16 lg:grid lg:h-dvh lg:grid-cols-[260px_minmax(0,880px)_240px] lg:items-center lg:justify-center lg:gap-6 lg:overflow-hidden lg:px-10 lg:pb-14 lg:pt-[7rem]">
           <aside className="order-3 lg:order-none home-unstable-panel group/home-panel relative shrink-0 overflow-hidden border border-white/[0.055] bg-black/22 p-5 backdrop-blur-md transition-colors duration-500 hover:bg-black/28 lg:h-[calc(100dvh-13rem)]">
             <div className="home-glass-region home-glass-region-a" />
             <div className="home-glass-region home-glass-region-b" />
@@ -405,7 +405,7 @@ export default async function Home() {
               }}
             />
 
-            <div className="relative z-10 flex h-full min-h-0 flex-col px-5 py-6 md:px-8 md:py-8">
+            <div className="relative z-10 flex min-h-[520px] flex-col px-5 py-6 md:px-8 md:py-8 lg:h-full lg:min-h-0">
               <div className="shrink-0 border-b border-white/[0.08] pb-7">
                 <div className="mb-4 text-[12px] font-bold uppercase tracking-[0.38em] text-lime-300">
                   IMMORTAL RAINDROPS
@@ -419,7 +419,7 @@ export default async function Home() {
               </div>
 
               <div className="mt-6 grid min-h-0 flex-1 gap-6 md:grid-cols-[minmax(0,1fr)_240px]">
-                <section className="flex min-h-[320px] flex-col overflow-hidden border border-white/[0.08] bg-black/18 md:min-h-0">
+                <section className="flex min-h-[320px] flex-col overflow-hidden border border-white/[0.08] bg-black/18 lg:min-h-0">
                   <div className="shrink-0 border-b border-white/[0.08] px-4 py-3">
                     <div className="text-[11px] font-bold uppercase tracking-[0.32em] text-lime-300/85">
                       LATEST NEWS
